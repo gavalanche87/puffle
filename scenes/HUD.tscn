@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://cp2n5wcln742p"]
+
+[ext_resource type="Texture2D" uid="uid://c5ev60ex6jqj6" path="res://assets/items/pixel heart 2.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://d4bprxninpchp" path="res://assets/items/Coin.png" id="2"]
+[ext_resource type="FontFile" uid="uid://b4pkq6ib5fc5r" path="res://assets/fonts/LuckiestGuy-Regular.ttf" id="3"]
+
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0.75, 0.75, 0.78, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="2"]
+bg_color = Color(0.05, 0.05, 0.05, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_left = 5
+corner_radius_bottom_right = 5
+
+[sub_resource type="StyleBoxFlat" id="3"]
+bg_color = Color(0.25, 0, 0, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+
+[sub_resource type="StyleBoxFlat" id="4"]
+bg_color = Color(0.9, 0.1, 0.1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+[node name="HUD" type="CanvasLayer" unique_id=66276889]
+groups = ["hud"]
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 200.0
+offset_bottom = 72.0
+theme_override_styles/panel = SubResource("1")
+
+[node name="HealthIconOutline" type="Sprite2D" parent="."]
+position = Vector2(28, 28)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("1")
+modulate = Color(0, 0, 0, 1)
+
+[node name="HealthIcon" type="Sprite2D" parent="." unique_id=754831425]
+position = Vector2(28, 28)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("1")
+
+[node name="HealthBarOutline" type="Panel" parent="."]
+offset_left = 46.0
+offset_top = 20.5
+offset_right = 190.0
+offset_bottom = 34.5
+theme_override_styles/panel = SubResource("2")
+
+[node name="HealthBarBg" type="Panel" parent="." unique_id=1453589713]
+offset_left = 48.0
+offset_top = 22.5
+offset_right = 188.0
+offset_bottom = 32.5
+theme_override_styles/panel = SubResource("3")
+
+[node name="HealthBarFill" type="Panel" parent="HealthBarBg" unique_id=1841356778]
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 10.0
+theme_override_styles/panel = SubResource("4")
+
+[node name="CoinsIcon" type="Sprite2D" parent="." unique_id=927579451]
+position = Vector2(28, 52)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2")
+
+[node name="CoinsLabel" type="Label" parent="." unique_id=849703059]
+offset_left = 48.0
+offset_top = 45.0
+offset_right = 59.0
+offset_bottom = 62.0
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0.5, 0.35, 0.05, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3")
+text = "0"

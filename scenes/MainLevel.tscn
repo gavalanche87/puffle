@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dvlvm12gcue7o" path="res://assets/backgrounds/back.png" id="3"]
 [ext_resource type="Texture2D" uid="uid://gib5735vu35u" path="res://assets/tiles/platform_placeholder.png" id="4"]
 [ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/Goal.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="6"]
 [ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="7"]
 
 [sub_resource type="RectangleShape2D" id="1"]
@@ -40,6 +41,12 @@ size = Vector2(100, 24)
 [sub_resource type="RectangleShape2D" id="11"]
 size = Vector2(4806, 64)
 
+[sub_resource type="RectangleShape2D" id="12"]
+size = Vector2(32, 900)
+
+[sub_resource type="RectangleShape2D" id="13"]
+size = Vector2(32, 900)
+
 [node name="MainLevel" type="Node2D" unique_id=477514167]
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=591502514]
@@ -52,6 +59,8 @@ anchor_bottom = 1.0
 texture = ExtResource("3")
 expand_mode = 1
 stretch_mode = 6
+
+[node name="HUD" parent="." instance=ExtResource("6")]
 
 [node name="World" type="Node2D" parent="." unique_id=1206723391]
 scale = Vector2(1.5, 1.5)
@@ -68,6 +77,28 @@ texture = ExtResource("4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/Ground" unique_id=1507628070]
 shape = SubResource("1")
+
+[node name="LeftWall" type="StaticBody2D" parent="World"]
+position = Vector2(-1120, 0)
+
+[node name="WallVisual" type="Sprite2D" parent="World/LeftWall"]
+rotation = 1.5708
+scale = Vector2(28.125, 2)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/LeftWall"]
+shape = SubResource("12")
+
+[node name="RightWall" type="StaticBody2D" parent="World"]
+position = Vector2(2220, 0)
+
+[node name="WallVisual" type="Sprite2D" parent="World/RightWall"]
+rotation = 1.5708
+scale = Vector2(28.125, 2)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/RightWall"]
+shape = SubResource("13")
 
 [node name="PlatformA" type="StaticBody2D" parent="World" unique_id=1435679972]
 position = Vector2(-820, 170)

@@ -152,13 +152,6 @@ zoom = Vector2(0.7, 0.7)
 position_smoothing_enabled = true
 position_smoothing_speed = 6.0
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=390412869]
-
-[node name="HealthLabel" type="Label" parent="CanvasLayer" unique_id=1621591979]
-offset_left = 16.0
-offset_top = 16.0
-text = "HP: 100/100"
-
 [node name="SfxJump" type="AudioStreamPlayer" parent="." unique_id=375345066]
 stream = ExtResource("18")
 
@@ -167,3 +160,6 @@ stream = ExtResource("19")
 
 [node name="SfxSwitch" type="AudioStreamPlayer" parent="." unique_id=1736573014]
 stream = ExtResource("20")
+
+[node name="SfxHurt" type="AudioStreamPlayer" parent="." unique_id=890112345]
+stream = ExtResource("19")
