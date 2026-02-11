@@ -26,6 +26,8 @@ enum PlayerMode { SMALL, BIG }
 @export var air_accel: float = 2200.0
 @export var air_brake: float = 0.0
 @export var ground_accel: float = 3200.0
+@export var midair_spin_speed: float = 5.0
+@export var midair_spin_delay: float = 0.5
 
 var mode: PlayerMode = PlayerMode.SMALL
 var damage_multiplier: float = 1.0
@@ -45,6 +47,7 @@ var grounded_timer: float = 0.0
 @export var knockback_decay: float = 1200.0
 var knockback_velocity: float = 0.0
 var wall_normal: Vector2 = Vector2.ZERO
+var air_time: float = 0.0
 var wall_jump_timer: float = 0.0
 var base_body_size: Vector2 = Vector2.ZERO
 var base_hurt_size: Vector2 = Vector2.ZERO
@@ -102,6 +105,7 @@ func _physics_process(delta: float) -> void:
 	wall_normal = Vector2.ZERO
 	var snapped := _try_wall_snap()
 	var wall_sliding := _is_wall_sliding(snapped)
+	var should_spin := _should_spin_midair(snapped)
 	var target_speed := input_dir * _current_speed()
 	var accel := ground_accel if _is_grounded() else air_accel
 	if input_dir != 0.0:
@@ -113,6 +117,9 @@ func _physics_process(delta: float) -> void:
 	velocity.x += knockback_velocity
 
 	if not is_on_floor():
+		air_time += delta
+		if wall_sliding or snapped:
+			air_time = 0.0
 		if wall_sliding:
 			velocity.y = min(velocity.y + _current_gravity() * delta, wall_slide_speed)
 		if Input.is_action_just_pressed("ui_accept") and (wall_sliding or snapped):
@@ -121,9 +128,21 @@ func _physics_process(delta: float) -> void:
 		else:
 			velocity.y += _current_gravity() * delta
 	else:
+		air_time = 0.0
 		if Input.is_action_just_pressed("ui_accept"):
 			velocity.y = _current_jump_velocity()
 			_play_sfx(sfx_jump)
+
+	if should_spin and sprite:
+		var spin_dir := signf(velocity.x)
+		if spin_dir == 0.0:
+			spin_dir = 1.0
+		var spin_speed := midair_spin_speed
+		if Input.get_axis("ui_left", "ui_right") != 0.0:
+			spin_speed *= 2.0
+		sprite.rotation += spin_speed * delta * spin_dir
+	else:
+		_reset_sprite_rotation()
 
 	move_and_slide()
 	if is_on_floor():
@@ -307,6 +326,25 @@ func _update_animation(wall_sliding: bool) -> void:
 			next_anim = "jump" if velocity.y < 0.0 else "fall"
 	if sprite.animation != next_anim:
 		sprite.play(next_anim)
+
+func _should_spin_midair(snapped: bool) -> bool:
+	if mode != PlayerMode.SMALL:
+		return false
+	if _is_grounded():
+		return false
+	if air_time < midair_spin_delay:
+		return false
+	if snapped:
+		return false
+	if is_on_wall():
+		return false
+	return true
+
+func _reset_sprite_rotation() -> void:
+	if not sprite:
+		return
+	if absf(sprite.rotation) > 0.001:
+		sprite.rotation = 0.0
 
 func _is_grounded() -> bool:
 	return grounded_timer > 0.0
