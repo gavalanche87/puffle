@@ -14,7 +14,7 @@ enum PlayerMode { SMALL, BIG }
 @export var big_frames: SpriteFrames
 
 @export var small_jump_velocity: float = -550.0
-@export var big_jump_velocity: float = -380.0
+@export var big_jump_velocity: float = -760.0
 @export var squash_time: float = 0.12
 @export var wall_slide_speed: float = 120.0
 @export var wall_jump_vertical: float = -500.0
@@ -33,8 +33,9 @@ var damage_multiplier: float = 1.0
 @export var enemy_contact_damage: int = 20
 @export var damage_cooldown: float = 0.5
 @export var stomp_bounce_velocity: float = -520.0
-@export var small_player_knockback: float = 420.0
-@export var big_player_knockback: float = 260.0
+@export var small_player_knockback: float = 160.0
+@export var big_player_knockback: float = 100.0
+@export var max_knockback: float = 500.0
 @export var small_enemy_knockback: float = 120.0
 @export var big_enemy_knockback: float = 220.0
 var current_health: int = max_health
@@ -48,8 +49,8 @@ var wall_jump_timer: float = 0.0
 var base_body_size: Vector2 = Vector2.ZERO
 var base_hurt_size: Vector2 = Vector2.ZERO
 
-var health_bar_bg: ColorRect
-var health_bar_fill: ColorRect
+var health_bar_bg: Control
+var health_bar_fill: Control
 var coins_label: Label
 @onready var floating_text_scene: PackedScene = preload("res://scenes/FloatingText.tscn")
 @onready var coin_icon: Texture2D = preload("res://assets/items/Coin.png")
@@ -114,9 +115,9 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		if wall_sliding:
 			velocity.y = min(velocity.y + _current_gravity() * delta, wall_slide_speed)
-			if Input.is_action_just_pressed("ui_accept"):
-				_wall_jump()
-				_play_sfx(sfx_jump)
+		if Input.is_action_just_pressed("ui_accept") and (wall_sliding or snapped):
+			_wall_jump()
+			_play_sfx(sfx_jump)
 		else:
 			velocity.y += _current_gravity() * delta
 	else:
@@ -265,7 +266,7 @@ func _apply_knockback(enemy_area: Area2D) -> void:
 	if dir == 0.0:
 		dir = -1.0
 	var player_force := small_player_knockback if mode == PlayerMode.SMALL else big_player_knockback
-	knockback_velocity = player_force * dir
+	knockback_velocity = clamp(player_force * dir, -max_knockback, max_knockback)
 	velocity.y = min(velocity.y, -80.0)
 
 	var enemy_force := small_enemy_knockback if mode == PlayerMode.SMALL else big_enemy_knockback
@@ -337,6 +338,7 @@ func _try_wall_snap() -> bool:
 	if _is_grounded():
 		return false
 	if is_on_wall():
+		wall_normal = get_wall_normal()
 		return true
 	if wall_snap_distance <= 0.0:
 		return false
@@ -351,6 +353,14 @@ func _try_wall_snap() -> bool:
 	return false
 
 func _wall_jump() -> void:
+	if wall_normal == Vector2.ZERO:
+		if is_on_wall():
+			wall_normal = get_wall_normal()
+		elif wall_snap_distance > 0.0:
+			if test_move(global_transform, Vector2(wall_snap_distance, 0.0)):
+				wall_normal = Vector2(-1.0, 0.0)
+			elif test_move(global_transform, Vector2(-wall_snap_distance, 0.0)):
+				wall_normal = Vector2(1.0, 0.0)
 	if wall_normal == Vector2.ZERO:
 		return
 	var away_dir := signf(wall_normal.x)

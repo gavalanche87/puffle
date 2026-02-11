@@ -1,13 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dcfajfxdv5sih"]
 
-[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/Enemy.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://scenes/Goal.tscn" id="3"]
-[ext_resource type="Script" path="res://scripts/kill_plane.gd" id="4"]
-[ext_resource type="Texture2D" path="res://assets/tiles/platform_placeholder.png" id="5"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/back.png" id="6"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/game_background_1/layers/sky.png" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="8"]
+[ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/Player.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/Enemy.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/Goal.tscn" id="3"]
+[ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://gib5735vu35u" path="res://assets/tiles/platform_placeholder.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://dvlvm12gcue7o" path="res://assets/backgrounds/back.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://drcs8wcj3f116" path="res://assets/backgrounds/game_background_1/layers/sky.png" id="7"]
+[ext_resource type="PackedScene" uid="uid://cp2n5wcln742p" path="res://scenes/HUD.tscn" id="8"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(3200, 48)
@@ -51,12 +51,12 @@ size = Vector2(32, 800)
 [sub_resource type="RectangleShape2D" id="14"]
 size = Vector2(32, 600)
 
-[node name="VerticalTestScene" type="Node2D"]
+[node name="VerticalTestScene" type="Node2D" unique_id=1198225251]
 
-[node name="Background" type="CanvasLayer" parent="."]
+[node name="Background" type="CanvasLayer" parent="." unique_id=1503960579]
 layer = -10
 
-[node name="Sky" type="TextureRect" parent="Background"]
+[node name="Sky" type="TextureRect" parent="Background" unique_id=1657200454]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -64,208 +64,208 @@ texture = ExtResource("7")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Back" type="TextureRect" parent="Background"]
+[node name="Back" type="TextureRect" parent="Background" unique_id=1820796036]
+modulate = Color(1, 1, 1, 0.6)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 texture = ExtResource("6")
 expand_mode = 1
 stretch_mode = 6
-modulate = Color(1, 1, 1, 0.6)
 
-[node name="HUD" parent="." instance=ExtResource("8")]
+[node name="HUD" parent="." unique_id=86355027 instance=ExtResource("8")]
 
-[node name="World" type="Node2D" parent="."]
+[node name="World" type="Node2D" parent="." unique_id=1358519409]
 scale = Vector2(1.5, 1.5)
 
-[node name="Player" parent="World" instance=ExtResource("1")]
+[node name="Player" parent="World" unique_id=693069414 instance=ExtResource("1")]
 position = Vector2(-320, 680)
 
-[node name="Platforms" type="Node2D" parent="World"]
+[node name="Platforms" type="Node2D" parent="World" unique_id=197979092]
 
-[node name="Ground" type="StaticBody2D" parent="World/Platforms"]
+[node name="Ground" type="StaticBody2D" parent="World/Platforms" unique_id=1453284424]
 position = Vector2(0, 760)
 
-[node name="GroundVisual" type="Sprite2D" parent="World/Platforms/Ground"]
+[node name="GroundVisual" type="Sprite2D" parent="World/Platforms/Ground" unique_id=2131706007]
 scale = Vector2(50, 2)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/Ground"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/Ground" unique_id=2039702694]
 shape = SubResource("1")
 
-[node name="PlatformA" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformA" type="StaticBody2D" parent="World/Platforms" unique_id=1990171567]
 position = Vector2(-420, 560)
 
-[node name="PlatformAVisual" type="Sprite2D" parent="World/Platforms/PlatformA"]
+[node name="PlatformAVisual" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=1358095766]
 scale = Vector2(6.875, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformA"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformA" unique_id=1807616553]
 shape = SubResource("2")
 
-[node name="PlatformB" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformB" type="StaticBody2D" parent="World/Platforms" unique_id=11692420]
 position = Vector2(-140, 480)
 
-[node name="PlatformBVisual" type="Sprite2D" parent="World/Platforms/PlatformB"]
+[node name="PlatformBVisual" type="Sprite2D" parent="World/Platforms/PlatformB" unique_id=1853358196]
 scale = Vector2(5.625, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformB"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformB" unique_id=1493431863]
 shape = SubResource("3")
 
-[node name="PlatformC" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformC" type="StaticBody2D" parent="World/Platforms" unique_id=439982880]
 position = Vector2(120, 390)
 
-[node name="PlatformCVisual" type="Sprite2D" parent="World/Platforms/PlatformC"]
+[node name="PlatformCVisual" type="Sprite2D" parent="World/Platforms/PlatformC" unique_id=1649705742]
 scale = Vector2(4.375, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformC"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformC" unique_id=1471719513]
 shape = SubResource("4")
 
-[node name="PlatformD" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformD" type="StaticBody2D" parent="World/Platforms" unique_id=1262079969]
 position = Vector2(-320, 300)
 
-[node name="PlatformDVisual" type="Sprite2D" parent="World/Platforms/PlatformD"]
+[node name="PlatformDVisual" type="Sprite2D" parent="World/Platforms/PlatformD" unique_id=312908995]
 scale = Vector2(8.125, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformD"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformD" unique_id=703599691]
 shape = SubResource("5")
 
-[node name="PlatformE" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformE" type="StaticBody2D" parent="World/Platforms" unique_id=580559711]
 position = Vector2(40, 220)
 
-[node name="PlatformEVisual" type="Sprite2D" parent="World/Platforms/PlatformE"]
+[node name="PlatformEVisual" type="Sprite2D" parent="World/Platforms/PlatformE" unique_id=371107293]
 scale = Vector2(3.75, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformE"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformE" unique_id=1645601715]
 shape = SubResource("6")
 
-[node name="PlatformF" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformF" type="StaticBody2D" parent="World/Platforms" unique_id=635516944]
 position = Vector2(-220, 120)
 
-[node name="PlatformFVisual" type="Sprite2D" parent="World/Platforms/PlatformF"]
+[node name="PlatformFVisual" type="Sprite2D" parent="World/Platforms/PlatformF" unique_id=1006458601]
 scale = Vector2(5, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformF"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformF" unique_id=2084298222]
 shape = SubResource("7")
 
-[node name="PlatformG" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformG" type="StaticBody2D" parent="World/Platforms" unique_id=243383558]
 position = Vector2(140, 40)
 
-[node name="PlatformGVisual" type="Sprite2D" parent="World/Platforms/PlatformG"]
+[node name="PlatformGVisual" type="Sprite2D" parent="World/Platforms/PlatformG" unique_id=1981096474]
 scale = Vector2(6.25, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformG"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformG" unique_id=115802457]
 shape = SubResource("8")
 
-[node name="PlatformH" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformH" type="StaticBody2D" parent="World/Platforms" unique_id=1260171501]
 position = Vector2(-80, -60)
 
-[node name="PlatformHVisual" type="Sprite2D" parent="World/Platforms/PlatformH"]
+[node name="PlatformHVisual" type="Sprite2D" parent="World/Platforms/PlatformH" unique_id=1919981760]
 scale = Vector2(7.5, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformH"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformH" unique_id=1429286876]
 shape = SubResource("9")
 
-[node name="PlatformI" type="StaticBody2D" parent="World/Platforms"]
+[node name="PlatformI" type="StaticBody2D" parent="World/Platforms" unique_id=1177325464]
 position = Vector2(220, -140)
 
-[node name="PlatformIVisual" type="Sprite2D" parent="World/Platforms/PlatformI"]
+[node name="PlatformIVisual" type="Sprite2D" parent="World/Platforms/PlatformI" unique_id=1780358416]
 scale = Vector2(3.125, 1.5)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformI"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/PlatformI" unique_id=58672316]
 shape = SubResource("10")
 
-[node name="Walls" type="Node2D" parent="World"]
+[node name="Walls" type="Node2D" parent="World" unique_id=1218809112]
 
-[node name="LeftWall" type="StaticBody2D" parent="World/Walls"]
+[node name="LeftWall" type="StaticBody2D" parent="World/Walls" unique_id=789423377]
 position = Vector2(-520, 0)
 
-[node name="WallVisual" type="Sprite2D" parent="World/Walls/LeftWall"]
+[node name="WallVisual" type="Sprite2D" parent="World/Walls/LeftWall" unique_id=1192919489]
 rotation = 1.5708
 scale = Vector2(70, 2)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/LeftWall"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/LeftWall" unique_id=2108477147]
 shape = SubResource("11")
 
-[node name="RightWall" type="StaticBody2D" parent="World/Walls"]
+[node name="RightWall" type="StaticBody2D" parent="World/Walls" unique_id=1335665259]
 position = Vector2(520, 0)
 
-[node name="WallVisual" type="Sprite2D" parent="World/Walls/RightWall"]
+[node name="WallVisual" type="Sprite2D" parent="World/Walls/RightWall" unique_id=834600209]
 rotation = 1.5708
 scale = Vector2(70, 2)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/RightWall"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/RightWall" unique_id=695346642]
 shape = SubResource("12")
 
-[node name="InnerWallA" type="StaticBody2D" parent="World/Walls"]
+[node name="InnerWallA" type="StaticBody2D" parent="World/Walls" unique_id=437141480]
 position = Vector2(-60, 300)
 
-[node name="WallVisual" type="Sprite2D" parent="World/Walls/InnerWallA"]
+[node name="WallVisual" type="Sprite2D" parent="World/Walls/InnerWallA" unique_id=2133967769]
 rotation = 1.5708
 scale = Vector2(24, 2)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/InnerWallA"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/InnerWallA" unique_id=1522697096]
 shape = SubResource("13")
 
-[node name="InnerWallB" type="StaticBody2D" parent="World/Walls"]
+[node name="InnerWallB" type="StaticBody2D" parent="World/Walls" unique_id=584122830]
 position = Vector2(180, 120)
 
-[node name="WallVisual" type="Sprite2D" parent="World/Walls/InnerWallB"]
+[node name="WallVisual" type="Sprite2D" parent="World/Walls/InnerWallB" unique_id=1395647207]
 rotation = 1.5708
 scale = Vector2(20, 2)
 texture = ExtResource("5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/InnerWallB"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/InnerWallB" unique_id=423771608]
 shape = SubResource("14")
 
-[node name="Enemies" type="Node2D" parent="World"]
+[node name="Enemies" type="Node2D" parent="World" unique_id=1465750994]
 
-[node name="EnemyA" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyA" parent="World/Enemies" unique_id=826466757 instance=ExtResource("2")]
 position = Vector2(-420, 538)
 
-[node name="EnemyB" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyB" parent="World/Enemies" unique_id=489875799 instance=ExtResource("2")]
 position = Vector2(-140, 458)
 
-[node name="EnemyC" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyC" parent="World/Enemies" unique_id=1035981095 instance=ExtResource("2")]
 position = Vector2(120, 368)
 
-[node name="EnemyD" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyD" parent="World/Enemies" unique_id=2093204920 instance=ExtResource("2")]
 position = Vector2(-320, 278)
 
-[node name="EnemyE" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyE" parent="World/Enemies" unique_id=1035416980 instance=ExtResource("2")]
 position = Vector2(40, 198)
 
-[node name="EnemyF" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyF" parent="World/Enemies" unique_id=145356115 instance=ExtResource("2")]
 position = Vector2(-220, 98)
 
-[node name="EnemyG" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyG" parent="World/Enemies" unique_id=1950358418 instance=ExtResource("2")]
 position = Vector2(140, 18)
 
-[node name="EnemyH" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyH" parent="World/Enemies" unique_id=1391844187 instance=ExtResource("2")]
 position = Vector2(-80, -82)
 
-[node name="EnemyI" parent="World/Enemies" instance=ExtResource("2")]
+[node name="EnemyI" parent="World/Enemies" unique_id=663365207 instance=ExtResource("2")]
 position = Vector2(220, -162)
 
-[node name="Goal" parent="World" instance=ExtResource("3")]
+[node name="Goal" parent="World" unique_id=159913275 instance=ExtResource("3")]
 position = Vector2(320, -300)
 scale = Vector2(4, 4)
 next_scene_path = "res://scenes/MainLevel.tscn"
 
-[node name="KillPlane" type="Area2D" parent="World"]
+[node name="KillPlane" type="Area2D" parent="World" unique_id=1914274321]
 position = Vector2(0, 880)
 script = ExtResource("4")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/KillPlane"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/KillPlane" unique_id=98737922]
 shape = SubResource("1")
