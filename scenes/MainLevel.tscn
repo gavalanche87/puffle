@@ -1,0 +1,246 @@
+[gd_scene format=3 uid="uid://dukjuia563eq7"]
+
+[ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/Player.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/Enemy.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://dvlvm12gcue7o" path="res://assets/backgrounds/back.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://gib5735vu35u" path="res://assets/tiles/platform_placeholder.png" id="4"]
+[ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/Goal.tscn" id="5"]
+[ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="7"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(2200, 32)
+
+[sub_resource type="RectangleShape2D" id="2"]
+size = Vector2(220, 24)
+
+[sub_resource type="RectangleShape2D" id="3"]
+size = Vector2(180, 24)
+
+[sub_resource type="RectangleShape2D" id="4"]
+size = Vector2(140, 24)
+
+[sub_resource type="RectangleShape2D" id="5"]
+size = Vector2(260, 24)
+
+[sub_resource type="RectangleShape2D" id="6"]
+size = Vector2(120, 24)
+
+[sub_resource type="RectangleShape2D" id="7"]
+size = Vector2(160, 24)
+
+[sub_resource type="RectangleShape2D" id="8"]
+size = Vector2(200, 24)
+
+[sub_resource type="RectangleShape2D" id="9"]
+size = Vector2(240, 24)
+
+[sub_resource type="RectangleShape2D" id="10"]
+size = Vector2(100, 24)
+
+[sub_resource type="RectangleShape2D" id="11"]
+size = Vector2(4806, 64)
+
+[node name="MainLevel" type="Node2D" unique_id=477514167]
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=591502514]
+layer = -10
+
+[node name="Background" type="TextureRect" parent="BackgroundLayer" unique_id=598053873]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="World" type="Node2D" parent="." unique_id=1206723391]
+scale = Vector2(1.5, 1.5)
+
+[node name="Player" parent="World" unique_id=493820669 instance=ExtResource("1")]
+position = Vector2(-980, 120)
+
+[node name="Ground" type="StaticBody2D" parent="World" unique_id=1630327671]
+position = Vector2(0, 300)
+
+[node name="GroundVisual" type="Sprite2D" parent="World/Ground" unique_id=621630434]
+scale = Vector2(68.75, 2)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Ground" unique_id=1507628070]
+shape = SubResource("1")
+
+[node name="PlatformA" type="StaticBody2D" parent="World" unique_id=1435679972]
+position = Vector2(-820, 170)
+
+[node name="PlatformAVisual" type="Sprite2D" parent="World/PlatformA" unique_id=702781883]
+scale = Vector2(6.875, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformA" unique_id=1072548868]
+shape = SubResource("2")
+
+[node name="PlatformB" type="StaticBody2D" parent="World" unique_id=327473134]
+position = Vector2(-520, 80)
+
+[node name="PlatformBVisual" type="Sprite2D" parent="World/PlatformB" unique_id=142534359]
+scale = Vector2(5.625, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformB" unique_id=961137786]
+shape = SubResource("3")
+
+[node name="PlatformC" type="StaticBody2D" parent="World" unique_id=596116359]
+position = Vector2(-280, -10)
+
+[node name="PlatformCVisual" type="Sprite2D" parent="World/PlatformC" unique_id=1082636337]
+scale = Vector2(4.375, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformC" unique_id=971230700]
+shape = SubResource("4")
+
+[node name="PlatformD" type="StaticBody2D" parent="World" unique_id=719841260]
+position = Vector2(-40, 90)
+
+[node name="PlatformDVisual" type="Sprite2D" parent="World/PlatformD" unique_id=1665467355]
+scale = Vector2(8.125, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformD" unique_id=1087152501]
+shape = SubResource("5")
+
+[node name="PlatformE" type="StaticBody2D" parent="World" unique_id=1958587903]
+position = Vector2(260, 30)
+
+[node name="PlatformEVisual" type="Sprite2D" parent="World/PlatformE" unique_id=1778664085]
+scale = Vector2(3.75, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformE" unique_id=433836998]
+shape = SubResource("6")
+
+[node name="PlatformF" type="StaticBody2D" parent="World" unique_id=318900111]
+position = Vector2(420, 150)
+
+[node name="PlatformFVisual" type="Sprite2D" parent="World/PlatformF" unique_id=762206514]
+scale = Vector2(5, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformF" unique_id=616707097]
+shape = SubResource("7")
+
+[node name="PlatformG" type="StaticBody2D" parent="World" unique_id=1158353914]
+position = Vector2(640, 40)
+
+[node name="PlatformGVisual" type="Sprite2D" parent="World/PlatformG" unique_id=1791397871]
+scale = Vector2(6.25, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformG" unique_id=1203268214]
+shape = SubResource("8")
+
+[node name="PlatformH" type="StaticBody2D" parent="World" unique_id=1981071599]
+position = Vector2(860, 110)
+
+[node name="PlatformHVisual" type="Sprite2D" parent="World/PlatformH" unique_id=2075094380]
+scale = Vector2(7.5, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformH" unique_id=660085413]
+shape = SubResource("9")
+
+[node name="PlatformI" type="StaticBody2D" parent="World" unique_id=211109078]
+position = Vector2(1110, 10)
+
+[node name="PlatformIVisual" type="Sprite2D" parent="World/PlatformI" unique_id=502477899]
+scale = Vector2(3.125, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformI" unique_id=31896213]
+shape = SubResource("10")
+
+[node name="PlatformJ" type="StaticBody2D" parent="World" unique_id=1809024372]
+position = Vector2(1280, 140)
+
+[node name="PlatformJVisual" type="Sprite2D" parent="World/PlatformJ" unique_id=1852315258]
+scale = Vector2(5.625, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformJ" unique_id=1689586386]
+shape = SubResource("3")
+
+[node name="PlatformK" type="StaticBody2D" parent="World" unique_id=1720906276]
+position = Vector2(1500, 60)
+
+[node name="PlatformKVisual" type="Sprite2D" parent="World/PlatformK" unique_id=185368828]
+scale = Vector2(8.125, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformK" unique_id=1196398397]
+shape = SubResource("5")
+
+[node name="PlatformL" type="StaticBody2D" parent="World" unique_id=1834338927]
+position = Vector2(1760, -10)
+
+[node name="PlatformLVisual" type="Sprite2D" parent="World/PlatformL" unique_id=1866821095]
+scale = Vector2(4.375, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformL" unique_id=408198175]
+shape = SubResource("4")
+
+[node name="PlatformM" type="StaticBody2D" parent="World" unique_id=1951889236]
+position = Vector2(1960, 120)
+
+[node name="PlatformMVisual" type="Sprite2D" parent="World/PlatformM" unique_id=570421804]
+scale = Vector2(6.875, 1.5)
+texture = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformM" unique_id=117107960]
+shape = SubResource("2")
+
+[node name="EnemyA" parent="World" unique_id=1124192399 instance=ExtResource("2")]
+position = Vector2(-790, 148)
+
+[node name="EnemyB" parent="World" unique_id=350707135 instance=ExtResource("2")]
+position = Vector2(-520, 58)
+
+[node name="EnemyC" parent="World" unique_id=1250146576 instance=ExtResource("2")]
+position = Vector2(-40, 68)
+
+[node name="EnemyD" parent="World" unique_id=855736157 instance=ExtResource("2")]
+position = Vector2(260, 8)
+
+[node name="EnemyE" parent="World" unique_id=179890453 instance=ExtResource("2")]
+position = Vector2(640, 18)
+
+[node name="EnemyF" parent="World" unique_id=744346060 instance=ExtResource("2")]
+position = Vector2(860, 88)
+
+[node name="EnemyG" parent="World" unique_id=334900862 instance=ExtResource("2")]
+position = Vector2(1110, -12)
+
+[node name="EnemyH" parent="World" unique_id=300368038 instance=ExtResource("2")]
+position = Vector2(1280, 118)
+
+[node name="EnemyI" parent="World" unique_id=1711581472 instance=ExtResource("2")]
+position = Vector2(1500, 38)
+
+[node name="EnemyJ" parent="World" unique_id=1946379919 instance=ExtResource("2")]
+position = Vector2(1760, -32)
+
+[node name="EnemyK" parent="World" unique_id=1739741141 instance=ExtResource("2")]
+position = Vector2(1960, 98)
+
+[node name="Goal" parent="World" unique_id=1611429005 instance=ExtResource("5")]
+position = Vector2(1040.6667, 234.66667)
+scale = Vector2(5, 5)
+next_scene_path = "res://scenes/Level2.tscn"
+
+[node name="KillPlane" type="Area2D" parent="World" unique_id=1668266115]
+position = Vector2(0, 520)
+script = ExtResource("7")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/KillPlane" unique_id=2054528097]
+position = Vector2(513.66675, 0)
+shape = SubResource("11")

@@ -1,0 +1,102 @@
+[gd_scene format=3 uid="uid://bdlw4efq2llwq"]
+
+[ext_resource type="Script" uid="uid://ds7v1inio53dw" path="res://scripts/enemy.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dktg5i0pkrl3j" path="res://assets/enemies/snail/snail.png" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/EnemyDeath.tscn" id="3"]
+
+[sub_resource type="AtlasTexture" id="2"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="3"]
+atlas = ExtResource("2")
+region = Rect2(38, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="4"]
+atlas = ExtResource("2")
+region = Rect2(76, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="5"]
+atlas = ExtResource("2")
+region = Rect2(114, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="6"]
+atlas = ExtResource("2")
+region = Rect2(152, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="7"]
+atlas = ExtResource("2")
+region = Rect2(190, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="8"]
+atlas = ExtResource("2")
+region = Rect2(228, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="9"]
+atlas = ExtResource("2")
+region = Rect2(266, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="10"]
+atlas = ExtResource("2")
+region = Rect2(304, 0, 38, 24)
+
+[sub_resource type="AtlasTexture" id="11"]
+atlas = ExtResource("2")
+region = Rect2(342, 0, 38, 24)
+
+[sub_resource type="SpriteFrames" id="12"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("2")
+}, {
+"duration": 1.0,
+"texture": SubResource("3")
+}, {
+"duration": 1.0,
+"texture": SubResource("4")
+}, {
+"duration": 1.0,
+"texture": SubResource("5")
+}, {
+"duration": 1.0,
+"texture": SubResource("6")
+}, {
+"duration": 1.0,
+"texture": SubResource("7")
+}, {
+"duration": 1.0,
+"texture": SubResource("8")
+}, {
+"duration": 1.0,
+"texture": SubResource("9")
+}, {
+"duration": 1.0,
+"texture": SubResource("10")
+}, {
+"duration": 1.0,
+"texture": SubResource("11")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 10.0
+}]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(24, 20)
+
+[node name="Enemy" type="Area2D" unique_id=923496733]
+script = ExtResource("1")
+death_scene = ExtResource("3")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=412141046]
+position = Vector2(0, -2)
+sprite_frames = SubResource("12")
+animation = &"walk"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=165281374]
+shape = SubResource("1")
+
+[node name="FloorCast" type="RayCast2D" parent="." unique_id=542463915]
+
+[node name="WallCast" type="RayCast2D" parent="." unique_id=488395669]

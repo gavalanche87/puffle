@@ -1,0 +1,169 @@
+[gd_scene format=3 uid="uid://bg882w6or57o"]
+
+[ext_resource type="Script" uid="uid://nfki18fq1gmc" path="res://scripts/player.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://kbavhdhqd0k5" path="res://assets/player/Standing (16 x 16)Blue.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://d25rpuvx5rfbk" path="res://assets/player/Running (16 x 16)Blue_frame_0.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://cypclgeyeeafy" path="res://assets/player/Running (16 x 16)Blue_frame_1.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://b7kdf5qspujmi" path="res://assets/player/Running (16 x 16)Blue_frame_2.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://bx5nnk2gst65k" path="res://assets/player/Running (16 x 16)Blue_frame_3.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://bjuxmo4undnfa" path="res://assets/player/Jumping (16 x 16)Blue.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://c5kqy1g5akq7l" path="res://assets/player/Falling (16 x 16)Blue.png" id="8"]
+[ext_resource type="Texture2D" uid="uid://bnmj8n7fv8u4e" path="res://assets/player/Hurt (16 x 16)Blue.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://beqmxefj8v4d8" path="res://assets/player/Standing (16 x 16)BlueNoSpike.png" id="10"]
+[ext_resource type="Texture2D" uid="uid://ctv0a7wu1fkmy" path="res://assets/player/Running (16 x 16)BlueNoSpike_frame_0.png" id="11"]
+[ext_resource type="Texture2D" uid="uid://do6esbqlmvnh4" path="res://assets/player/Running (16 x 16)BlueNoSpike_frame_1.png" id="12"]
+[ext_resource type="Texture2D" uid="uid://bpmrk4d6dlc5g" path="res://assets/player/Running (16 x 16)BlueNoSpike_frame_2.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://mber7p2n8xsf" path="res://assets/player/Running (16 x 16)BlueNoSpike_frame_3.png" id="14"]
+[ext_resource type="Texture2D" uid="uid://bwb5m2wkiblpl" path="res://assets/player/Jumping (16 x 16)BlueNoSpike.png" id="15"]
+[ext_resource type="Texture2D" uid="uid://gfutsujbme7c" path="res://assets/player/Falling (16 x 16)BlueNoSpike.png" id="16"]
+[ext_resource type="Texture2D" uid="uid://dyok2vnnjq3ac" path="res://assets/player/Hurt (16 x 16)BlueNoSpike.png" id="17"]
+[ext_resource type="AudioStream" uid="uid://betkn0hqjmqsq" path="res://assets/sound/jump.wav" id="18"]
+[ext_resource type="AudioStream" uid="uid://bkkab84cy1jpt" path="res://assets/sound/impact.wav" id="19"]
+[ext_resource type="AudioStream" uid="uid://6jgqhk42uydv" path="res://assets/sound/phaseJump1.ogg" id="20"]
+
+[sub_resource type="SpriteFrames" id="3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("16")
+}],
+"loop": false,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}]
+
+[sub_resource type="SpriteFrames" id="2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8")
+}],
+"loop": false,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(16, 16)
+
+[node name="Player" type="CharacterBody2D" unique_id=1254275606]
+script = ExtResource("1")
+small_frames = SubResource("3")
+big_frames = SubResource("2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=407884569]
+sprite_frames = SubResource("3")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1378537505]
+shape = SubResource("1")
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=853368313]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1846928484]
+shape = SubResource("1")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=2056619036]
+top_level = true
+position = Vector2(0, -32)
+zoom = Vector2(0.7, 0.7)
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=390412869]
+
+[node name="HealthLabel" type="Label" parent="CanvasLayer" unique_id=1621591979]
+offset_left = 16.0
+offset_top = 16.0
+text = "HP: 100/100"
+
+[node name="SfxJump" type="AudioStreamPlayer" parent="." unique_id=375345066]
+stream = ExtResource("18")
+
+[node name="SfxStomp" type="AudioStreamPlayer" parent="." unique_id=1047873297]
+stream = ExtResource("19")
+
+[node name="SfxSwitch" type="AudioStreamPlayer" parent="." unique_id=1736573014]
+stream = ExtResource("20")
