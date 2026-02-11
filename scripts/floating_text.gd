@@ -1,7 +1,7 @@
 extends Node2D
 
 @export var float_distance: float = 60.0
-@export var duration: float = 0.7
+@export var duration: float = 1.25
 
 @onready var icon: Sprite2D = $Icon
 @onready var label: Label = $Label

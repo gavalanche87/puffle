@@ -302,7 +302,7 @@ func _update_animation(wall_sliding: bool) -> void:
 			next_anim = "run"
 	else:
 		if wall_sliding:
-			next_anim = "fall"
+			next_anim = "wall"
 		else:
 			next_anim = "jump" if velocity.y < 0.0 else "fall"
 	if sprite.animation != next_anim:

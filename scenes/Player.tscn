@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://bwb5m2wkiblpl" path="res://assets/player/Jumping (16 x 16)BlueNoSpike.png" id="15"]
 [ext_resource type="Texture2D" uid="uid://gfutsujbme7c" path="res://assets/player/Falling (16 x 16)BlueNoSpike.png" id="16"]
 [ext_resource type="Texture2D" uid="uid://dyok2vnnjq3ac" path="res://assets/player/Hurt (16 x 16)BlueNoSpike.png" id="17"]
+[ext_resource type="Texture2D" path="res://assets/player/Wallslide (16 x 16)BlueNoSpike.png" id="21"]
 [ext_resource type="AudioStream" uid="uid://betkn0hqjmqsq" path="res://assets/sound/jump.wav" id="18"]
 [ext_resource type="AudioStream" uid="uid://bkkab84cy1jpt" path="res://assets/sound/impact.wav" id="19"]
 [ext_resource type="AudioStream" uid="uid://6jgqhk42uydv" path="res://assets/sound/phaseJump1.ogg" id="20"]
@@ -29,6 +30,14 @@ animations = [{
 }],
 "loop": false,
 "name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("21")
+}],
+"loop": false,
+"name": &"wall",
 "speed": 5.0
 }, {
 "frames": [{
@@ -81,6 +90,14 @@ animations = [{
 }],
 "loop": false,
 "name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("21")
+}],
+"loop": false,
+"name": &"wall",
 "speed": 5.0
 }, {
 "frames": [{
