@@ -17,10 +17,15 @@
 [ext_resource type="Texture2D" uid="uid://bwb5m2wkiblpl" path="res://assets/player/Jumping (16 x 16)BlueNoSpike.png" id="15"]
 [ext_resource type="Texture2D" uid="uid://gfutsujbme7c" path="res://assets/player/Falling (16 x 16)BlueNoSpike.png" id="16"]
 [ext_resource type="Texture2D" uid="uid://dyok2vnnjq3ac" path="res://assets/player/Hurt (16 x 16)BlueNoSpike.png" id="17"]
-[ext_resource type="Texture2D" path="res://assets/player/Wallslide (16 x 16)BlueNoSpike.png" id="21"]
 [ext_resource type="AudioStream" uid="uid://betkn0hqjmqsq" path="res://assets/sound/jump.wav" id="18"]
 [ext_resource type="AudioStream" uid="uid://bkkab84cy1jpt" path="res://assets/sound/impact.wav" id="19"]
 [ext_resource type="AudioStream" uid="uid://6jgqhk42uydv" path="res://assets/sound/phaseJump1.ogg" id="20"]
+[ext_resource type="Texture2D" uid="uid://kp68tswg5fay" path="res://assets/player/Wallslide (16 x 16)BlueNoSpike.png" id="21"]
+[ext_resource type="AudioStream" uid="uid://q2gi080tamkp" path="res://assets/sound/pickup.wav" id="22_b8lor"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6e537"]
+atlas = ExtResource("21")
+region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="SpriteFrames" id="3"]
 animations = [{
@@ -30,14 +35,6 @@ animations = [{
 }],
 "loop": false,
 "name": &"fall",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("21")
-}],
-"loop": false,
-"name": &"wall",
 "speed": 5.0
 }, {
 "frames": [{
@@ -80,6 +77,14 @@ animations = [{
 "loop": true,
 "name": &"run",
 "speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6e537")
+}],
+"loop": false,
+"name": &"wall",
+"speed": 5.0
 }]
 
 [sub_resource type="SpriteFrames" id="2"]
@@ -90,14 +95,6 @@ animations = [{
 }],
 "loop": false,
 "name": &"fall",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("21")
-}],
-"loop": false,
-"name": &"wall",
 "speed": 5.0
 }, {
 "frames": [{
@@ -140,6 +137,14 @@ animations = [{
 "loop": true,
 "name": &"run",
 "speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"wall",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="1"]
@@ -152,7 +157,7 @@ big_frames = SubResource("2")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=407884569]
 sprite_frames = SubResource("3")
-animation = &"idle"
+animation = &"wall"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1378537505]
 shape = SubResource("1")
@@ -180,3 +185,6 @@ stream = ExtResource("20")
 
 [node name="SfxHurt" type="AudioStreamPlayer" parent="." unique_id=890112345]
 stream = ExtResource("19")
+
+[node name="SfxCoin" type="AudioStreamPlayer" parent="." unique_id=75177721]
+stream = ExtResource("22_b8lor")

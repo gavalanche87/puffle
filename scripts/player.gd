@@ -48,6 +48,7 @@ var grounded_timer: float = 0.0
 var knockback_velocity: float = 0.0
 var wall_normal: Vector2 = Vector2.ZERO
 var air_time: float = 0.0
+var spin_accumulated: float = 0.0
 var wall_jump_timer: float = 0.0
 var base_body_size: Vector2 = Vector2.ZERO
 var base_hurt_size: Vector2 = Vector2.ZERO
@@ -58,11 +59,13 @@ var coins_label: Label
 @onready var floating_text_scene: PackedScene = preload("res://scenes/FloatingText.tscn")
 @onready var coin_icon: Texture2D = preload("res://assets/items/Coin.png")
 @onready var heart_icon: Texture2D = preload("res://assets/items/pixel heart 2.png")
+@onready var hud_font: Font = preload("res://assets/fonts/LuckiestGuy-Regular.ttf")
 @onready var hurtbox: Area2D = $Hurtbox
 @onready var sfx_jump: AudioStreamPlayer = $SfxJump
 @onready var sfx_stomp: AudioStreamPlayer = $SfxStomp
 @onready var sfx_switch: AudioStreamPlayer = $SfxSwitch
 @onready var sfx_hurt: AudioStreamPlayer = $SfxHurt
+@onready var sfx_coin: AudioStreamPlayer = $SfxCoin
 @onready var camera: Camera2D = $Camera2D
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var body_shape: RectangleShape2D = $CollisionShape2D.shape
@@ -87,6 +90,8 @@ func _ready() -> void:
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	camera_offset = camera.position
 	_update_camera(true)
+	if sprite:
+		sprite.flip_h = true
 
 func _physics_process(delta: float) -> void:
 	if not health_bar_bg or not health_bar_fill or not coins_label:
@@ -139,8 +144,18 @@ func _physics_process(delta: float) -> void:
 			spin_dir = 1.0
 		var spin_speed := midair_spin_speed
 		if Input.get_axis("ui_left", "ui_right") != 0.0:
-			spin_speed *= 2.0
-		sprite.rotation += spin_speed * delta * spin_dir
+			spin_speed *= 2.5
+		var delta_rot := spin_speed * delta * spin_dir
+		sprite.rotation += delta_rot
+		spin_accumulated += absf(delta_rot)
+		if spin_accumulated >= TAU:
+			var spins := int(floor(spin_accumulated / TAU))
+			if spins > 0:
+				_add_coins(spins)
+				_play_sfx(sfx_coin)
+				_spawn_floating_text("   + %d" % spins, Color(1, 0.9, 0.2), coin_icon, global_position, Color(0.5019608, 0.3490196, 0.0509804), 3)
+				_spawn_screen_text("Nice Flip!", Color(0.2, 0.9, 0.3), Vector2(-45.0, -85.0), true, Color(0.0, 0.35, 0.1), 3)
+				spin_accumulated -= spins * TAU
 	else:
 		_reset_sprite_rotation()
 
@@ -202,7 +217,7 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 		if area.has_method("die"):
 			area.call("die")
 			_add_coins(100)
-			_spawn_floating_text("+100", Color(1, 0.9, 0.2), coin_icon, area.global_position)
+			_spawn_floating_text("   + 100", Color(1, 0.9, 0.2), coin_icon, area.global_position, Color(0.5019608, 0.3490196, 0.0509804), 3)
 		velocity.y = stomp_bounce_velocity
 		_play_sfx(sfx_stomp)
 	else:
@@ -225,16 +240,39 @@ func _add_coins(amount: int) -> void:
 	if amount <= 0:
 		return
 	coins += amount
+	_play_sfx(sfx_coin)
 	_update_coins_ui()
 
-func _spawn_floating_text(text: String, color: Color, icon_tex: Texture2D, world_pos: Vector2 = Vector2.INF) -> void:
+func _spawn_floating_text(text: String, color: Color, icon_tex: Texture2D, world_pos: Vector2 = Vector2.INF, outline_color: Color = Color(0, 0, 0, 0), outline_size: int = 0) -> void:
 	if not floating_text_scene:
 		return
 	var fx := floating_text_scene.instantiate()
 	get_tree().current_scene.add_child(fx)
 	var spawn_pos := global_position if world_pos == Vector2.INF else world_pos
-	spawn_pos.y -= 100.0
+	spawn_pos.y -= 50.0
+	fx.override_font = hud_font
+	fx.outline_color = outline_color
+	fx.outline_size = outline_size
 	fx.setup(text, color, icon_tex, spawn_pos)
+
+func _spawn_screen_text(text: String, color: Color, screen_offset: Vector2, relative_to_player: bool = false, outline_color: Color = Color(0, 0, 0, 0), outline_size: int = 0) -> void:
+	if not floating_text_scene:
+		return
+	var fx := floating_text_scene.instantiate()
+	var hud := get_tree().get_first_node_in_group("hud")
+	var parent_node := hud if hud else get_tree().current_scene
+	parent_node.add_child(fx)
+	var screen_pos := screen_offset
+	if relative_to_player:
+		screen_pos = global_position + screen_offset
+	else:
+		var cam := camera if camera else get_viewport().get_camera_2d()
+		if cam:
+			screen_pos = cam.global_position + screen_offset
+	fx.override_font = hud_font
+	fx.outline_color = outline_color
+	fx.outline_size = outline_size
+	fx.setup(text, color, null, screen_pos)
 
 func _update_coins_ui() -> void:
 	if not coins_label:
@@ -315,13 +353,18 @@ func _update_facing(wall_sliding: bool) -> void:
 func _update_animation(wall_sliding: bool) -> void:
 	if not sprite:
 		return
+	sprite.visible = true
 	var next_anim := "idle"
 	if _is_grounded():
 		if absf(velocity.x) > 1.0:
 			next_anim = "run"
 	else:
 		if wall_sliding:
-			next_anim = "wall"
+			var use_wall := false
+			if sprite.sprite_frames and sprite.sprite_frames.has_animation("wall") and sprite.sprite_frames.get_frame_count("wall") > 0:
+				var tex := sprite.sprite_frames.get_frame_texture("wall", 0)
+				use_wall = tex != null
+			next_anim = "wall" if use_wall else "fall"
 		else:
 			next_anim = "jump" if velocity.y < 0.0 else "fall"
 	if sprite.animation != next_anim:
@@ -345,6 +388,7 @@ func _reset_sprite_rotation() -> void:
 		return
 	if absf(sprite.rotation) > 0.001:
 		sprite.rotation = 0.0
+	spin_accumulated = 0.0
 
 func _is_grounded() -> bool:
 	return grounded_timer > 0.0
