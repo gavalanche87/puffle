@@ -7,6 +7,7 @@ extends Area2D
 @export var knockback_decay: float = 900.0
 @export var knockback_duration: float = 0.18
 @export var death_scene: PackedScene
+@export var flip_when_moving_right: bool = true
 
 @onready var floor_cast: RayCast2D = $FloorCast
 @onready var wall_cast: RayCast2D = $WallCast
@@ -17,6 +18,9 @@ var knockback_timer: float = 0.0
 func _ready() -> void:
 	add_to_group("enemies")
 	_update_casts()
+	var sprite := $AnimatedSprite2D
+	if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation("walk"):
+		sprite.play("walk")
 
 func _physics_process(delta: float) -> void:
 	if knockback_timer > 0.0:
@@ -39,7 +43,7 @@ func apply_knockback(force: float, dir: float) -> void:
 func _update_facing() -> void:
 	var sprite := $AnimatedSprite2D
 	if sprite:
-		sprite.flip_h = direction > 0
+		sprite.flip_h = direction > 0 if flip_when_moving_right else direction < 0
 
 func die() -> void:
 	if death_scene:

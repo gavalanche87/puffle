@@ -8,9 +8,10 @@
 [ext_resource type="Texture2D" uid="uid://dvlvm12gcue7o" path="res://assets/backgrounds/back.png" id="6"]
 [ext_resource type="Texture2D" uid="uid://drcs8wcj3f116" path="res://assets/backgrounds/game_background_1/layers/sky.png" id="7"]
 [ext_resource type="PackedScene" uid="uid://cp2n5wcln742p" path="res://scenes/HUD.tscn" id="8"]
+[ext_resource type="PackedScene" uid="uid://dnhg3sd3vvwvj" path="res://scenes/GreenEnemy.tscn" id="9"]
 
 [sub_resource type="RectangleShape2D" id="1"]
-size = Vector2(3200, 48)
+size = Vector2(3200, 30.00003)
 
 [sub_resource type="RectangleShape2D" id="2"]
 size = Vector2(220, 24)
@@ -46,10 +47,10 @@ size = Vector2(32, 2200)
 size = Vector2(32, 2200)
 
 [sub_resource type="RectangleShape2D" id="13"]
-size = Vector2(32, 800)
+size = Vector2(32, 762.6667)
 
 [sub_resource type="RectangleShape2D" id="14"]
-size = Vector2(32, 600)
+size = Vector2(32, 638)
 
 [node name="VerticalTestScene" type="Node2D" unique_id=1198225251]
 
@@ -91,6 +92,7 @@ scale = Vector2(50, 2)
 texture = ExtResource("5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/Platforms/Ground" unique_id=2039702694]
+position = Vector2(0, 1.666687)
 shape = SubResource("1")
 
 [node name="PlatformA" type="StaticBody2D" parent="World/Platforms" unique_id=1990171567]
@@ -216,6 +218,7 @@ scale = Vector2(24, 2)
 texture = ExtResource("5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/InnerWallA" unique_id=1522697096]
+position = Vector2(0, -2.6666565)
 shape = SubResource("13")
 
 [node name="InnerWallB" type="StaticBody2D" parent="World/Walls" unique_id=584122830]
@@ -227,6 +230,7 @@ scale = Vector2(20, 2)
 texture = ExtResource("5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/Walls/InnerWallB" unique_id=423771608]
+position = Vector2(0, 0.33333588)
 shape = SubResource("14")
 
 [node name="Enemies" type="Node2D" parent="World" unique_id=1465750994]
@@ -257,6 +261,12 @@ position = Vector2(-80, -82)
 
 [node name="EnemyI" parent="World/Enemies" unique_id=663365207 instance=ExtResource("2")]
 position = Vector2(220, -162)
+
+[node name="GreenEnemyA" parent="World/Enemies" unique_id=1713919263 instance=ExtResource("9")]
+position = Vector2(-232.66667, 268.66666)
+
+[node name="GreenEnemyB" parent="World/Enemies" unique_id=2052163917 instance=ExtResource("9")]
+position = Vector2(270, 724.6667)
 
 [node name="Goal" parent="World" unique_id=159913275 instance=ExtResource("3")]
 position = Vector2(320, -300)

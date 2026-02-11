@@ -14,7 +14,7 @@ enum PlayerMode { SMALL, BIG }
 @export var big_frames: SpriteFrames
 
 @export var small_jump_velocity: float = -550.0
-@export var big_jump_velocity: float = -760.0
+@export var big_jump_velocity: float = -650.0
 @export var squash_time: float = 0.12
 @export var wall_slide_speed: float = 120.0
 @export var wall_jump_vertical: float = -500.0
