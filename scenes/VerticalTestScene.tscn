@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://c7tffwc222mk2" path="res://assets/backgrounds/background_1.png" id="6"]
 [ext_resource type="PackedScene" uid="uid://cp2n5wcln742p" path="res://scenes/HUD.tscn" id="8"]
 [ext_resource type="PackedScene" uid="uid://dnhg3sd3vvwvj" path="res://scenes/GreenEnemy.tscn" id="9"]
+[ext_resource type="PackedScene" uid="uid://m5v7kkve38uv" path="res://scenes/DestroyablePlatform.tscn" id="destroyable_platform_scene"]
 [ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/Ground.tscn" id="ground_scene"]
 [ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/Platform.tscn" id="platform_scene"]
 [ext_resource type="PackedScene" path="res://scenes/Wall.tscn" id="wall_scene"]
@@ -62,6 +63,14 @@ length_tiles = 8
 [node name="PlatformE" parent="World/Platforms" unique_id=580559711 instance=ExtResource("platform_scene")]
 position = Vector2(32, 224)
 length_tiles = 4
+
+[node name="DestroyablePlatformA" parent="World/Platforms" unique_id=173608242 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(192, 160)
+length_tiles = 4
+
+[node name="DestroyablePlatformB" parent="World/Platforms" unique_id=1129467499 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(192, 608)
+length_tiles = 5
 
 [node name="PlatformF" parent="World/Platforms" unique_id=635516944 instance=ExtResource("platform_scene")]
 position = Vector2(-224, 128)

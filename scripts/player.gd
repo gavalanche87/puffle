@@ -159,7 +159,9 @@ func _physics_process(delta: float) -> void:
 	else:
 		_reset_sprite_rotation()
 
+	var was_falling := velocity.y > 0.0
 	move_and_slide()
+	_try_break_destroyable_platform(was_falling)
 	if is_on_floor():
 		grounded_timer = grounded_grace
 	else:
@@ -210,9 +212,18 @@ func _ensure_toggle_action() -> void:
 	InputMap.action_add_event("toggle_mode", key_event)
 
 func _on_hurtbox_area_entered(area: Area2D) -> void:
+	var is_stomp := velocity.y > 0.0 and global_position.y < area.global_position.y - 6.0
+
+	if area.is_in_group("destroyable_platforms"):
+		var target := area.get_parent()
+		if is_stomp and mode == PlayerMode.BIG and target and target.has_method("break_platform"):
+			target.call("break_platform")
+			velocity.y = stomp_bounce_velocity
+			_play_sfx(sfx_stomp)
+		return
+
 	if not area.is_in_group("enemies"):
 		return
-	var is_stomp := velocity.y > 0.0 and global_position.y < area.global_position.y - 6.0
 	if is_stomp and mode == PlayerMode.BIG:
 		if area.has_method("die"):
 			area.call("die")
@@ -224,6 +235,27 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 		_apply_knockback(area)
 		_play_sfx(sfx_hurt)
 		take_damage(enemy_contact_damage)
+
+func _try_break_destroyable_platform(was_falling: bool) -> void:
+	if not was_falling or mode != PlayerMode.BIG:
+		return
+
+	var broken := false
+	for i in range(get_slide_collision_count()):
+		var col := get_slide_collision(i)
+		if col == null:
+			continue
+		if col.get_normal().y > -0.6:
+			continue
+		var collider := col.get_collider()
+		if collider and collider.has_method("break_platform"):
+			collider.call("break_platform")
+			broken = true
+			break
+
+	if broken:
+		velocity.y = stomp_bounce_velocity
+		_play_sfx(sfx_stomp)
 
 func _update_health_ui() -> void:
 	if not health_bar_bg or not health_bar_fill:
