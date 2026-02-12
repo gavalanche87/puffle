@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dbdrhxehyso2o"
-path="res://.godot/imported/rocks_1.png-70c37c751db864aded95cfc5004bec7e.ctex"
+uid="uid://dwn7fxg84v0ur"
+path="res://.godot/imported/pastel_palette.png-e3cc29aac6e7b31f326b03ca9393feb7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/game_background_1/layers/rocks_1.png"
-dest_files=["res://.godot/imported/rocks_1.png-70c37c751db864aded95cfc5004bec7e.ctex"]
+source_file="res://assets/palette/pastel_palette.png"
+dest_files=["res://.godot/imported/pastel_palette.png-e3cc29aac6e7b31f326b03ca9393feb7.ctex"]
 
 [params]
 

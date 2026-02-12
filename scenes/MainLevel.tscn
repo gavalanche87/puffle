@@ -2,8 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/Player.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/Enemy.tscn" id="2"]
-[ext_resource type="Texture2D" uid="uid://dvlvm12gcue7o" path="res://assets/backgrounds/back.png" id="3"]
-[ext_resource type="Texture2D" uid="uid://gib5735vu35u" path="res://assets/tiles/platform_placeholder.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/background_1.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/tiles/platform_palette_blue.png" id="4"]
 [ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/Goal.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="6"]
 [ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="7"]
@@ -72,8 +72,12 @@ position = Vector2(-980, 120)
 position = Vector2(0, 300)
 
 [node name="GroundVisual" type="Sprite2D" parent="World/Ground" unique_id=621630434]
-scale = Vector2(68.75, 2)
+scale = Vector2(1, 2)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 2208, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/Ground" unique_id=1507628070]
 shape = SubResource("1")
@@ -83,8 +87,12 @@ position = Vector2(-1120, 0)
 
 [node name="WallVisual" type="Sprite2D" parent="World/LeftWall"]
 rotation = 1.5708
-scale = Vector2(28.125, 2)
+scale = Vector2(1, 2)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 896, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/LeftWall"]
 shape = SubResource("12")
@@ -94,8 +102,12 @@ position = Vector2(2220, 0)
 
 [node name="WallVisual" type="Sprite2D" parent="World/RightWall"]
 rotation = 1.5708
-scale = Vector2(28.125, 2)
+scale = Vector2(1, 2)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 896, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/RightWall"]
 shape = SubResource("13")
@@ -104,8 +116,12 @@ shape = SubResource("13")
 position = Vector2(-820, 170)
 
 [node name="PlatformAVisual" type="Sprite2D" parent="World/PlatformA" unique_id=702781883]
-scale = Vector2(6.875, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 224, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformA" unique_id=1072548868]
 shape = SubResource("2")
@@ -114,8 +130,12 @@ shape = SubResource("2")
 position = Vector2(-520, 80)
 
 [node name="PlatformBVisual" type="Sprite2D" parent="World/PlatformB" unique_id=142534359]
-scale = Vector2(5.625, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 192, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformB" unique_id=961137786]
 shape = SubResource("3")
@@ -124,8 +144,12 @@ shape = SubResource("3")
 position = Vector2(-280, -10)
 
 [node name="PlatformCVisual" type="Sprite2D" parent="World/PlatformC" unique_id=1082636337]
-scale = Vector2(4.375, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 128, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformC" unique_id=971230700]
 shape = SubResource("4")
@@ -134,8 +158,12 @@ shape = SubResource("4")
 position = Vector2(-40, 90)
 
 [node name="PlatformDVisual" type="Sprite2D" parent="World/PlatformD" unique_id=1665467355]
-scale = Vector2(8.125, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 256, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformD" unique_id=1087152501]
 shape = SubResource("5")
@@ -144,8 +172,12 @@ shape = SubResource("5")
 position = Vector2(260, 30)
 
 [node name="PlatformEVisual" type="Sprite2D" parent="World/PlatformE" unique_id=1778664085]
-scale = Vector2(3.75, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 128, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformE" unique_id=433836998]
 shape = SubResource("6")
@@ -154,8 +186,12 @@ shape = SubResource("6")
 position = Vector2(420, 150)
 
 [node name="PlatformFVisual" type="Sprite2D" parent="World/PlatformF" unique_id=762206514]
-scale = Vector2(5, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 160, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformF" unique_id=616707097]
 shape = SubResource("7")
@@ -164,8 +200,12 @@ shape = SubResource("7")
 position = Vector2(640, 40)
 
 [node name="PlatformGVisual" type="Sprite2D" parent="World/PlatformG" unique_id=1791397871]
-scale = Vector2(6.25, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 192, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformG" unique_id=1203268214]
 shape = SubResource("8")
@@ -174,8 +214,12 @@ shape = SubResource("8")
 position = Vector2(860, 110)
 
 [node name="PlatformHVisual" type="Sprite2D" parent="World/PlatformH" unique_id=2075094380]
-scale = Vector2(7.5, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 256, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformH" unique_id=660085413]
 shape = SubResource("9")
@@ -184,8 +228,12 @@ shape = SubResource("9")
 position = Vector2(1110, 10)
 
 [node name="PlatformIVisual" type="Sprite2D" parent="World/PlatformI" unique_id=502477899]
-scale = Vector2(3.125, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 96, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformI" unique_id=31896213]
 shape = SubResource("10")
@@ -194,8 +242,12 @@ shape = SubResource("10")
 position = Vector2(1280, 140)
 
 [node name="PlatformJVisual" type="Sprite2D" parent="World/PlatformJ" unique_id=1852315258]
-scale = Vector2(5.625, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 192, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformJ" unique_id=1689586386]
 shape = SubResource("3")
@@ -204,8 +256,12 @@ shape = SubResource("3")
 position = Vector2(1500, 60)
 
 [node name="PlatformKVisual" type="Sprite2D" parent="World/PlatformK" unique_id=185368828]
-scale = Vector2(8.125, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 256, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformK" unique_id=1196398397]
 shape = SubResource("5")
@@ -214,8 +270,12 @@ shape = SubResource("5")
 position = Vector2(1760, -10)
 
 [node name="PlatformLVisual" type="Sprite2D" parent="World/PlatformL" unique_id=1866821095]
-scale = Vector2(4.375, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 128, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformL" unique_id=408198175]
 shape = SubResource("4")
@@ -224,8 +284,12 @@ shape = SubResource("4")
 position = Vector2(1960, 120)
 
 [node name="PlatformMVisual" type="Sprite2D" parent="World/PlatformM" unique_id=570421804]
-scale = Vector2(6.875, 1.5)
+scale = Vector2(1, 1.5)
 texture = ExtResource("4")
+texture_filter = 1
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 224, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/PlatformM" unique_id=117107960]
 shape = SubResource("2")

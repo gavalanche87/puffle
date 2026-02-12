@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://brghkglvnlyhw"
-path="res://.godot/imported/clouds_2.png-0e4fbb77d3303bcb2af5b2df753ec74e.ctex"
+uid="uid://fyt4akvrd4ak"
+path="res://.godot/imported/Enemy_Pastel_X.png-77c1705a6ba210d84bda4cd5716796e8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/game_background_1/layers/clouds_2.png"
-dest_files=["res://.godot/imported/clouds_2.png-0e4fbb77d3303bcb2af5b2df753ec74e.ctex"]
+source_file="res://assets/enemies/Enemy_Pastel_X.png"
+dest_files=["res://.godot/imported/Enemy_Pastel_X.png-77c1705a6ba210d84bda4cd5716796e8.ctex"]
 
 [params]
 

@@ -23,10 +23,6 @@
 [ext_resource type="Texture2D" uid="uid://kp68tswg5fay" path="res://assets/player/Wallslide (16 x 16)BlueNoSpike.png" id="21"]
 [ext_resource type="AudioStream" uid="uid://q2gi080tamkp" path="res://assets/sound/pickup.wav" id="22_b8lor"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_6e537"]
-atlas = ExtResource("21")
-region = Rect2(0, 0, 16, 16)
-
 [sub_resource type="SpriteFrames" id="3"]
 animations = [{
 "frames": [{
@@ -80,7 +76,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_6e537")
+"texture": ExtResource("21")
 }],
 "loop": false,
 "name": &"wall",
