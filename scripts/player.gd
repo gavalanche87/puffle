@@ -8,7 +8,7 @@ enum PlayerMode { SMALL, BIG }
 
 @export var big_speed: float = 180.0
 @export var big_gravity: float = 1800.0
-@export var big_scale: Vector2 = Vector2(2.0, 2.0)
+@export var big_scale: Vector2 = Vector2(1.5, 1.5)
 @export var big_damage_multiplier: float = 0.6
 @export var small_frames: SpriteFrames
 @export var big_frames: SpriteFrames

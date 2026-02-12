@@ -152,16 +152,20 @@ small_frames = SubResource("3")
 big_frames = SubResource("2")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=407884569]
+position = Vector2(16, 16)
 sprite_frames = SubResource("3")
 animation = &"wall"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1378537505]
+position = Vector2(16, 16)
 shape = SubResource("1")
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=853368313]
+position = Vector2(16, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1846928484]
 shape = SubResource("1")
+debug_color = Color(0.9295492, 0.17470735, 0.5066026, 0.41960785)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2056619036]
 top_level = true
