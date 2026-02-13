@@ -34,6 +34,7 @@ var damage_multiplier: float = 1.0
 @export var max_health: int = 100
 @export var max_energy: int = 100
 @export var enemy_contact_damage: int = 20
+@export var hazard_contact_damage: int = 20
 @export var damage_cooldown: float = 0.5
 @export var big_mode_energy_cost: int = 10
 @export var stomp_bounce_velocity: float = -520.0
@@ -235,6 +236,15 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 			target.call("break_platform")
 			velocity.y = stomp_bounce_velocity
 			_play_sfx(sfx_stomp)
+		return
+
+	if area.is_in_group("hazards"):
+		var amount := hazard_contact_damage
+		if area.has_method("get_damage_amount"):
+			amount = int(area.call("get_damage_amount"))
+		_apply_knockback(area)
+		_play_sfx(sfx_hurt)
+		take_damage(amount)
 		return
 
 	if not area.is_in_group("enemies"):
