@@ -32,8 +32,10 @@ enum PlayerMode { SMALL, BIG }
 var mode: PlayerMode = PlayerMode.SMALL
 var damage_multiplier: float = 1.0
 @export var max_health: int = 100
+@export var max_energy: int = 100
 @export var enemy_contact_damage: int = 20
 @export var damage_cooldown: float = 0.5
+@export var big_mode_energy_cost: int = 10
 @export var stomp_bounce_velocity: float = -520.0
 @export var small_player_knockback: float = 160.0
 @export var big_player_knockback: float = 100.0
@@ -41,6 +43,7 @@ var damage_multiplier: float = 1.0
 @export var small_enemy_knockback: float = 120.0
 @export var big_enemy_knockback: float = 220.0
 var current_health: int = max_health
+var current_energy: int = max_energy
 var damage_cooldown_timer: float = 0.0
 @export var grounded_grace: float = 0.08
 var grounded_timer: float = 0.0
@@ -55,10 +58,12 @@ var base_hurt_size: Vector2 = Vector2.ZERO
 
 var health_bar_bg: Control
 var health_bar_fill: Control
+var energy_bar_bg: Control
+var energy_bar_fill: Control
 var coins_label: Label
 @onready var floating_text_scene: PackedScene = preload("res://scenes/FloatingText.tscn")
 @onready var coin_icon: Texture2D = preload("res://assets/items/Coin.png")
-@onready var heart_icon: Texture2D = preload("res://assets/items/pixel heart 2.png")
+@onready var heart_icon: Texture2D = preload("res://assets/items/heart_icon.png")
 @onready var hud_font: Font = preload("res://assets/fonts/LuckiestGuy-Regular.ttf")
 @onready var hurtbox: Area2D = $Hurtbox
 @onready var sfx_jump: AudioStreamPlayer = $SfxJump
@@ -79,8 +84,10 @@ var coins: int = 0
 func _ready() -> void:
 	_ensure_toggle_action()
 	current_health = max_health
+	current_energy = max_energy
 	_cache_hud()
 	_update_health_ui()
+	_update_energy_ui()
 	_update_coins_ui()
 	if body_shape:
 		base_body_size = body_shape.size
@@ -94,12 +101,20 @@ func _ready() -> void:
 		sprite.flip_h = true
 
 func _physics_process(delta: float) -> void:
-	if not health_bar_bg or not health_bar_fill or not coins_label:
+	if not health_bar_bg or not health_bar_fill or not energy_bar_bg or not energy_bar_fill or not coins_label:
 		_cache_hud()
 	if Input.is_action_just_pressed("toggle_mode"):
-		mode = PlayerMode.BIG if mode == PlayerMode.SMALL else PlayerMode.SMALL
-		_apply_mode(mode, true)
-		_play_sfx(sfx_switch)
+		if mode == PlayerMode.SMALL:
+			if current_energy >= big_mode_energy_cost:
+				current_energy = max(0, current_energy - big_mode_energy_cost)
+				_update_energy_ui()
+				mode = PlayerMode.BIG
+				_apply_mode(mode, true)
+				_play_sfx(sfx_switch)
+		else:
+			mode = PlayerMode.SMALL
+			_apply_mode(mode, true)
+			_play_sfx(sfx_switch)
 
 	if damage_cooldown_timer > 0.0:
 		damage_cooldown_timer -= delta
@@ -268,6 +283,17 @@ func _update_health_ui() -> void:
 	else:
 		print("HP: %d/%d" % [current_health, max_health])
 
+func _update_energy_ui() -> void:
+	if not energy_bar_bg or not energy_bar_fill:
+		_cache_hud()
+	if energy_bar_bg and energy_bar_fill:
+		var ratio := 0.0
+		if max_energy > 0:
+			ratio = clamp(float(current_energy) / float(max_energy), 0.0, 1.0)
+		energy_bar_fill.size.x = energy_bar_bg.size.x * ratio
+	else:
+		print("Energy: %d/%d" % [current_energy, max_energy])
+
 func _add_coins(amount: int) -> void:
 	if amount <= 0:
 		return
@@ -312,6 +338,12 @@ func _update_coins_ui() -> void:
 	if coins_label:
 		coins_label.text = "%d" % coins
 
+func add_energy(amount: int) -> void:
+	if amount <= 0:
+		return
+	current_energy = min(max_energy, current_energy + amount)
+	_update_energy_ui()
+
 func _cache_hud() -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if not hud and get_tree().current_scene:
@@ -320,6 +352,8 @@ func _cache_hud() -> void:
 		return
 	health_bar_bg = hud.get_node_or_null("HealthBarBg")
 	health_bar_fill = hud.get_node_or_null("HealthBarBg/HealthBarFill")
+	energy_bar_bg = hud.get_node_or_null("EnergyBarBg")
+	energy_bar_fill = hud.get_node_or_null("EnergyBarBg/EnergyBarFill")
 	coins_label = hud.get_node_or_null("CoinsLabel")
 
 func _set_mode_scale(target_scale: Vector2, animate: bool) -> void:
