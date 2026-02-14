@@ -1,26 +1,74 @@
 [gd_scene format=3 uid="uid://dnhg3sd3vvwvj"]
 
 [ext_resource type="Script" uid="uid://ds7v1inio53dw" path="res://scripts/enemy.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://d0eeqyuh6o28u" path="res://assets/enemies/green/green_enemy_walk_0.png" id="2"]
-[ext_resource type="Texture2D" uid="uid://dgaiomplob074" path="res://assets/enemies/green/green_enemy_walk_1.png" id="3"]
-[ext_resource type="Texture2D" uid="uid://idxe6kkuqurl" path="res://assets/enemies/green/green_enemy_walk_2.png" id="4"]
-[ext_resource type="Texture2D" uid="uid://cg8gq1u6lxqsx" path="res://assets/enemies/green/green_enemy_walk_3.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://f767h5kliylu" path="res://assets/enemies/green/frame_000.png" id="3_hhaxu"]
+[ext_resource type="Texture2D" uid="uid://cv5rknj3loxde" path="res://assets/enemies/green/frame_001.png" id="4_ou8np"]
+[ext_resource type="Texture2D" uid="uid://c8m8jyn5hg7s1" path="res://assets/enemies/green/frame_002.png" id="5_j76y4"]
 [ext_resource type="PackedScene" path="res://scenes/EnemyDeath.tscn" id="6"]
+[ext_resource type="Texture2D" uid="uid://dsx2ns8in6p77" path="res://assets/enemies/green/frame_003.png" id="6_ngj74"]
+[ext_resource type="Texture2D" uid="uid://bb08a41k1h1uy" path="res://assets/enemies/green/frame_004.png" id="7_r1iab"]
+[ext_resource type="Texture2D" uid="uid://dq7mkpd432ro7" path="res://assets/enemies/green/frame_005.png" id="8_1lkbp"]
+[ext_resource type="Texture2D" uid="uid://djy71ytouvygu" path="res://assets/enemies/green/frame_006.png" id="9_qekth"]
+[ext_resource type="Texture2D" uid="uid://du0p5071sae12" path="res://assets/enemies/green/frame_007.png" id="10_6daaj"]
+[ext_resource type="Texture2D" uid="uid://dxo5u0pp8mrcq" path="res://assets/enemies/green/frame_008.png" id="11_rw3wv"]
+[ext_resource type="Texture2D" uid="uid://cl0uav7txv43e" path="res://assets/enemies/green/frame_009.png" id="12_27a3o"]
+[ext_resource type="Texture2D" uid="uid://bqwb27u3t3l7y" path="res://assets/enemies/green/frame_010.png" id="13_yldnb"]
+[ext_resource type="Texture2D" uid="uid://cp3634t02i2dl" path="res://assets/enemies/green/frame_011.png" id="14_ynjlr"]
+[ext_resource type="Texture2D" uid="uid://dyrie7188k70n" path="res://assets/enemies/green/frame_012.png" id="15_ha1ry"]
+[ext_resource type="Texture2D" uid="uid://cimjgeqyfjh83" path="res://assets/enemies/green/frame_013.png" id="16_fhymw"]
+[ext_resource type="Texture2D" uid="uid://bhpa6taixpqm0" path="res://assets/enemies/green/frame_014.png" id="17_5x8qk"]
+[ext_resource type="Texture2D" uid="uid://bf6i5lgwecv26" path="res://assets/enemies/green/frame_015.png" id="18_10sba"]
 
 [sub_resource type="SpriteFrames" id="1"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2")
+"texture": ExtResource("3_hhaxu")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3")
+"texture": ExtResource("4_ou8np")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4")
+"texture": ExtResource("5_j76y4")
 }, {
 "duration": 1.0,
-"texture": ExtResource("5")
+"texture": ExtResource("6_ngj74")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_r1iab")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_1lkbp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_qekth")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_6daaj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_rw3wv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_27a3o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_yldnb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_ynjlr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_ha1ry")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_fhymw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_5x8qk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_10sba")
 }],
 "loop": true,
 "name": &"walk",
@@ -28,7 +76,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_edw3h"]
-size = Vector2(26, 12.5)
+size = Vector2(17.955395, 21.138977)
 
 [node name="GreenEnemy" type="Area2D" unique_id=941687845]
 scale = Vector2(2, 2)
@@ -41,7 +89,7 @@ sprite_frames = SubResource("1")
 animation = &"walk"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=92035300]
-position = Vector2(16, 16)
+position = Vector2(15.601866, 14.73455)
 shape = SubResource("RectangleShape2D_edw3h")
 
 [node name="FloorCast" type="RayCast2D" parent="." unique_id=1399953146]

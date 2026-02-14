@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://br1cjgobe3ovy"
-path="res://.godot/imported/boss_bunny.png-cf8c7e2ca9f0b1f4b67c470ec031c7a9.ctex"
+uid="uid://dxo5u0pp8mrcq"
+path="res://.godot/imported/frame_008.png-a324790751930499a5dd7930b12e0188.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/enemies/bunny/boss_bunny.png"
-dest_files=["res://.godot/imported/boss_bunny.png-cf8c7e2ca9f0b1f4b67c470ec031c7a9.ctex"]
+source_file="res://assets/enemies/green/frame_008.png"
+dest_files=["res://.godot/imported/frame_008.png-a324790751930499a5dd7930b12e0188.ctex"]
 
 [params]
 

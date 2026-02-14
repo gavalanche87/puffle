@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dydk6fr4d1a68"
-path="res://.godot/imported/frog_sheet.png-e165c73d140197d2b08d84e4c77c33b6.ctex"
+uid="uid://cp3634t02i2dl"
+path="res://.godot/imported/frame_011.png-115e5603c990e35e985e4835dba9fe92.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/enemies/frog/frog_sheet.png"
-dest_files=["res://.godot/imported/frog_sheet.png-e165c73d140197d2b08d84e4c77c33b6.ctex"]
+source_file="res://assets/enemies/green/frame_011.png"
+dest_files=["res://.godot/imported/frame_011.png-115e5603c990e35e985e4835dba9fe92.ctex"]
 
 [params]
 
