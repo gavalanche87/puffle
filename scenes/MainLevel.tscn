@@ -1,55 +1,17 @@
-[gd_scene format=3 uid="uid://dukjuia563eq7"]
+[gd_scene format=3 uid="uid://dow61pxa57e1g"]
 
 [ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/Player.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/Enemy.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/background_1.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/tiles/platform_palette_blue.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://c7tffwc222mk2" path="res://assets/backgrounds/background_1.png" id="3"]
 [ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/Goal.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="6"]
+[ext_resource type="PackedScene" uid="uid://cp2n5wcln742p" path="res://scenes/HUD.tscn" id="6"]
 [ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/Ground.tscn" id="ground_scene"]
-[ext_resource type="PackedScene" path="res://scenes/Platform.tscn" id="platform_scene"]
+[ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/Ground.tscn" id="ground_scene"]
+[ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/Platform.tscn" id="platform_scene"]
 [ext_resource type="PackedScene" path="res://scenes/Wall.tscn" id="wall_scene"]
-
-
-[sub_resource type="RectangleShape2D" id="1"]
-size = Vector2(2200, 32)
-
-[sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(220, 24)
-
-[sub_resource type="RectangleShape2D" id="3"]
-size = Vector2(180, 24)
-
-[sub_resource type="RectangleShape2D" id="4"]
-size = Vector2(140, 24)
-
-[sub_resource type="RectangleShape2D" id="5"]
-size = Vector2(260, 24)
-
-[sub_resource type="RectangleShape2D" id="6"]
-size = Vector2(120, 24)
-
-[sub_resource type="RectangleShape2D" id="7"]
-size = Vector2(160, 24)
-
-[sub_resource type="RectangleShape2D" id="8"]
-size = Vector2(200, 24)
-
-[sub_resource type="RectangleShape2D" id="9"]
-size = Vector2(240, 24)
-
-[sub_resource type="RectangleShape2D" id="10"]
-size = Vector2(100, 24)
 
 [sub_resource type="RectangleShape2D" id="11"]
 size = Vector2(4806, 64)
-
-[sub_resource type="RectangleShape2D" id="12"]
-size = Vector2(32, 900)
-
-[sub_resource type="RectangleShape2D" id="13"]
-size = Vector2(32, 900)
 
 [node name="MainLevel" type="Node2D" unique_id=477514167]
 
@@ -64,7 +26,7 @@ texture = ExtResource("3")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="HUD" parent="." instance=ExtResource("6")]
+[node name="HUD" parent="." unique_id=399437058 instance=ExtResource("6")]
 
 [node name="World" type="Node2D" parent="." unique_id=1206723391]
 scale = Vector2(1.5, 1.5)
@@ -74,19 +36,15 @@ position = Vector2(-980, 120)
 
 [node name="Ground" parent="World" unique_id=1630327671 instance=ExtResource("ground_scene")]
 position = Vector2(0, 300)
-length_tiles = 69
 
-[node name="LeftWall" parent="World" instance=ExtResource("wall_scene")]
+[node name="LeftWall" parent="World" unique_id=183325396 instance=ExtResource("wall_scene")]
 position = Vector2(-1120, 0)
-length_tiles = 28
 
-[node name="RightWall" parent="World" instance=ExtResource("wall_scene")]
+[node name="RightWall" parent="World" unique_id=584794897 instance=ExtResource("wall_scene")]
 position = Vector2(2220, 0)
-length_tiles = 28
 
 [node name="PlatformA" parent="World" unique_id=1435679972 instance=ExtResource("platform_scene")]
 position = Vector2(-820, 170)
-length_tiles = 7
 
 [node name="PlatformB" parent="World" unique_id=327473134 instance=ExtResource("platform_scene")]
 position = Vector2(-520, 80)
@@ -134,7 +92,6 @@ length_tiles = 4
 
 [node name="PlatformM" parent="World" unique_id=1951889236 instance=ExtResource("platform_scene")]
 position = Vector2(1960, 120)
-length_tiles = 7
 
 [node name="EnemyA" parent="World" unique_id=1124192399 instance=ExtResource("2")]
 position = Vector2(-790, 148)
