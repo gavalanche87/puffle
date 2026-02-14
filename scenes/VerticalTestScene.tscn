@@ -42,7 +42,7 @@ position = Vector2(-320, 608)
 
 [node name="Ground" parent="World/Platforms" unique_id=1453284424 instance=ExtResource("ground_scene")]
 position = Vector2(0, 768)
-length_tiles = 250
+length_tiles = 33
 visual_offset = Vector2(16, 16)
 collision_offset = Vector2(16, 16)
 
@@ -183,15 +183,19 @@ length_tiles = 5
 position = Vector2(192, -4672)
 length_tiles = 4
 
+[node name="CeilingPlatform" parent="World/Platforms" unique_id=1933199367 instance=ExtResource("platform_scene")]
+position = Vector2(0, -4960)
+length_tiles = 33
+
 [node name="Walls" type="Node2D" parent="World" unique_id=1218809112]
 
 [node name="LeftWall" parent="World/Walls" unique_id=789423377 instance=ExtResource("wall_scene")]
-position = Vector2(-512, 0)
-length_tiles = 350
+position = Vector2(-512, -2080)
+length_tiles = 180
 
 [node name="RightWall" parent="World/Walls" unique_id=1335665259 instance=ExtResource("wall_scene")]
-position = Vector2(512, 0)
-length_tiles = 350
+position = Vector2(512, -2080)
+length_tiles = 180
 
 [node name="InnerWallA" parent="World/Walls" unique_id=437141480 instance=ExtResource("wall_scene")]
 position = Vector2(-64, 288)
@@ -337,7 +341,7 @@ position = Vector2(320, 160)
 position = Vector2(-32, 64)
 
 [node name="Goal" parent="World" unique_id=159913275 instance=ExtResource("3")]
-position = Vector2(320, -4800)
+position = Vector2(320, -4896)
 scale = Vector2(4, 4)
 next_scene_path = "res://scenes/MainLevel.tscn"
 

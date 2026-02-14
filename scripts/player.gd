@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-enum PlayerMode { SMALL, BIG }
+enum PlayerMode {SMALL, BIG}
 
 @export var small_speed: float = 320.0
 @export var small_gravity: float = 700.0
@@ -97,6 +97,19 @@ func _ready() -> void:
 	_apply_mode(mode, false)
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	camera_offset = camera.position
+	
+	# Set up camera bounds based on Ground object
+	# We search recursively since Ground might not be a direct sibling
+	var ground = get_tree().current_scene.find_child("Ground", true, false)
+	if ground and camera:
+		var start_x = ground.global_position.x
+		# Retrieve length_tiles if available, default to 0 if not found
+		var length = ground.get("length_tiles")
+		if length:
+			var width = length * 32 # Assuming 32px per tile based on Ground implementation
+			camera.limit_left = int(start_x - width / 2)
+			camera.limit_right = int(start_x + width / 2)
+
 	_update_camera(true)
 	if sprite:
 		sprite.flip_h = true
@@ -410,9 +423,21 @@ func _update_camera(force: bool = false) -> void:
 		return
 	var target := global_position + camera_offset
 	if force:
+		camera.position_smoothing_enabled = false
 		camera.global_position = target
+		camera.position_smoothing_speed = 6.0 # Reset to default
 	else:
-		camera.global_position = camera.global_position.lerp(target, 0.2)
+		camera.position_smoothing_enabled = true
+		var lerp_speed := 0.2
+		
+		# If falling fast in big mode, use much faster smoothing to keep up
+		if mode == PlayerMode.BIG and velocity.y > 500.0:
+			camera.position_smoothing_speed = 20.0
+			lerp_speed = 1.0 # Also snap manual lerp for responsiveness
+		else:
+			camera.position_smoothing_speed = 6.0 # Default speed
+			
+		camera.global_position = camera.global_position.lerp(target, lerp_speed)
 
 func _update_facing(wall_sliding: bool) -> void:
 	if not sprite:
