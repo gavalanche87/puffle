@@ -1,81 +1,50 @@
 [gd_scene format=3 uid="uid://bdlw4efq2llwq"]
 
 [ext_resource type="Script" uid="uid://ds7v1inio53dw" path="res://scripts/enemy.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dktg5i0pkrl3j" path="res://assets/enemies/snail/snail.png" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/EnemyDeath.tscn" id="3"]
-
-[sub_resource type="AtlasTexture" id="2"]
-atlas = ExtResource("2")
-region = Rect2(0, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="3"]
-atlas = ExtResource("2")
-region = Rect2(38, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="4"]
-atlas = ExtResource("2")
-region = Rect2(76, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="5"]
-atlas = ExtResource("2")
-region = Rect2(114, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="6"]
-atlas = ExtResource("2")
-region = Rect2(152, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="7"]
-atlas = ExtResource("2")
-region = Rect2(190, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="8"]
-atlas = ExtResource("2")
-region = Rect2(228, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="9"]
-atlas = ExtResource("2")
-region = Rect2(266, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="10"]
-atlas = ExtResource("2")
-region = Rect2(304, 0, 38, 24)
-
-[sub_resource type="AtlasTexture" id="11"]
-atlas = ExtResource("2")
-region = Rect2(342, 0, 38, 24)
+[ext_resource type="Texture2D" uid="uid://dkvm4h4yv2q2w" path="res://assets/enemies/wom/frame_006.png" id="3_isvm2"]
+[ext_resource type="Texture2D" uid="uid://ck3k6uxdmgv3c" path="res://assets/enemies/wom/frame_007.png" id="4_gr8dl"]
+[ext_resource type="Texture2D" uid="uid://bcqi7dbnb7wxw" path="res://assets/enemies/wom/frame_008.png" id="5_axa8o"]
+[ext_resource type="Texture2D" uid="uid://r8coxtofgdxh" path="res://assets/enemies/wom/frame_009.png" id="6_4iqch"]
+[ext_resource type="Texture2D" uid="uid://tn5ahg73r6mk" path="res://assets/enemies/wom/frame_010.png" id="7_x3f71"]
+[ext_resource type="Texture2D" uid="uid://brqoc3chj0w6l" path="res://assets/enemies/wom/frame_011.png" id="8_ksmwx"]
+[ext_resource type="Texture2D" uid="uid://cmolcumihxbll" path="res://assets/enemies/wom/frame_012.png" id="9_oq86d"]
+[ext_resource type="Texture2D" uid="uid://b8yua4iflnr2d" path="res://assets/enemies/wom/frame_013.png" id="10_joqoj"]
+[ext_resource type="Texture2D" uid="uid://vvjtesixasnv" path="res://assets/enemies/wom/frame_014.png" id="11_govun"]
+[ext_resource type="Texture2D" uid="uid://2l6fcsn8c3r1" path="res://assets/enemies/wom/frame_015.png" id="12_hwoi6"]
 
 [sub_resource type="SpriteFrames" id="12"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("2")
+"texture": ExtResource("3_isvm2")
 }, {
 "duration": 1.0,
-"texture": SubResource("3")
+"texture": ExtResource("4_gr8dl")
 }, {
 "duration": 1.0,
-"texture": SubResource("4")
+"texture": ExtResource("5_axa8o")
 }, {
 "duration": 1.0,
-"texture": SubResource("5")
+"texture": ExtResource("6_4iqch")
 }, {
 "duration": 1.0,
-"texture": SubResource("6")
+"texture": ExtResource("7_x3f71")
 }, {
 "duration": 1.0,
-"texture": SubResource("7")
+"texture": ExtResource("8_ksmwx")
 }, {
 "duration": 1.0,
-"texture": SubResource("8")
+"texture": ExtResource("9_oq86d")
 }, {
 "duration": 1.0,
-"texture": SubResource("9")
+"texture": ExtResource("10_joqoj")
 }, {
 "duration": 1.0,
-"texture": SubResource("10")
+"texture": ExtResource("11_govun")
 }, {
 "duration": 1.0,
-"texture": SubResource("11")
+"texture": ExtResource("12_hwoi6")
 }],
 "loop": true,
 "name": &"walk",
@@ -83,7 +52,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="1"]
-size = Vector2(24, 20)
+size = Vector2(24, 21.98428)
 
 [node name="Enemy" type="Area2D" unique_id=923496733]
 script = ExtResource("1")
@@ -93,9 +62,10 @@ death_scene = ExtResource("3")
 position = Vector2(16, 16)
 sprite_frames = SubResource("12")
 animation = &"walk"
+frame_progress = 0.71176726
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=165281374]
-position = Vector2(16, 16)
+position = Vector2(16, 16.99214)
 shape = SubResource("1")
 
 [node name="FloorCast" type="RayCast2D" parent="." unique_id=542463915]
