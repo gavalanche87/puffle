@@ -59,13 +59,15 @@ script = ExtResource("1")
 death_scene = ExtResource("3")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=412141046]
-position = Vector2(16, 16)
+position = Vector2(16, 12)
+scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("12")
 animation = &"walk"
-frame_progress = 0.71176726
+frame_progress = 0.9680119
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=165281374]
-position = Vector2(16, 16.99214)
+position = Vector2(16, 12.743477)
+scale = Vector2(1.5, 1.5)
 shape = SubResource("1")
 
 [node name="FloorCast" type="RayCast2D" parent="." unique_id=542463915]

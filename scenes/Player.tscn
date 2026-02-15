@@ -168,11 +168,9 @@ shape = SubResource("1")
 debug_color = Color(0.9295492, 0.17470735, 0.5066026, 0.41960785)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2056619036]
-top_level = true
-position = Vector2(0, -32)
 zoom = Vector2(0.875, 0.875)
 position_smoothing_enabled = true
-position_smoothing_speed = 6.0
+position_smoothing_speed = 12.0
 
 [node name="SfxJump" type="AudioStreamPlayer" parent="." unique_id=375345066]
 stream = ExtResource("18")

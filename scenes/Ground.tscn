@@ -19,29 +19,5 @@ texture = ExtResource("2")
 region_enabled = true
 region_rect = Rect2(0, 0, 2208, 32)
 
-[node name="Visual" type="Sprite2D" parent="Visual" unique_id=621243810]
-texture_filter = 1
-texture_repeat = 2
-position = Vector2(0, 32)
-texture = ExtResource("2")
-region_enabled = true
-region_rect = Rect2(0, 0, 2208, 32)
-
-[node name="Visual" type="Sprite2D" parent="Visual/Visual" unique_id=1021427772]
-texture_filter = 1
-texture_repeat = 2
-position = Vector2(0, 32)
-texture = ExtResource("2")
-region_enabled = true
-region_rect = Rect2(0, 0, 2208, 32)
-
-[node name="Visual" type="Sprite2D" parent="Visual/Visual/Visual" unique_id=2101526229]
-texture_filter = 1
-texture_repeat = 2
-position = Vector2(0, 32)
-texture = ExtResource("2")
-region_enabled = true
-region_rect = Rect2(0, 0, 2208, 32)
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=738769069]
 shape = SubResource("RectangleShape2D_lr1lr")

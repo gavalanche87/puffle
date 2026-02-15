@@ -1,0 +1,114 @@
+[gd_scene format=3 uid="uid://co5bsblpqb88x"]
+
+[ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/Player.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/Enemy.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/Goal.tscn" id="3"]
+[ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://bxxd7qmpakhm6" path="res://assets/backgrounds/background_2.png" id="5"]
+[ext_resource type="PackedScene" uid="uid://cp2n5wcln742p" path="res://scenes/HUD.tscn" id="6"]
+[ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/Ground.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/HazardSaw.tscn" id="8"]
+[ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/Platform.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/Wall.tscn" id="10"]
+[ext_resource type="Script" uid="uid://cfg62htb75fb8" path="res://scripts/level_1.gd" id="11"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(8000, 200)
+
+[node name="Level_1" type="Node2D" unique_id=1498874025]
+script = ExtResource("11")
+
+[node name="Background" type="CanvasLayer" parent="." unique_id=1836297394]
+layer = -10
+
+[node name="Back" type="TextureRect" parent="Background" unique_id=1330332485]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="HUD" parent="." unique_id=337148851 instance=ExtResource("6")]
+
+[node name="World" type="Node2D" parent="." unique_id=15817606]
+
+[node name="Player" parent="World" unique_id=913214436 instance=ExtResource("1")]
+position = Vector2(-35.677002, 213.30875)
+
+[node name="Platforms" type="Node2D" parent="World" unique_id=360609642]
+position = Vector2(2100.2617, -385.89148)
+
+[node name="Ground" parent="World/Platforms" unique_id=2065003243 instance=ExtResource("7")]
+position = Vector2(-1524.2617, 801.8915)
+
+[node name="Ground2" parent="World/Platforms" unique_id=2068468700 instance=ExtResource("7")]
+position = Vector2(427.73828, 801.8915)
+scale = Vector2(1, 0.99600405)
+length_tiles = 30
+
+[node name="Ground3" parent="World/Platforms" unique_id=220703249 instance=ExtResource("7")]
+position = Vector2(1386.103, 825.29175)
+scale = Vector2(1, 0.99600405)
+length_tiles = 10
+
+[node name="Platform1" parent="World/Platforms" unique_id=1704122404 instance=ExtResource("9")]
+position = Vector2(-244.26172, 609.8915)
+length_tiles = 5
+
+[node name="Platform2" parent="World/Platforms" unique_id=1685315777 instance=ExtResource("9")]
+position = Vector2(983.33936, 475.42957)
+length_tiles = 6
+
+[node name="Walls" type="Node2D" parent="World" unique_id=976195661]
+position = Vector2(684.34174, 798.26355)
+
+[node name="LeftWall" parent="World/Walls" unique_id=2054015985 instance=ExtResource("10")]
+position = Vector2(-1200, -2000)
+length_tiles = 100
+
+[node name="RightWall" parent="World/Walls" unique_id=1395029095 instance=ExtResource("10")]
+position = Vector2(2926.9314, -2003.0575)
+length_tiles = 100
+
+[node name="Enemies" type="Node2D" parent="World" unique_id=1375909128]
+
+[node name="Enemy" parent="World/Enemies" unique_id=108086096 instance=ExtResource("2")]
+position = Vector2(864, 352)
+
+[node name="Hazards" type="Node2D" parent="World" unique_id=377294241]
+
+[node name="SawGround" parent="World/Hazards" unique_id=174075143 instance=ExtResource("8")]
+position = Vector2(1376, 384)
+
+[node name="SawGround2" parent="World/Hazards" unique_id=1790634178 instance=ExtResource("8")]
+position = Vector2(2272, 384)
+
+[node name="SawPlatform" parent="World/Hazards" unique_id=648410444 instance=ExtResource("8")]
+position = Vector2(1856, 192)
+
+[node name="SawGround3" parent="World/Hazards" unique_id=669065864 instance=ExtResource("8")]
+position = Vector2(2304, 384)
+
+[node name="SawGround4" parent="World/Hazards" unique_id=718181856 instance=ExtResource("8")]
+position = Vector2(2336, 384)
+
+[node name="SawGround5" parent="World/Hazards" unique_id=109569454 instance=ExtResource("8")]
+position = Vector2(1472, 384)
+
+[node name="SawGround6" parent="World/Hazards" unique_id=2119906614 instance=ExtResource("8")]
+position = Vector2(1568, 384)
+
+[node name="Goal" parent="World" unique_id=1339931279 instance=ExtResource("3")]
+position = Vector2(3427.2178, -127.28735)
+scale = Vector2(4, 4)
+next_scene_path = "res://scenes/MainLevel.tscn"
+
+[node name="KillPlane" type="Area2D" parent="World" unique_id=506157767]
+position = Vector2(1500, 1500)
+script = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/KillPlane" unique_id=2130299985]
+shape = SubResource("1")

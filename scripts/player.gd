@@ -77,7 +77,6 @@ var coins_label: Label
 @onready var body_shape: RectangleShape2D = $CollisionShape2D.shape
 @onready var hurt_shape: RectangleShape2D = $Hurtbox/CollisionShape2D.shape
 
-var camera_offset: Vector2 = Vector2.ZERO
 
 var mode_tween: Tween
 var coins: int = 0
@@ -96,21 +95,8 @@ func _ready() -> void:
 		base_hurt_size = hurt_shape.size
 	_apply_mode(mode, false)
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
-	camera_offset = camera.position
-	
-	# Set up camera bounds based on Ground object
-	# We search recursively since Ground might not be a direct sibling
-	var ground = get_tree().current_scene.find_child("Ground", true, false)
-	if ground and camera:
-		var start_x = ground.global_position.x
-		# Retrieve length_tiles if available, default to 0 if not found
-		var length = ground.get("length_tiles")
-		if length:
-			var width = length * 32 # Assuming 32px per tile based on Ground implementation
-			camera.limit_left = int(start_x - width / 2)
-			camera.limit_right = int(start_x + width / 2)
-
-	_update_camera(true)
+	# Camera now uses Godot's built-in offset and position_smoothing
+	# No manual positioning needed
 	if sprite:
 		sprite.flip_h = true
 
@@ -197,7 +183,14 @@ func _physics_process(delta: float) -> void:
 		grounded_timer = max(0.0, grounded_timer - delta)
 	_update_facing(wall_sliding)
 	_update_animation(wall_sliding)
-	_update_camera()
+	
+	# Adjust camera smoothing for fast falling in Big Mode
+	if camera:
+		if mode == PlayerMode.BIG and velocity.y > 500.0:
+			camera.position_smoothing_speed = 25.0
+		else:
+			camera.position_smoothing_speed = 12.0
+	# Camera updates automatically via Godot's position_smoothing
 
 func take_damage(amount: float) -> float:
 	var final_amount := amount * damage_multiplier
@@ -419,25 +412,9 @@ func _apply_knockback(enemy_area: Area2D) -> void:
 	# Enemy knockback disabled for now.
 
 func _update_camera(force: bool = false) -> void:
-	if not camera:
-		return
-	var target := global_position + camera_offset
-	if force:
-		camera.position_smoothing_enabled = false
-		camera.global_position = target
-		camera.position_smoothing_speed = 6.0 # Reset to default
-	else:
-		camera.position_smoothing_enabled = true
-		var lerp_speed := 0.2
-		
-		# If falling fast in big mode, use much faster smoothing to keep up
-		if mode == PlayerMode.BIG and velocity.y > 500.0:
-			camera.position_smoothing_speed = 20.0
-			lerp_speed = 1.0 # Also snap manual lerp for responsiveness
-		else:
-			camera.position_smoothing_speed = 6.0 # Default speed
-			
-		camera.global_position = camera.global_position.lerp(target, lerp_speed)
+	# Camera now handled automatically by Godot's position_smoothing
+	# No manual positioning needed
+	pass
 
 func _update_facing(wall_sliding: bool) -> void:
 	if not sprite:
