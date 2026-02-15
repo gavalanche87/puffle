@@ -57,6 +57,8 @@ var spin_accumulated: float = 0.0
 var wall_jump_timer: float = 0.0
 var base_body_size: Vector2 = Vector2.ZERO
 var base_hurt_size: Vector2 = Vector2.ZERO
+var input_lock_timer: float = 0.0
+
 
 var health_bar_bg: Control
 var health_bar_fill: Control
@@ -117,12 +119,16 @@ func _physics_process(delta: float) -> void:
 			_apply_mode(mode, true)
 			_play_sfx(sfx_switch)
 
+	if input_lock_timer > 0.0:
+		input_lock_timer -= delta
 	if damage_cooldown_timer > 0.0:
 		damage_cooldown_timer -= delta
 	if knockback_velocity != 0.0:
 		knockback_velocity = move_toward(knockback_velocity, 0.0, knockback_decay * delta)
 
-	var input_dir := Input.get_axis("ui_left", "ui_right")
+	var input_dir := 0.0
+	if input_lock_timer <= 0.0:
+		input_dir = Input.get_axis("ui_left", "ui_right")
 	wall_normal = Vector2.ZERO
 	var snapped := _try_wall_snap()
 	var wall_sliding := _is_wall_sliding(snapped)
@@ -143,18 +149,18 @@ func _physics_process(delta: float) -> void:
 			air_time = 0.0
 		if wall_sliding:
 			velocity.y = min(velocity.y + _current_gravity() * delta, wall_slide_speed)
-		if Input.is_action_just_pressed("ui_accept") and (wall_sliding or snapped):
+		if Input.is_action_just_pressed("ui_accept") and (wall_sliding or snapped) and input_lock_timer <= 0.0:
 			_wall_jump()
 			_play_sfx(sfx_jump)
 		else:
 			velocity.y += _current_gravity() * delta
 	else:
 		air_time = 0.0
-		if Input.is_action_just_pressed("ui_accept"):
+		if Input.is_action_just_pressed("ui_accept") and input_lock_timer <= 0.0:
 			velocity.y = _current_jump_velocity()
 			_play_sfx(sfx_jump)
 
-	if should_spin and sprite:
+	if should_spin and sprite and input_lock_timer <= 0.0:
 		var spin_dir := signf(velocity.x)
 		if spin_dir == 0.0:
 			spin_dir = 1.0
@@ -185,9 +191,19 @@ func _physics_process(delta: float) -> void:
 	_update_facing(wall_sliding)
 	_update_animation(wall_sliding)
 	
+	# Visual feedback for damage/invulnerability
+	if damage_cooldown_timer > 0.0:
+		# Rapidly flicker between bright white and normal
+		var flash_speed := 15.0
+		if int(damage_cooldown_timer * flash_speed) % 2 == 0:
+			sprite.modulate = Color(4, 4, 4, 1) # Bright white/glow
+		else:
+			sprite.modulate = Color(1, 1, 1, 1)
+	else:
+		sprite.modulate = Color(1, 1, 1, 1)
+	
 	# Adjust camera behavior
 	if camera:
-		
 		# 1. Smoothing speed (Big mode fast fall needs faster tracking, otherwise use base)
 		if mode == PlayerMode.BIG and velocity.y > 500.0:
 			camera.position_smoothing_speed = 25.0
@@ -202,6 +218,7 @@ func take_damage(amount: float) -> float:
 		return 0.0
 	damage_cooldown_timer = damage_cooldown
 	current_health = max(0, current_health - int(round(final_amount)))
+	input_lock_timer = 0.5
 	_update_health_ui()
 	_spawn_floating_text("-%d" % int(round(final_amount)), Color(1, 0.2, 0.2), heart_icon)
 	if current_health <= 0:
@@ -405,12 +422,16 @@ func _set_frames(frames: SpriteFrames) -> void:
 		sprite.stop()
 
 func _apply_knockback(enemy_area: Area2D) -> void:
+	# Reset all existing velocities/forces first
+	velocity = Vector2.ZERO
+	knockback_velocity = 0.0
+	
 	var dir := signf(global_position.x - enemy_area.global_position.x)
 	if dir == 0.0:
 		dir = -1.0
-	var player_force := small_player_knockback if mode == PlayerMode.SMALL else big_player_knockback
+	var player_force := (small_player_knockback if mode == PlayerMode.SMALL else big_player_knockback) * 0.5
 	knockback_velocity = clamp(player_force * dir, -max_knockback, max_knockback)
-	velocity.y = min(velocity.y, -80.0)
+	velocity.y = -300.0 # Significant upward bounce
 
 	var enemy_force := small_enemy_knockback if mode == PlayerMode.SMALL else big_enemy_knockback
 	# Enemy knockback disabled for now.
