@@ -150,6 +150,7 @@ size = Vector2(16, 16)
 script = ExtResource("1")
 small_frames = SubResource("3")
 big_frames = SubResource("2")
+camera_smoothing_base_speed = 15.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=407884569]
 position = Vector2(16, 16)
@@ -168,9 +169,19 @@ shape = SubResource("1")
 debug_color = Color(0.9295492, 0.17470735, 0.5066026, 0.41960785)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2056619036]
+position = Vector2(75, 16)
 zoom = Vector2(0.875, 0.875)
 position_smoothing_enabled = true
-position_smoothing_speed = 12.0
+position_smoothing_speed = 10.0
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_horizontal_offset = 0.85
+drag_vertical_offset = 0.15
+drag_left_margin = 0.05
+drag_top_margin = 0.15
+drag_right_margin = 0.05
+drag_bottom_margin = 0.1
+editor_draw_drag_margin = true
 
 [node name="SfxJump" type="AudioStreamPlayer" parent="." unique_id=375345066]
 stream = ExtResource("18")

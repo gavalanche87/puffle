@@ -29,7 +29,6 @@ stretch_mode = 6
 [node name="HUD" parent="." unique_id=399437058 instance=ExtResource("6")]
 
 [node name="World" type="Node2D" parent="." unique_id=1206723391]
-scale = Vector2(1.5, 1.5)
 
 [node name="Player" parent="World" unique_id=493820669 instance=ExtResource("1")]
 position = Vector2(-980, 120)
@@ -127,7 +126,7 @@ position = Vector2(1760, -32)
 position = Vector2(1960, 98)
 
 [node name="Goal" parent="World" unique_id=1611429005 instance=ExtResource("5")]
-position = Vector2(1040.6667, 234.66667)
+position = Vector2(960, 160)
 scale = Vector2(5, 5)
 next_scene_path = "res://scenes/Level2.tscn"
 

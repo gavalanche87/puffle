@@ -43,6 +43,7 @@ var damage_multiplier: float = 1.0
 @export var max_knockback: float = 500.0
 @export var small_enemy_knockback: float = 120.0
 @export var big_enemy_knockback: float = 220.0
+@export var camera_smoothing_base_speed: float = 4.0
 var current_health: int = max_health
 var current_energy: int = max_energy
 var damage_cooldown_timer: float = 0.0
@@ -184,12 +185,15 @@ func _physics_process(delta: float) -> void:
 	_update_facing(wall_sliding)
 	_update_animation(wall_sliding)
 	
-	# Adjust camera smoothing for fast falling in Big Mode
+	# Adjust camera behavior
 	if camera:
+		
+		# 1. Smoothing speed (Big mode fast fall needs faster tracking, otherwise use base)
 		if mode == PlayerMode.BIG and velocity.y > 500.0:
 			camera.position_smoothing_speed = 25.0
 		else:
-			camera.position_smoothing_speed = 12.0
+			camera.position_smoothing_speed = camera_smoothing_base_speed
+			
 	# Camera updates automatically via Godot's position_smoothing
 
 func take_damage(amount: float) -> float:
