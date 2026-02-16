@@ -57,6 +57,7 @@ size = Vector2(24, 21.98428)
 [node name="Enemy" type="Area2D" unique_id=923496733]
 script = ExtResource("1")
 death_scene = ExtResource("3")
+xp_drop_value = 8
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=412141046]
 position = Vector2(16, 12)

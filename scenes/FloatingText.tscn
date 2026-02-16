@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cdqq7145uumra"]
 
 [ext_resource type="Script" uid="uid://m0g4ioou2e6m" path="res://scripts/floating_text.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://cc4s28tp5dj3i" path="res://assets/fonts/at01.ttf" id="2_fc4js"]
 
 [node name="FloatingText" type="Node2D" unique_id=1808370664]
 script = ExtResource("1")
@@ -11,4 +12,8 @@ position = Vector2(-14, 0)
 [node name="Label" type="Label" parent="." unique_id=419900359]
 offset_top = -8.0
 offset_bottom = -8.0
+theme_override_colors/font_color = Color(0.98039216, 0.972549, 0.6745098, 1)
+theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("2_fc4js")
 text = "+100"

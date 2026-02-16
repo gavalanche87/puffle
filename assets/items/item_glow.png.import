@@ -2,16 +2,12 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cmquxq4rj4uaa"
-path="res://.godot/imported/Melon.png-06f63d22cecbc8743200362ce080eaf3.ctex"
-metadata={
-"vram_texture": false
-}
+uid="uid://bfn5ukwtasnh"
+valid=false
 
 [deps]
 
-source_file="res://assets/items/Melon.png"
-dest_files=["res://.godot/imported/Melon.png-06f63d22cecbc8743200362ce080eaf3.ctex"]
+source_file="res://assets/items/item_glow.png"
 
 [params]
 

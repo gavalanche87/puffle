@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="AI Platformer"
-run/main_scene="res://scenes/Level_1.tscn"
+config/name="Puffle"
+run/main_scene="uid://dcfajfxdv5sih"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
@@ -32,7 +32,7 @@ window/size/window_height=360
 
 [editor]
 
-movie_writer/movie_file="/Users/gavincampbell/Desktop/Godot/puffle/movie.avi"
+movie_writer/movie_file="/Users/gavincampbell/Desktop/Godot/movie.avi"
 
 [physics]
 

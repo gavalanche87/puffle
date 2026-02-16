@@ -1,135 +1,200 @@
 [gd_scene format=3 uid="uid://cp2n5wcln742p"]
 
-[ext_resource type="Texture2D" path="res://assets/items/heart_icon.png" id="1"]
-[ext_resource type="Texture2D" uid="uid://d4bprxninpchp" path="res://assets/items/Coin.png" id="2"]
-[ext_resource type="FontFile" uid="uid://b4pkq6ib5fc5r" path="res://assets/fonts/LuckiestGuy-Regular.ttf" id="3"]
-[ext_resource type="Texture2D" path="res://assets/items/energy_icon.png" id="4"]
+[ext_resource type="PackedScene" uid="uid://l0xja4ems7yu" path="res://scenes/HealthItem.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://bme2pj2i5cdo5" path="res://scenes/EnergyItem.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://btah2q6fu5vgh" path="res://scenes/XPItem.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/CoinItem.tscn" id="4"]
+[ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="5"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0.75, 0.75, 0.78, 0.8)
+bg_color = Color(0.7490196, 0.7490196, 0.7490196, 0.7058824)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
-corner_radius_bottom_left = 8
 corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="9"]
+bg_color = Color(0.7490196, 0.7490196, 0.7490196, 0.7058824)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="2"]
-bg_color = Color(0.05, 0.05, 0.05, 1)
+bg_color = Color(0.25490198, 0.25490198, 0.25490198, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
-corner_radius_bottom_left = 5
 corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
 
 [sub_resource type="StyleBoxFlat" id="3"]
 bg_color = Color(0.25, 0, 0, 0.8)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
-corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="4"]
-bg_color = Color(0.9, 0.1, 0.1, 1)
+bg_color = Color(1, 1, 1, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
-corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="5"]
 bg_color = Color(0.02, 0.13, 0.2, 0.85)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
-corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="6"]
-bg_color = Color(0.15, 0.8, 0.95, 1)
+bg_color = Color(1, 1, 1, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
-corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
-[node name="HUD" type="CanvasLayer" unique_id=66276889]
-groups = ["hud"]
+corner_radius_bottom_left = 4
 
-[node name="Panel" type="Panel" parent="."]
+[sub_resource type="StyleBoxFlat" id="7"]
+bg_color = Color(0.16, 0.05, 0.22, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="8"]
+bg_color = Color(0.7490196, 0.18431373, 0.6862745, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="HUD" type="CanvasLayer" unique_id=1783102352]
+
+[node name="LeftPanel" type="Panel" parent="." unique_id=1801817848]
 offset_left = 8.0
 offset_top = 8.0
-offset_right = 200.0
-offset_bottom = 96.0
+offset_right = 208.0
+offset_bottom = 78.0
 theme_override_styles/panel = SubResource("1")
 
-[node name="HealthIconOutline" type="Sprite2D" parent="."]
-position = Vector2(28, 28)
-scale = Vector2(0.9, 0.9)
-texture = ExtResource("1")
-modulate = Color(0, 0, 0, 1)
+[node name="RightPanel" type="Panel" parent="." unique_id=1552093256]
+offset_left = 436.0
+offset_top = 8.0
+offset_right = 632.0
+offset_bottom = 80.0
+theme_override_styles/panel = SubResource("1")
 
-[node name="HealthIcon" type="Sprite2D" parent="." unique_id=754831425]
+[node name="HealthItem" parent="." unique_id=610023548 instance=ExtResource("1")]
 position = Vector2(28, 28)
+
+[node name="EnergyItem" parent="." unique_id=925709517 instance=ExtResource("2")]
+position = Vector2(28, 57.09601)
+
+[node name="XpItem" parent="." unique_id=1154377571 instance=ExtResource("3")]
+position = Vector2(454, 28)
+
+[node name="CoinItem" parent="." unique_id=1861734594 instance=ExtResource("4")]
+position = Vector2(454, 58)
+
+[node name="CoinCountLabel" type="Label" parent="." unique_id=17759874]
+offset_left = 480.3531
+offset_top = 42.93724
+offset_right = 580.3531
+offset_bottom = 69.93724
+theme_override_colors/font_color = Color(0.98039216, 0.972549, 0.6745098, 1)
+theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("5")
+theme_override_font_sizes/font_size = 24
+text = "0"
+vertical_alignment = 1
+
+[node name="CommentaryPanel" type="Panel" parent="." unique_id=1610744071]
+modulate = Color(1, 1, 1, 0)
+offset_left = 221.0
+offset_top = 8.0
+offset_right = 417.0
+offset_bottom = 44.0
+pivot_offset = Vector2(98, 18)
+theme_override_styles/panel = SubResource("9")
+
+[node name="CommentaryEnergyItem" parent="CommentaryPanel" unique_id=1486838549 instance=ExtResource("2")]
+position = Vector2(174.66324, 17.54871)
 scale = Vector2(0.8, 0.8)
-texture = ExtResource("1")
 
-[node name="HealthBarOutline" type="Panel" parent="."]
+[node name="CommentaryLabel" type="Label" parent="CommentaryPanel" unique_id=214765294]
+layout_mode = 0
+offset_left = 25.51355
+offset_top = 3.502304
+offset_right = 173.51355
+offset_bottom = 30.502304
+theme_override_colors/font_color = Color(0.98039216, 0.972549, 0.6745098, 1)
+theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("5")
+theme_override_font_sizes/font_size = 24
+text = "Nice Flip!!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HealthBarOutline" type="Panel" parent="." unique_id=1443374081]
 offset_left = 46.0
 offset_top = 20.5
-offset_right = 190.0
+offset_right = 198.0
 offset_bottom = 34.5
 theme_override_styles/panel = SubResource("2")
 
-[node name="HealthBarBg" type="Panel" parent="." unique_id=1453589713]
+[node name="HealthBarBg" type="Panel" parent="." unique_id=302532238]
 offset_left = 48.0
 offset_top = 22.5
-offset_right = 188.0
+offset_right = 196.0
 offset_bottom = 32.5
 theme_override_styles/panel = SubResource("3")
 
-[node name="HealthBarFill" type="Panel" parent="HealthBarBg" unique_id=1841356778]
+[node name="HealthBarFill" type="Panel" parent="HealthBarBg" unique_id=1100578968]
+modulate = Color(1, 0.56, 0.78, 1)
 layout_mode = 0
-offset_right = 140.0
+offset_right = 148.0
 offset_bottom = 10.0
 theme_override_styles/panel = SubResource("4")
 
-[node name="EnergyIconOutline" type="Sprite2D" parent="."]
-position = Vector2(28, 52)
-scale = Vector2(0.9, 0.9)
-texture = ExtResource("4")
-modulate = Color(0, 0, 0, 1)
-
-[node name="EnergyIcon" type="Sprite2D" parent="."]
-position = Vector2(28, 52)
-scale = Vector2(0.8, 0.8)
-texture = ExtResource("4")
-
-[node name="EnergyBarOutline" type="Panel" parent="."]
+[node name="EnergyBarOutline" type="Panel" parent="." unique_id=224594350]
 offset_left = 46.0
-offset_top = 44.5
-offset_right = 190.0
-offset_bottom = 58.5
+offset_top = 49.59601
+offset_right = 198.0
+offset_bottom = 63.59601
 theme_override_styles/panel = SubResource("2")
 
-[node name="EnergyBarBg" type="Panel" parent="."]
+[node name="EnergyBarBg" type="Panel" parent="." unique_id=1627373366]
 offset_left = 48.0
-offset_top = 46.5
-offset_right = 188.0
-offset_bottom = 56.5
+offset_top = 51.59601
+offset_right = 196.0
+offset_bottom = 61.59601
 theme_override_styles/panel = SubResource("5")
 
-[node name="EnergyBarFill" type="Panel" parent="EnergyBarBg"]
+[node name="EnergyBarFill" type="Panel" parent="EnergyBarBg" unique_id=834906253]
+modulate = Color(0.52, 0.86, 1, 1)
 layout_mode = 0
-offset_right = 140.0
+offset_right = 148.0
 offset_bottom = 10.0
 theme_override_styles/panel = SubResource("6")
 
-[node name="CoinsIcon" type="Sprite2D" parent="." unique_id=927579451]
-position = Vector2(28, 76)
-scale = Vector2(0.6, 0.6)
-texture = ExtResource("2")
+[node name="XpBarOutline" type="Panel" parent="." unique_id=117900956]
+offset_left = 472.0
+offset_top = 20.5
+offset_right = 624.0
+offset_bottom = 34.5
+theme_override_styles/panel = SubResource("2")
 
-[node name="CoinsLabel" type="Label" parent="." unique_id=849703059]
-offset_left = 48.0
-offset_top = 69.0
-offset_right = 59.0
-offset_bottom = 86.0
-theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
-theme_override_colors/font_outline_color = Color(0.5, 0.35, 0.05, 1)
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("3")
-text = "0"
+[node name="XpBarBg" type="Panel" parent="." unique_id=1566333996]
+offset_left = 474.0
+offset_top = 22.5
+offset_right = 622.0
+offset_bottom = 32.5
+theme_override_styles/panel = SubResource("7")
+
+[node name="XpBarFill" type="Panel" parent="XpBarBg" unique_id=788402392]
+layout_mode = 0
+offset_bottom = 10.0
+theme_override_styles/panel = SubResource("8")

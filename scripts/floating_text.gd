@@ -23,7 +23,33 @@ func setup(text: String, color: Color, icon_tex: Texture2D, start_pos: Vector2) 
 		icon.visible = true
 	else:
 		icon.visible = false
+	scale = Vector2(0.85, 0.85)
 	var t := create_tween()
-	t.tween_property(self, "position", position + Vector2(0.0, -float_distance), duration)
+	t.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(self, "scale", Vector2.ONE, 0.14)
+	t.parallel().tween_property(self, "position", position + Vector2(0.0, -float_distance), duration)
 	t.parallel().tween_property(self, "modulate:a", 0.0, duration)
 	t.finished.connect(queue_free)
+
+func setup_with_item_scene(
+	text: String,
+	color: Color,
+	item_scene: PackedScene,
+	start_pos: Vector2,
+	icon_scale: float = 1.0,
+	hide_backings: bool = true
+) -> void:
+	setup(text, color, null, start_pos)
+	if not item_scene:
+		return
+	var icon_node := item_scene.instantiate() as Node2D
+	if not icon_node:
+		return
+	add_child(icon_node)
+	icon_node.position = icon.position
+	icon_node.scale *= icon_scale
+	if hide_backings:
+		for node_name in ["HealthIconBacking", "EnergyIconBacking", "XpIconBacking", "CoinIconBacking"]:
+			var backing := icon_node.get_node_or_null(node_name) as CanvasItem
+			if backing:
+				backing.visible = false

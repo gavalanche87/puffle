@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://l0xja4ems7yu"]
+
+[ext_resource type="Texture2D" uid="uid://c5w0mokw2l5ve" path="res://assets/items/heart_icon.png" id="1"]
+
+[sub_resource type="Gradient" id="1"]
+offsets = PackedFloat32Array(0, 0.82, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.95, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="2"]
+gradient = SubResource("1")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="HealthItem" type="Node2D" unique_id=661183127]
+
+[node name="HealthIconOutline" type="Sprite2D" parent="." unique_id=899489032]
+visible = false
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("1")
+
+[node name="HealthIconBacking" type="Sprite2D" parent="." unique_id=344720227]
+modulate = Color(1, 0.7, 0.82, 0.9)
+position = Vector2(0.066265106, -0.98797226)
+scale = Vector2(0.55, 0.55)
+texture = SubResource("2")
+
+[node name="HealthIcon" type="Sprite2D" parent="." unique_id=1997626490]
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("1")

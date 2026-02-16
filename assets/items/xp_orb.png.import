@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvvjjm0ctoypy"
-path="res://.godot/imported/Kiwi.png-abd1bf59dce4b72aaeeafa0457b8dadd.ctex"
+uid="uid://dw6f7rechcxjv"
+path="res://.godot/imported/xp_orb.png-6a574c8b3e305ee9e1cfcf1bd61975cc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/items/Kiwi.png"
-dest_files=["res://.godot/imported/Kiwi.png-abd1bf59dce4b72aaeeafa0457b8dadd.ctex"]
+source_file="res://assets/items/xp_orb.png"
+dest_files=["res://.godot/imported/xp_orb.png-6a574c8b3e305ee9e1cfcf1bd61975cc.ctex"]
 
 [params]
 

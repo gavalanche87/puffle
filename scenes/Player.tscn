@@ -22,6 +22,8 @@
 [ext_resource type="AudioStream" uid="uid://6jgqhk42uydv" path="res://assets/sound/phaseJump1.ogg" id="20"]
 [ext_resource type="Texture2D" uid="uid://kp68tswg5fay" path="res://assets/player/Wallslide (16 x 16)BlueNoSpike.png" id="21"]
 [ext_resource type="AudioStream" uid="uid://q2gi080tamkp" path="res://assets/sound/pickup.wav" id="22_b8lor"]
+[ext_resource type="AudioStream" uid="uid://bc5u5pd1akj01" path="res://assets/sound/pickup5.ogg" id="23_item_land"]
+[ext_resource type="AudioStream" uid="uid://dvcdmohlpptng" path="res://assets/sound/game_over.ogg" id="24_death"]
 
 [sub_resource type="SpriteFrames" id="3"]
 animations = [{
@@ -163,6 +165,8 @@ shape = SubResource("1")
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=853368313]
 position = Vector2(16, 16)
+collision_layer = 2
+collision_mask = 29
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1846928484]
 shape = SubResource("1")
@@ -197,3 +201,9 @@ stream = ExtResource("19")
 
 [node name="SfxCoin" type="AudioStreamPlayer" parent="." unique_id=75177721]
 stream = ExtResource("22_b8lor")
+
+[node name="SfxItemLand" type="AudioStreamPlayer" parent="." unique_id=1502215111]
+stream = ExtResource("23_item_land")
+
+[node name="SfxDeath" type="AudioStreamPlayer" parent="." unique_id=2015856846]
+stream = ExtResource("24_death")

@@ -8,8 +8,8 @@ enum PlayerMode {SMALL, BIG}
 
 @export var big_speed: float = 180.0
 @export var big_gravity: float = 1800.0
-@export var big_scale: Vector2 = Vector2(1.5, 1.5)
 @export var big_damage_multiplier: float = 0.6
+@export var big_scale: Vector2 = Vector2(1.5, 1.5)
 @export var small_frames: SpriteFrames
 @export var big_frames: SpriteFrames
 
@@ -28,6 +28,11 @@ enum PlayerMode {SMALL, BIG}
 @export var ground_accel: float = 3200.0
 @export var midair_spin_speed: float = 5.0
 @export var midair_spin_delay: float = 0.5
+@export var flip_energy_reward: int = 5
+@export var flip_reward_pickup_count_per_spin: int = 1
+@export var death_anim_time: float = 0.4
+@export var death_fade_time: float = 0.22
+@export var xp_growth_multiplier: float = 1.25
 
 var mode: PlayerMode = PlayerMode.SMALL
 var damage_multiplier: float = 1.0
@@ -58,23 +63,38 @@ var wall_jump_timer: float = 0.0
 var base_body_size: Vector2 = Vector2.ZERO
 var base_hurt_size: Vector2 = Vector2.ZERO
 var input_lock_timer: float = 0.0
+static var pending_coin_restore: bool = false
+static var stored_coin_balance: int = 0
+static var pending_fade_in: bool = false
 
 
 var health_bar_bg: Control
 var health_bar_fill: Control
 var energy_bar_bg: Control
 var energy_bar_fill: Control
-var coins_label: Label
+var xp_bar_bg: Control
+var xp_bar_fill: Control
+var xp_level_label: Label
+var left_panel: Panel
+var right_panel: Panel
+var coin_count_label: Label
+var commentary_panel: Panel
+var commentary_label: Label
+var commentary_energy_item: Node2D
 @onready var floating_text_scene: PackedScene = preload("res://scenes/FloatingText.tscn")
-@onready var coin_icon: Texture2D = preload("res://assets/items/Coin.png")
-@onready var heart_icon: Texture2D = preload("res://assets/items/heart_icon.png")
+@onready var item_pickup_scene: PackedScene = preload("res://scenes/ItemPickup.tscn")
+@onready var coin_item_scene: PackedScene = preload("res://scenes/CoinItem.tscn")
+@onready var health_item_scene: PackedScene = preload("res://scenes/HealthItem.tscn")
 @onready var hud_font: Font = preload("res://assets/fonts/LuckiestGuy-Regular.ttf")
 @onready var hurtbox: Area2D = $Hurtbox
+@onready var body_collision: CollisionShape2D = $CollisionShape2D
 @onready var sfx_jump: AudioStreamPlayer = $SfxJump
 @onready var sfx_stomp: AudioStreamPlayer = $SfxStomp
 @onready var sfx_switch: AudioStreamPlayer = $SfxSwitch
 @onready var sfx_hurt: AudioStreamPlayer = $SfxHurt
 @onready var sfx_coin: AudioStreamPlayer = $SfxCoin
+@onready var sfx_item_land: AudioStreamPlayer = $SfxItemLand
+@onready var sfx_death: AudioStreamPlayer = $SfxDeath
 @onready var camera: Camera2D = $Camera2D
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var body_shape: RectangleShape2D = $CollisionShape2D.shape
@@ -83,14 +103,26 @@ var coins_label: Label
 
 var mode_tween: Tween
 var coins: int = 0
+var xp_level: int = 1
+var xp_current: float = 0.0
+var xp_to_next_level: float = 100.0
+var is_dying: bool = false
+var hud_flash_tween: Tween
+var commentary_tween: Tween
+var hud_base_modulates: Dictionary = {}
 
 func _ready() -> void:
 	_ensure_toggle_action()
+	add_to_group("player")
+	if pending_coin_restore:
+		coins = stored_coin_balance
+		pending_coin_restore = false
 	current_health = max_health
 	current_energy = max_energy
 	_cache_hud()
 	_update_health_ui()
 	_update_energy_ui()
+	_update_xp_ui()
 	_update_coins_ui()
 	if body_shape:
 		base_body_size = body_shape.size
@@ -102,9 +134,14 @@ func _ready() -> void:
 	# No manual positioning needed
 	if sprite:
 		sprite.flip_h = true
+	if pending_fade_in:
+		pending_fade_in = false
+		call_deferred("_fade_in_from_black")
 
 func _physics_process(delta: float) -> void:
-	if not health_bar_bg or not health_bar_fill or not energy_bar_bg or not energy_bar_fill or not coins_label:
+	if is_dying:
+		return
+	if not health_bar_bg or not health_bar_fill or not energy_bar_bg or not energy_bar_fill or not xp_bar_bg or not xp_bar_fill or not xp_level_label:
 		_cache_hud()
 	if Input.is_action_just_pressed("toggle_mode"):
 		if mode == PlayerMode.SMALL:
@@ -173,10 +210,9 @@ func _physics_process(delta: float) -> void:
 		if spin_accumulated >= TAU:
 			var spins := int(floor(spin_accumulated / TAU))
 			if spins > 0:
-				_add_coins(spins)
-				_play_sfx(sfx_coin)
-				_spawn_floating_text("   + %d" % spins, Color(1, 0.9, 0.2), coin_icon, global_position, Color(0.5019608, 0.3490196, 0.0509804), 3)
-				_spawn_screen_text("Nice Flip!", Color(0.2, 0.9, 0.3), Vector2(-45.0, -85.0), true, Color(0.0, 0.35, 0.1), 3)
+				_spawn_flip_energy_pickups(spins)
+				_play_sfx(sfx_switch)
+				_show_commentary_message("Nice Flip!", true)
 				spin_accumulated -= spins * TAU
 	else:
 		_reset_sprite_rotation()
@@ -220,9 +256,10 @@ func take_damage(amount: float) -> float:
 	current_health = max(0, current_health - int(round(final_amount)))
 	input_lock_timer = 0.5
 	_update_health_ui()
-	_spawn_floating_text("-%d" % int(round(final_amount)), Color(1, 0.2, 0.2), heart_icon)
-	if current_health <= 0:
-		get_tree().reload_current_scene()
+	_flash_left_panel(Color(1.0, 0.56, 0.78, 1.0))
+	_spawn_floating_text_with_item("-%d" % int(round(final_amount)), Color(1, 0.2, 0.2), health_item_scene, global_position, Color(0.4, 0.03, 0.06), 2, 0.92, true)
+	if current_health <= 0 and not is_dying:
+		call_deferred("_start_death_sequence")
 	return final_amount
 
 func _apply_mode(new_mode: PlayerMode, animate: bool) -> void:
@@ -255,7 +292,16 @@ func _ensure_toggle_action() -> void:
 	InputMap.action_add_event("toggle_mode", key_event)
 
 func _on_hurtbox_area_entered(area: Area2D) -> void:
+	if is_dying:
+		return
 	var is_stomp := velocity.y > 0.0 and global_position.y < area.global_position.y - 6.0
+
+	if area.is_in_group("items"):
+		if area.has_method("collect"):
+			area.call("collect", self)
+		elif area.get_parent().has_method("collect"):
+			area.get_parent().call("collect", self)
+		return
 
 	if area.is_in_group("destroyable_platforms"):
 		var target := area.get_parent()
@@ -279,8 +325,6 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 	if is_stomp and mode == PlayerMode.BIG:
 		if area.has_method("die"):
 			area.call("die")
-			_add_coins(100)
-			_spawn_floating_text("   + 100", Color(1, 0.9, 0.2), coin_icon, area.global_position, Color(0.5019608, 0.3490196, 0.0509804), 3)
 		velocity.y = stomp_bounce_velocity
 		_play_sfx(sfx_stomp)
 	else:
@@ -331,12 +375,13 @@ func _update_energy_ui() -> void:
 	else:
 		print("Energy: %d/%d" % [current_energy, max_energy])
 
-func _add_coins(amount: int) -> void:
+func _add_coins(amount: int, play_sound: bool = true) -> void:
 	if amount <= 0:
 		return
 	coins += amount
-	_play_sfx(sfx_coin)
 	_update_coins_ui()
+	if play_sound:
+		_play_sfx(sfx_coin)
 
 func _spawn_floating_text(text: String, color: Color, icon_tex: Texture2D, world_pos: Vector2 = Vector2.INF, outline_color: Color = Color(0, 0, 0, 0), outline_size: int = 0) -> void:
 	if not floating_text_scene:
@@ -347,8 +392,35 @@ func _spawn_floating_text(text: String, color: Color, icon_tex: Texture2D, world
 	spawn_pos.y -= 50.0
 	fx.override_font = hud_font
 	fx.outline_color = outline_color
-	fx.outline_size = outline_size
+	fx.outline_size = max(8, outline_size)
 	fx.setup(text, color, icon_tex, spawn_pos)
+
+func _spawn_floating_text_with_item(
+	text: String,
+	color: Color,
+	item_scene: PackedScene,
+	world_pos: Vector2 = Vector2.INF,
+	outline_color: Color = Color(0, 0, 0, 0),
+	outline_size: int = 0,
+	icon_scale: float = 1.0,
+	hide_backings: bool = true
+) -> void:
+	if not floating_text_scene:
+		return
+	if not item_scene:
+		_spawn_floating_text(text, color, null, world_pos, outline_color, outline_size)
+		return
+	var fx := floating_text_scene.instantiate()
+	get_tree().current_scene.add_child(fx)
+	var spawn_pos := global_position if world_pos == Vector2.INF else world_pos
+	spawn_pos.y -= 50.0
+	fx.override_font = hud_font
+	fx.outline_color = outline_color
+	fx.outline_size = max(8, outline_size)
+	if fx.has_method("setup_with_item_scene"):
+		fx.call("setup_with_item_scene", text, color, item_scene, spawn_pos, icon_scale, hide_backings)
+	else:
+		fx.call("setup", text, color, null, spawn_pos)
 
 func _spawn_screen_text(text: String, color: Color, screen_offset: Vector2, relative_to_player: bool = false, outline_color: Color = Color(0, 0, 0, 0), outline_size: int = 0) -> void:
 	if not floating_text_scene:
@@ -366,20 +438,125 @@ func _spawn_screen_text(text: String, color: Color, screen_offset: Vector2, rela
 			screen_pos = cam.global_position + screen_offset
 	fx.override_font = hud_font
 	fx.outline_color = outline_color
-	fx.outline_size = outline_size
+	fx.outline_size = max(8, outline_size)
 	fx.setup(text, color, null, screen_pos)
 
-func _update_coins_ui() -> void:
-	if not coins_label:
-		_cache_hud()
-	if coins_label:
-		coins_label.text = "%d" % coins
+func add_health(amount: int) -> void:
+	if amount <= 0:
+		return
+	var old_health := current_health
+	current_health = min(max_health, current_health + amount)
+	var gained := current_health - old_health
+	if gained > 0:
+		_update_health_ui()
+		_flash_left_panel(Color(0.42, 1.0, 0.55, 1.0))
 
 func add_energy(amount: int) -> void:
 	if amount <= 0:
 		return
 	current_energy = min(max_energy, current_energy + amount)
 	_update_energy_ui()
+	_flash_left_panel(Color(0.52, 0.86, 1.0, 1.0))
+
+func add_xp(amount: int) -> void:
+	if amount <= 0:
+		return
+	xp_current += amount
+	var leveled_up := false
+	while xp_current >= xp_to_next_level:
+		xp_current -= xp_to_next_level
+		xp_level += 1
+		xp_to_next_level = ceil(xp_to_next_level * xp_growth_multiplier)
+		leveled_up = true
+	_update_xp_ui()
+	if leveled_up:
+		_spawn_screen_text("LEVEL UP!", Color(1.0, 0.95, 0.35), Vector2(-52.0, -100.0), true, Color(0.35, 0.25, 0.0), 3)
+
+func on_item_picked(type: int, value: int) -> void:
+	match type:
+		0: # HEALTH
+			pass
+		1: # ENERGY
+			pass
+		2: # COIN
+			pass
+
+func on_energy_item_landed(value: int) -> void:
+	var gain := value if value > 1 else (value * 25)
+	add_energy(gain)
+	_play_sfx(sfx_item_land)
+
+func on_health_item_landed(value: int) -> void:
+	add_health(value * 20)
+	_play_sfx(sfx_item_land)
+
+func on_coin_item_landed(value: int) -> void:
+	_add_coins(value, true)
+	_play_sfx(sfx_item_land)
+	_flash_right_panel(Color(0.98039216, 0.972549, 0.6745098, 1.0))
+
+func can_collect_item(type: int) -> bool:
+	match type:
+		0: # HEALTH
+			return current_health < max_health
+		1: # ENERGY
+			return current_energy < max_energy
+		_:
+			return true
+
+func _spawn_flip_energy_pickups(spins: int) -> void:
+	if not item_pickup_scene:
+		return
+	var drops_to_spawn: int = int(max(1, spins * max(1, flip_reward_pickup_count_per_spin)))
+	var root := get_tree().current_scene
+	if not root:
+		return
+	var spawn_origin := _get_flip_reward_spawn_world_pos()
+	for i in range(drops_to_spawn):
+		var item := item_pickup_scene.instantiate()
+		item.type = 1 # ItemType.ENERGY
+		item.value = flip_energy_reward
+		root.add_child(item)
+		var x_offset := randf_range(-10.0, 10.0) + float(i - drops_to_spawn / 2) * 14.0
+		item.global_position = spawn_origin + Vector2(x_offset, randf_range(-4.0, 4.0))
+		if item is CharacterBody2D:
+			var body := item as CharacterBody2D
+			body.velocity = Vector2(randf_range(-70.0, 70.0), randf_range(20.0, 90.0))
+
+func _get_flip_reward_spawn_world_pos() -> Vector2:
+	var viewport := get_viewport()
+	var rect := viewport.get_visible_rect()
+	var screen_pos := Vector2(rect.size.x * 0.5, 54.0)
+	return viewport.get_canvas_transform().affine_inverse() * screen_pos
+
+func _show_commentary_message(text: String, show_energy_icon: bool) -> void:
+	if not commentary_panel or not commentary_label:
+		_cache_hud()
+	if not commentary_panel or not commentary_label:
+		return
+	if commentary_tween and commentary_tween.is_running():
+		commentary_tween.kill()
+	commentary_label.text = text
+	if commentary_energy_item:
+		commentary_energy_item.visible = show_energy_icon
+	commentary_panel.visible = true
+	commentary_panel.modulate.a = 0.0
+	commentary_panel.scale = Vector2(0.92, 0.92)
+	commentary_tween = create_tween()
+	commentary_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	commentary_tween.tween_property(commentary_panel, "modulate:a", 1.0, 0.16)
+	commentary_tween.parallel().tween_property(commentary_panel, "scale", Vector2.ONE, 0.16)
+	commentary_tween.tween_interval(2.0)
+	commentary_tween.tween_property(commentary_panel, "modulate:a", 0.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	commentary_tween.parallel().tween_property(commentary_panel, "scale", Vector2(0.92, 0.92), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	commentary_tween.tween_callback(func() -> void:
+		commentary_panel.visible = false
+	)
+
+func on_xp_item_landed(value: int) -> void:
+	add_xp(value)
+	_play_sfx(sfx_item_land)
+	_flash_right_panel(Color(0.7490196, 0.18431373, 0.6862745, 1.0))
 
 func _cache_hud() -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
@@ -391,7 +568,40 @@ func _cache_hud() -> void:
 	health_bar_fill = hud.get_node_or_null("HealthBarBg/HealthBarFill")
 	energy_bar_bg = hud.get_node_or_null("EnergyBarBg")
 	energy_bar_fill = hud.get_node_or_null("EnergyBarBg/EnergyBarFill")
-	coins_label = hud.get_node_or_null("CoinsLabel")
+	xp_bar_bg = hud.get_node_or_null("XpBarBg")
+	xp_bar_fill = hud.get_node_or_null("XpBarBg/XpBarFill")
+	xp_level_label = hud.get_node_or_null("XpItem/XpLevelLabel")
+	left_panel = hud.get_node_or_null("LeftPanel")
+	right_panel = hud.get_node_or_null("RightPanel")
+	coin_count_label = hud.get_node_or_null("CoinCountLabel")
+	commentary_panel = hud.get_node_or_null("CommentaryPanel")
+	commentary_label = hud.get_node_or_null("CommentaryPanel/CommentaryLabel")
+	commentary_energy_item = hud.get_node_or_null("CommentaryPanel/CommentaryEnergyItem") as Node2D
+	var health_backing := hud.get_node_or_null("HealthItem/HealthIconBacking") as CanvasItem
+	var energy_backing := hud.get_node_or_null("EnergyItem/EnergyIconBacking") as CanvasItem
+	var xp_backing := hud.get_node_or_null("XpItem/XpIconBacking") as CanvasItem
+	var coin_backing := hud.get_node_or_null("CoinItem/CoinIconBacking") as CanvasItem
+	var commentary_energy_backing := hud.get_node_or_null("CommentaryPanel/CommentaryEnergyItem/EnergyIconBacking") as CanvasItem
+	if health_backing:
+		health_backing.visible = false
+	if energy_backing:
+		energy_backing.visible = false
+	if xp_backing:
+		xp_backing.visible = false
+	if coin_backing:
+		coin_backing.visible = false
+	if commentary_energy_backing:
+		commentary_energy_backing.visible = false
+	if commentary_panel and not commentary_panel.visible:
+		commentary_panel.modulate.a = 0.0
+	for node in [
+		left_panel, right_panel,
+		health_bar_bg, health_bar_fill,
+		energy_bar_bg, energy_bar_fill,
+		xp_bar_bg, xp_bar_fill
+	]:
+		if node is CanvasItem:
+			_register_hud_base_modulate(node as CanvasItem)
 
 func _set_mode_scale(target_scale: Vector2, animate: bool) -> void:
 	if not animate:
@@ -407,6 +617,70 @@ func _set_mode_scale(target_scale: Vector2, animate: bool) -> void:
 func _play_sfx(player: AudioStreamPlayer) -> void:
 	if player and player.stream:
 		player.play()
+
+func _flash_hud_nodes(nodes: Array, flash_color: Color) -> void:
+	var targets: Array[CanvasItem] = []
+	for node in nodes:
+		if node is CanvasItem:
+			var target := node as CanvasItem
+			targets.append(target)
+			_register_hud_base_modulate(target)
+	if targets.is_empty():
+		return
+	if hud_flash_tween and hud_flash_tween.is_running():
+		hud_flash_tween.kill()
+		_reset_hud_flash_modulates()
+	hud_flash_tween = create_tween().set_parallel(true)
+	for target in targets:
+		var base: Color = hud_base_modulates.get(target, target.modulate)
+		target.modulate = base.lerp(flash_color, 0.8)
+		hud_flash_tween.tween_property(target, "modulate", base, 0.36).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	hud_flash_tween.tween_callback(_reset_hud_flash_modulates)
+
+func _register_hud_base_modulate(target: CanvasItem) -> void:
+	if not target:
+		return
+	if not hud_base_modulates.has(target):
+		hud_base_modulates[target] = target.modulate
+
+func _reset_hud_flash_modulates() -> void:
+	var stale: Array = []
+	for target in hud_base_modulates.keys():
+		if not is_instance_valid(target):
+			stale.append(target)
+			continue
+		(target as CanvasItem).modulate = hud_base_modulates[target]
+	for key in stale:
+		hud_base_modulates.erase(key)
+
+func _flash_left_panel(color: Color) -> void:
+	if not left_panel:
+		_cache_hud()
+	if left_panel:
+		_flash_hud_nodes([left_panel], color)
+
+func _flash_right_panel(color: Color) -> void:
+	if not right_panel:
+		_cache_hud()
+	if right_panel:
+		_flash_hud_nodes([right_panel], color)
+
+func _update_xp_ui() -> void:
+	if not xp_bar_bg or not xp_bar_fill or not xp_level_label:
+		_cache_hud()
+	if xp_bar_bg and xp_bar_fill:
+		var ratio := 0.0
+		if xp_to_next_level > 0.0:
+			ratio = clamp(xp_current / xp_to_next_level, 0.0, 1.0)
+		xp_bar_fill.size.x = xp_bar_bg.size.x * ratio
+	if xp_level_label:
+		xp_level_label.text = "%d" % xp_level
+
+func _update_coins_ui() -> void:
+	if not coin_count_label:
+		_cache_hud()
+	if coin_count_label:
+		coin_count_label.text = "%d" % coins
 
 func _set_frames(frames: SpriteFrames) -> void:
 	if not sprite or not frames:
@@ -455,6 +729,8 @@ func _update_facing(wall_sliding: bool) -> void:
 
 func _update_animation(wall_sliding: bool) -> void:
 	if not sprite:
+		return
+	if is_dying:
 		return
 	sprite.visible = true
 	var next_anim := "idle"
@@ -553,3 +829,75 @@ func _wall_jump() -> void:
 	velocity.x = wall_jump_horizontal * away_dir
 	velocity.y = wall_jump_vertical
 	knockback_velocity = 0.0
+
+func _start_death_sequence() -> void:
+	if is_dying:
+		return
+	is_dying = true
+	input_lock_timer = 999.0
+	velocity = Vector2.ZERO
+	knockback_velocity = 0.0
+	damage_cooldown_timer = 0.0
+	set_deferred("collision_layer", 0)
+	set_deferred("collision_mask", 0)
+	if body_collision:
+		body_collision.set_deferred("disabled", true)
+	if hurtbox:
+		hurtbox.set_deferred("monitoring", false)
+	if sprite:
+		if sprite.sprite_frames and sprite.sprite_frames.has_animation("hurt"):
+			sprite.play("hurt")
+		var death_tween := create_tween().set_parallel(true)
+		death_tween.tween_property(sprite, "rotation", sprite.rotation + deg_to_rad(200.0), death_anim_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		death_tween.tween_property(sprite, "scale", sprite.scale * 0.7, death_anim_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		death_tween.tween_property(sprite, "modulate", Color(1.4, 0.35, 0.35, 0.2), death_anim_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_play_sfx(sfx_death)
+	await get_tree().create_timer(death_anim_time).timeout
+	var fade_rect := _ensure_fade_overlay(0.0)
+	if fade_rect:
+		var fade_tween := create_tween()
+		fade_tween.tween_property(fade_rect, "color:a", 1.0, death_fade_time).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+		await fade_tween.finished
+	stored_coin_balance = coins
+	pending_coin_restore = true
+	pending_fade_in = true
+	get_tree().reload_current_scene()
+
+func _ensure_fade_overlay(initial_alpha: float) -> ColorRect:
+	var scene := get_tree().current_scene
+	if not scene:
+		return null
+	var fade_layer := scene.get_node_or_null("__DeathFadeLayer") as CanvasLayer
+	if fade_layer == null:
+		fade_layer = CanvasLayer.new()
+		fade_layer.name = "__DeathFadeLayer"
+		fade_layer.layer = 100
+		scene.add_child(fade_layer)
+	var fade_rect := fade_layer.get_node_or_null("FadeRect") as ColorRect
+	if fade_rect == null:
+		fade_rect = ColorRect.new()
+		fade_rect.name = "FadeRect"
+		fade_rect.anchor_left = 0.0
+		fade_rect.anchor_top = 0.0
+		fade_rect.anchor_right = 1.0
+		fade_rect.anchor_bottom = 1.0
+		fade_rect.offset_left = 0.0
+		fade_rect.offset_top = 0.0
+		fade_rect.offset_right = 0.0
+		fade_rect.offset_bottom = 0.0
+		fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fade_layer.add_child(fade_rect)
+	fade_rect.color = Color(0, 0, 0, clamp(initial_alpha, 0.0, 1.0))
+	return fade_rect
+
+func _fade_in_from_black() -> void:
+	await get_tree().process_frame
+	var fade_rect := _ensure_fade_overlay(1.0)
+	if not fade_rect:
+		return
+	var fade_tween := create_tween()
+	fade_tween.tween_property(fade_rect, "color:a", 0.0, death_fade_time).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
+	await fade_tween.finished
+	var fade_layer := fade_rect.get_parent()
+	if fade_layer:
+		fade_layer.queue_free()

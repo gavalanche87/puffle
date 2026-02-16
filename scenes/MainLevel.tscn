@@ -9,11 +9,13 @@
 [ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/Ground.tscn" id="ground_scene"]
 [ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/Platform.tscn" id="platform_scene"]
 [ext_resource type="PackedScene" path="res://scenes/Wall.tscn" id="wall_scene"]
+[ext_resource type="Script" path="res://scripts/level_camera_setup.gd" id="level_camera_setup_script"]
 
 [sub_resource type="RectangleShape2D" id="11"]
 size = Vector2(4806, 64)
 
 [node name="MainLevel" type="Node2D" unique_id=477514167]
+script = ExtResource("level_camera_setup_script")
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=591502514]
 layer = -10

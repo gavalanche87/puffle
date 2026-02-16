@@ -77,43 +77,47 @@ func _find_nodes_by_script(node: Node, script_path: String, result: Array) -> vo
 
 ## Gets the right edge of a tiled body (wall or ground)
 func _get_right_edge(body: Node2D) -> float:
-	var width = 32.0 # Default tile size
-	if body.has_method("get") and body.get("length_tiles"):
-		var length = body.get("length_tiles")
-		var scale_x = body.scale.x if body.scale else 1.0
-		var body_type = body.get("body_type")
-		
-		if body_type == "wall":
-			# Walls are vertical, width is the tile size
-			width = 32.0 * scale_x
-		else:
-			# Ground/platform is horizontal
-			width = length * 32.0 * scale_x
-	
+	var bounds := _get_body_world_bounds(body)
+	if bounds.size != Vector2.ZERO:
+		return bounds.end.x
+	var width := 32.0 # Fallback tile size
 	return body.global_position.x + (width / 2.0)
 
 ## Gets the left edge of a tiled body
 func _get_left_edge(body: Node2D) -> float:
-	var width = 32.0 # Default tile size
-	if body.has_method("get") and body.get("length_tiles"):
-		var length = body.get("length_tiles")
-		var scale_x = body.scale.x if body.scale else 1.0
-		var body_type = body.get("body_type")
-		
-		if body_type == "wall":
-			width = 32.0 * scale_x
-		else:
-			width = length * 32.0 * scale_x
-	
+	var bounds := _get_body_world_bounds(body)
+	if bounds.size != Vector2.ZERO:
+		return bounds.position.x
+	var width := 32.0 # Fallback tile size
 	return body.global_position.x - (width / 2.0)
 
 ## Gets the top edge of a tiled body
 func _get_top_edge(body: Node2D) -> float:
-	var height = 32.0 # Default tile size
-	var scale_y = body.scale.y if body.scale else 1.0
-	height *= scale_y
-	
+	var bounds := _get_body_world_bounds(body)
+	if bounds.size != Vector2.ZERO:
+		return bounds.position.y
+	var height := 32.0 # Fallback tile size
 	return body.global_position.y - (height / 2.0)
+
+## Gets world-space bounds from a tiled body's CollisionShape2D (supports offsets/scales)
+func _get_body_world_bounds(body: Node2D) -> Rect2:
+	var collision := body.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision == null or collision.shape == null:
+		return Rect2()
+	if collision.shape is RectangleShape2D:
+		var rect_shape := collision.shape as RectangleShape2D
+		var half := rect_shape.size * 0.5
+		var xf := collision.global_transform
+		var p0 := xf * Vector2(-half.x, -half.y)
+		var p1 := xf * Vector2(half.x, -half.y)
+		var p2 := xf * Vector2(half.x, half.y)
+		var p3 := xf * Vector2(-half.x, half.y)
+		var min_x := minf(minf(p0.x, p1.x), minf(p2.x, p3.x))
+		var max_x := maxf(maxf(p0.x, p1.x), maxf(p2.x, p3.x))
+		var min_y := minf(minf(p0.y, p1.y), minf(p2.y, p3.y))
+		var max_y := maxf(maxf(p0.y, p1.y), maxf(p2.y, p3.y))
+		return Rect2(Vector2(min_x, min_y), Vector2(max_x - min_x, max_y - min_y))
+	return Rect2()
 
 ## Main function to setup camera bounds
 func setup_camera_bounds(camera: Camera2D, player: Node2D = null) -> void:
@@ -160,9 +164,10 @@ func setup_camera_bounds(camera: Camera2D, player: Node2D = null) -> void:
 		push_warning("CameraBoundsManager: No right wall found")
 	
 	if bottom_ground:
-		var ground_top = _get_top_edge(bottom_ground)
-		var ground_bottom = bottom_ground.global_position.y + 16.0 # Approximate
-		camera.limit_bottom = int(ground_top)
+		var ground_bounds := _get_body_world_bounds(bottom_ground)
+		var ground_top := _get_top_edge(bottom_ground)
+		var ground_bottom: float = ground_bounds.end.y if ground_bounds.size != Vector2.ZERO else (bottom_ground.global_position.y + 16.0)
+		camera.limit_bottom = int(ground_bottom)
 		print("  Bottom Ground: pos=%v, top_edge=%.1f, bottom_edge=%.1f, limit_bottom=%d" %
 			[bottom_ground.global_position, ground_top, ground_bottom, camera.limit_bottom])
 	else:

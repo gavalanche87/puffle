@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://btah2q6fu5vgh"]
+
+[ext_resource type="Texture2D" uid="uid://dw6f7rechcxjv" path="res://assets/items/xp_orb.png" id="1_kx55h"]
+[ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="2_kx55h"]
+
+[sub_resource type="Gradient" id="1"]
+offsets = PackedFloat32Array(0, 0.82, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.95, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_66wji"]
+gradient = SubResource("1")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="XPItem" type="Node2D" unique_id=1393564388]
+
+[node name="XpIconBacking" type="Sprite2D" parent="." unique_id=1921207071]
+modulate = Color(0.7490196, 0.18431373, 0.6862745, 1)
+scale = Vector2(0.5, 0.5)
+texture = SubResource("GradientTexture2D_66wji")
+
+[node name="XpIcon" type="Sprite2D" parent="." unique_id=2120447266]
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("1_kx55h")
+
+[node name="XpLevelLabel" type="Label" parent="." unique_id=1434966500]
+offset_left = -7.0000076
+offset_top = -12.067329
+offset_right = 6.9999924
+offset_bottom = 9.932671
+theme_override_colors/font_color = Color(0.98039216, 0.972549, 0.6745098, 1)
+theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("2_kx55h")
+theme_override_font_sizes/font_size = 20
+text = "1"
+horizontal_alignment = 1

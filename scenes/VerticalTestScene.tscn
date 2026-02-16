@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://m5v7kkve38uv" path="res://scenes/DestroyablePlatform.tscn" id="destroyable_platform_scene"]
 [ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/Ground.tscn" id="ground_scene"]
 [ext_resource type="PackedScene" path="res://scenes/HazardSaw.tscn" id="hazard_saw_scene"]
+[ext_resource type="Script" uid="uid://ci2l63nm7wph7" path="res://scripts/level_camera_setup.gd" id="level_camera_setup_script"]
 [ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/Platform.tscn" id="platform_scene"]
 [ext_resource type="PackedScene" path="res://scenes/Wall.tscn" id="wall_scene"]
 
@@ -17,6 +18,7 @@
 size = Vector2(3200, 30.00003)
 
 [node name="VerticalTestScene" type="Node2D" unique_id=1198225251]
+script = ExtResource("level_camera_setup_script")
 
 [node name="Background" type="CanvasLayer" parent="." unique_id=1503960579]
 layer = -10
@@ -36,7 +38,7 @@ stretch_mode = 6
 [node name="World" type="Node2D" parent="." unique_id=1358519409]
 
 [node name="Player" parent="World" unique_id=693069414 instance=ExtResource("1")]
-position = Vector2(-320, 608)
+position = Vector2(-201.72534, 532.55676)
 
 [node name="Platforms" type="Node2D" parent="World" unique_id=197979092]
 

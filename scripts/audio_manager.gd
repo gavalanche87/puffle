@@ -17,17 +17,14 @@ func _ready() -> void:
 	add_child(saw_player)
 
 func add_saw_on_screen() -> void:
+	# Saw SFX temporarily disabled.
 	saw_visible_count += 1
-	_update_saw_sound()
 
 func remove_saw_on_screen() -> void:
 	saw_visible_count = max(0, saw_visible_count - 1)
-	_update_saw_sound()
+	# Saw SFX temporarily disabled.
 
 func _update_saw_sound() -> void:
-	if saw_visible_count > 0:
-		if not saw_player.playing:
-			saw_player.play()
-	else:
-		if saw_player.playing:
-			saw_player.stop()
+	# Saw SFX temporarily disabled.
+	if saw_player and saw_player.playing:
+		saw_player.stop()

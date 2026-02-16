@@ -82,6 +82,7 @@ size = Vector2(17.955395, 21.138977)
 scale = Vector2(2, 2)
 script = ExtResource("1")
 death_scene = ExtResource("6")
+xp_drop_value = 16
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=952385654]
 position = Vector2(16, 16)
