@@ -77,6 +77,10 @@ text = "PLAY"
 layout_mode = 2
 text = "SHOP"
 
+[node name="AmuletsButton" parent="Layout/Panel/Margin/Buttons" instance=ExtResource("2")]
+layout_mode = 2
+text = "AMULETS"
+
 [node name="HowToPlayButton" parent="Layout/Panel/Margin/Buttons" instance=ExtResource("2")]
 layout_mode = 2
 text = "HOW TO PLAY"

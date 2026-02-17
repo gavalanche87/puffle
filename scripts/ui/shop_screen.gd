@@ -18,11 +18,12 @@ func _ready() -> void:
 	if gd:
 		if gd.has_method("add_currency"):
 			gd.call("add_currency", "coins", 100)
+			gd.call("add_currency", "tokens", 100)
 		if gd.has_signal("currencies_changed"):
 			gd.currencies_changed.connect(_refresh)
 		if gd.has_signal("inventory_changed"):
 			gd.inventory_changed.connect(_refresh)
-		status_label.text = "Testing bonus: +100 Coins"
+		status_label.text = "Testing bonus: +100 Coins, +100 Tokens"
 	_refresh()
 
 func _refresh() -> void:

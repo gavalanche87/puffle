@@ -4,6 +4,7 @@ signal data_changed
 signal progression_changed
 signal currencies_changed
 signal inventory_changed
+signal amulets_changed
 
 const SAVE_PATH := "user://save_data.json"
 const LEVEL_SELECT_SCENE := "res://scenes/ui/LevelSelect.tscn"
@@ -19,6 +20,12 @@ var completed_levels: Array[String] = []
 var consumable_inventory: Dictionary = {"health": 0, "energy": 0}
 var owned_amulets: Array[String] = []
 var equipped_amulet: String = ""
+var equipped_amulets: Array[String] = []
+var amulet_slots_unlocked: int = 3
+var amulet_screen_manage_mode: bool = false
+var amulet_return_scene_path: String = ""
+var amulet_return_to_pause: bool = false
+var open_pause_on_next_hud: bool = false
 
 var current_world: int = 0
 var current_level: int = 0
@@ -53,30 +60,51 @@ const SHOP_ITEMS := [
 
 const SHOP_AMULETS := [
 	{
-		"id": "vigor_amulet",
+		"id": "size_shift",
 		"kind": "amulet",
-		"title": "Vigor Amulet",
-		"description": "Boon: +25 Max Health | Grievance: Move Speed -25%",
+		"title": "Size Shift",
+		"description": "Boon: Toggle Big/Small Mode | Grievance: Enemy Damage x1.5",
 		"currency": "tokens",
 		"cost": 2
 	},
 	{
-		"id": "surge_amulet",
+		"id": "head_spike",
 		"kind": "amulet",
-		"title": "Surge Amulet",
-		"description": "Boon: +20 Max Energy | Grievance: Damage Taken +20%",
+		"title": "Head Spike",
+		"description": "Boon: Spike Attack (X) | Grievance: Max Health -10%",
 		"currency": "tokens",
 		"cost": 2
 	},
 	{
-		"id": "fortune_amulet",
+		"id": "double_jump",
 		"kind": "amulet",
-		"title": "Fortune Amulet",
-		"description": "Boon: +25% Coin Drops | Grievance: XP Gain -20%",
+		"title": "Double Jump",
+		"description": "Boon: +1 Mid-air Jump | Grievance: Bonus Reward Rate x3",
 		"currency": "tokens",
 		"cost": 3
 	}
 ]
+
+const AMULET_INFO := {
+	"size_shift": {
+		"title": "Size Shift",
+		"boon": "Toggle Big and Small form with Z",
+		"grievance": "Enemy Damage x1.5",
+		"shop_cost_tokens": 2
+	},
+	"head_spike": {
+		"title": "Head Spike",
+		"boon": "Enable head spike attacks with X",
+		"grievance": "Max Health -10%",
+		"shop_cost_tokens": 2
+	},
+	"double_jump": {
+		"title": "Double Jump",
+		"boon": "Gain one extra jump in mid-air",
+		"grievance": "Bonus Reward Rate x3",
+		"shop_cost_tokens": 3
+	}
+}
 
 func _ready() -> void:
 	_ensure_audio_buses()
@@ -213,6 +241,7 @@ func purchase_offer(offer_id: String) -> Dictionary:
 	_save_data()
 	emit_signal("inventory_changed")
 	emit_signal("currencies_changed")
+	emit_signal("amulets_changed")
 	emit_signal("data_changed")
 	return {"ok": true, "message": "Purchased %s" % String(offer.get("title", "item"))}
 
@@ -249,6 +278,85 @@ func set_xp_state(level: int, current: float, to_next: float, save_now: bool = t
 func has_amulet(amulet_id: String) -> bool:
 	return owned_amulets.has(amulet_id)
 
+func get_amulet_catalog() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for offer in SHOP_AMULETS:
+		var id := String(offer.get("id", ""))
+		var info: Dictionary = AMULET_INFO.get(id, {})
+		out.append({
+			"id": id,
+			"title": String(info.get("title", String(offer.get("title", id)))),
+			"boon": String(info.get("boon", "")),
+			"grievance": String(info.get("grievance", "")),
+			"cost_tokens": int(info.get("shop_cost_tokens", int(offer.get("cost", 0))))
+		})
+	return out
+
+func get_owned_amulets() -> Array[String]:
+	return owned_amulets.duplicate()
+
+func get_equipped_amulets() -> Array[String]:
+	return equipped_amulets.duplicate()
+
+func get_amulet_slots_unlocked() -> int:
+	return max(3, amulet_slots_unlocked)
+
+func is_amulet_equipped(amulet_id: String) -> bool:
+	return equipped_amulets.has(amulet_id)
+
+func equip_amulet(amulet_id: String, slot_index: int = 0) -> Dictionary:
+	if not has_amulet(amulet_id):
+		return {"ok": false, "message": "Amulet not owned"}
+	if slot_index < 0 or slot_index >= get_amulet_slots_unlocked():
+		return {"ok": false, "message": "Slot locked"}
+	var existing_index: int = equipped_amulets.find(amulet_id)
+	if existing_index != -1 and existing_index != slot_index:
+		return {"ok": false, "message": "Amulet already equipped"}
+	while equipped_amulets.size() <= slot_index:
+		equipped_amulets.append("")
+	equipped_amulets[slot_index] = amulet_id
+	equipped_amulet = equipped_amulets[0] if not equipped_amulets.is_empty() else ""
+	_save_data()
+	emit_signal("amulets_changed")
+	emit_signal("inventory_changed")
+	emit_signal("data_changed")
+	return {"ok": true, "message": "Equipped %s" % amulet_id}
+
+func unequip_amulet(slot_index: int = 0) -> Dictionary:
+	if slot_index < 0 or slot_index >= get_amulet_slots_unlocked():
+		return {"ok": false, "message": "Slot locked"}
+	while equipped_amulets.size() <= slot_index:
+		equipped_amulets.append("")
+	equipped_amulets[slot_index] = ""
+	equipped_amulet = equipped_amulets[0] if not equipped_amulets.is_empty() else ""
+	_save_data()
+	emit_signal("amulets_changed")
+	emit_signal("inventory_changed")
+	emit_signal("data_changed")
+	return {"ok": true, "message": "Unequipped"}
+
+func set_amulet_screen_manage_mode(value: bool) -> void:
+	amulet_screen_manage_mode = value
+
+func get_amulet_screen_manage_mode() -> bool:
+	return amulet_screen_manage_mode
+
+func set_amulet_return_context(scene_path: String, should_reopen_pause: bool) -> void:
+	amulet_return_scene_path = scene_path
+	amulet_return_to_pause = should_reopen_pause
+	open_pause_on_next_hud = should_reopen_pause
+
+func get_amulet_return_scene_path() -> String:
+	return amulet_return_scene_path
+
+func should_reopen_pause_on_return() -> bool:
+	return amulet_return_to_pause
+
+func consume_open_pause_on_next_hud() -> bool:
+	var value := open_pause_on_next_hud
+	open_pause_on_next_hud = false
+	return value
+
 func set_music_volume_linear(value: float) -> void:
 	music_volume_linear = clampf(value, 0.0, 1.0)
 	_set_bus_volume("Music", music_volume_linear)
@@ -284,6 +392,8 @@ func _save_data() -> void:
 		"consumable_inventory": consumable_inventory,
 		"owned_amulets": owned_amulets,
 		"equipped_amulet": equipped_amulet,
+		"equipped_amulets": equipped_amulets,
+		"amulet_slots_unlocked": amulet_slots_unlocked,
 		"music_volume_linear": music_volume_linear,
 		"sfx_volume_linear": sfx_volume_linear,
 		"xp_level": xp_level,
@@ -330,6 +440,21 @@ func _load_data() -> void:
 	for amulet in loaded_amulets:
 		owned_amulets.append(String(amulet))
 	equipped_amulet = String(data.get("equipped_amulet", equipped_amulet))
+	var loaded_equipped: Array = data.get("equipped_amulets", [])
+	equipped_amulets.clear()
+	for entry in loaded_equipped:
+		equipped_amulets.append(String(entry))
+	amulet_slots_unlocked = max(3, int(data.get("amulet_slots_unlocked", amulet_slots_unlocked)))
+	while equipped_amulets.size() < amulet_slots_unlocked:
+		equipped_amulets.append("")
+	if equipped_amulets.is_empty() and equipped_amulet != "":
+		equipped_amulets.append(equipped_amulet)
+	if equipped_amulets.size() > amulet_slots_unlocked:
+		equipped_amulets.resize(amulet_slots_unlocked)
+	if not equipped_amulets.is_empty():
+		equipped_amulet = String(equipped_amulets[0])
+	else:
+		equipped_amulet = ""
 	music_volume_linear = float(data.get("music_volume_linear", music_volume_linear))
 	sfx_volume_linear = float(data.get("sfx_volume_linear", sfx_volume_linear))
 	xp_level = max(1, int(data.get("xp_level", xp_level)))

@@ -8,37 +8,40 @@
 [ext_resource type="Script" uid="uid://c6o82o8u0lctj" path="res://scripts/ui/hud_overlay.gd" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseMenuPopup.tscn" id="8"]
+[ext_resource type="Texture2D" uid="uid://dx4xlaww65v1e" path="res://assets/ui/amulets/Shift_Size_Amulet.png" id="11"]
+[ext_resource type="Texture2D" uid="uid://e74fusamu8hq" path="res://assets/ui/amulets/Head_Spike_Amulet.png" id="12"]
+[ext_resource type="Texture2D" path="res://assets/ui/amulets/Double_Jump_Amulet.png" id="13"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0.552941, 0.552941, 0.552941, 1)
+bg_color = Color(0.7490196, 0.7490196, 0.7490196, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="9"]
-bg_color = Color(0.552941, 0.552941, 0.552941, 1)
+bg_color = Color(0.7490196, 0.7490196, 0.7490196, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="10"]
-bg_color = Color(0.552941, 0.552941, 0.552941, 1)
+bg_color = Color(0.7490196, 0.7490196, 0.7490196, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="2"]
-bg_color = Color(0.25490198, 0.25490198, 0.25490198, 1)
+bg_color = Color(0.5529412, 0.5529412, 0.5529412, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
 [sub_resource type="StyleBoxFlat" id="3"]
-bg_color = Color(0.254902, 0.254902, 0.254902, 1)
+bg_color = Color(0.5529412, 0.5529412, 0.5529412, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -52,7 +55,7 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="5"]
-bg_color = Color(0.254902, 0.254902, 0.254902, 1)
+bg_color = Color(0.5529412, 0.5529412, 0.5529412, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -66,7 +69,7 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="7"]
-bg_color = Color(0.254902, 0.254902, 0.254902, 1)
+bg_color = Color(0.5529412, 0.5529412, 0.5529412, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -234,6 +237,50 @@ theme_override_font_sizes/font_size = 15
 text = "0"
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="EquippedAmuletsPanel" type="Panel" parent="." unique_id=2084601155]
+offset_left = 8.0
+offset_top = 84.27185
+offset_right = 152.0
+offset_bottom = 114.27185
+theme_override_styles/panel = SubResource("1")
+
+[node name="AmuletSlot1" type="TextureRect" parent="EquippedAmuletsPanel" unique_id=1786543211]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 2.0
+offset_right = 72.0
+offset_bottom = 66.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("11")
+stretch_mode = 5
+
+[node name="AmuletSlot2" type="TextureRect" parent="EquippedAmuletsPanel" unique_id=1098765432]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 2.0
+offset_right = 108.0
+offset_bottom = 66.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("12")
+stretch_mode = 5
+
+[node name="AmuletSlot3" type="TextureRect" parent="EquippedAmuletsPanel" unique_id=1098765433]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 2.0
+offset_right = 144.0
+offset_bottom = 66.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("13")
+stretch_mode = 5
+
+[node name="AmuletsHudButton" type="Button" parent="EquippedAmuletsPanel" unique_id=192837465]
+layout_mode = 0
+offset_right = 144.0
+offset_bottom = 30.0
+focus_mode = 0
+flat = true
 
 [node name="HealthBarOutline" type="Panel" parent="." unique_id=1443374081]
 offset_left = 46.0

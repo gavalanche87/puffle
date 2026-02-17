@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5j3ey111j6jo"
-path="res://.godot/imported/yellow_button00.png-1cc8c94abe47b1df349b810df1a19a7d.ctex"
+uid="uid://e74fusamu8hq"
+path="res://.godot/imported/Head_Spike_Amulet.png-4374ec46f004a68d30c5d9fe4e05f3cb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/yellow_button00.png"
-dest_files=["res://.godot/imported/yellow_button00.png-1cc8c94abe47b1df349b810df1a19a7d.ctex"]
+source_file="res://assets/ui/amulets/Head_Spike_Amulet.png"
+dest_files=["res://.godot/imported/Head_Spike_Amulet.png-4374ec46f004a68d30c5d9fe4e05f3cb.ctex"]
 
 [params]
 

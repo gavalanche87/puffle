@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cu1770sgq6yko"
-path="res://.godot/imported/Bananas.png-ef810b0c53941d60a083a4591301ae0f.ctex"
+uid="uid://deuhxm6gp2mr3"
+path="res://.godot/imported/Shift_Size copy.png-7fdf928a238a41e228e070422fa5a8a5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/items/Bananas.png"
-dest_files=["res://.godot/imported/Bananas.png-ef810b0c53941d60a083a4591301ae0f.ctex"]
+source_file="res://assets/ui/amulets/Shift_Size copy.png"
+dest_files=["res://.godot/imported/Shift_Size copy.png-7fdf928a238a41e228e070422fa5a8a5.ctex"]
 
 [params]
 

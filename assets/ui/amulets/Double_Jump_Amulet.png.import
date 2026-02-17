@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://8174t4dkxywu"
-path="res://.godot/imported/level_select_frame_128.png-6905a51f28e8df6de4ffa8f4acd6d21c.ctex"
+uid="uid://brhojjt7oc5pj"
+path="res://.godot/imported/Double_Jump_Amulet.png-303d4441c8bc0b3c001506a411513e95.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/level_select_frame_128.png"
-dest_files=["res://.godot/imported/level_select_frame_128.png-6905a51f28e8df6de4ffa8f4acd6d21c.ctex"]
+source_file="res://assets/ui/amulets/Double_Jump_Amulet.png"
+dest_files=["res://.godot/imported/Double_Jump_Amulet.png-303d4441c8bc0b3c001506a411513e95.ctex"]
 
 [params]
 

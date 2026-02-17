@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bb7abxg282m1a"
-path="res://.godot/imported/green_button00.png-11830825fe9e8b87dc2743bea46c9673.ctex"
+uid="uid://dncqybq6tdn1t"
+path="res://.godot/imported/Double_Jump.png-923016da41c1abb3ff4227b985b857f5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/green_button00.png"
-dest_files=["res://.godot/imported/green_button00.png-11830825fe9e8b87dc2743bea46c9673.ctex"]
+source_file="res://assets/ui/amulets/Double_Jump.png"
+dest_files=["res://.godot/imported/Double_Jump.png-923016da41c1abb3ff4227b985b857f5.ctex"]
 
 [params]
 

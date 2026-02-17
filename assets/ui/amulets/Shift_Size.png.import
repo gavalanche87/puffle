@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://by6fis2yhruif"
-path="res://.godot/imported/blue_button00.png-60896d5adae9501a330aee5bad44516f.ctex"
+uid="uid://c2uiro63bnc24"
+path="res://.godot/imported/Shift_Size.png-d8e78e2508085f4ef79686b5cecac707.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/blue_button00.png"
-dest_files=["res://.godot/imported/blue_button00.png-60896d5adae9501a330aee5bad44516f.ctex"]
+source_file="res://assets/ui/amulets/Shift_Size.png"
+dest_files=["res://.godot/imported/Shift_Size.png-d8e78e2508085f4ef79686b5cecac707.ctex"]
 
 [params]
 

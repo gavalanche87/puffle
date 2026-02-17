@@ -19,6 +19,10 @@ text = "RESUME"
 layout_mode = 2
 text = "SETTINGS"
 
+[node name="AmuletsButton" parent="Panel/Margin/VBox/Content/Buttons" instance=ExtResource("2")]
+layout_mode = 2
+text = "AMULETS"
+
 [node name="MainMenuButton" parent="Panel/Margin/VBox/Content/Buttons" instance=ExtResource("2")]
 layout_mode = 2
 text = "MAIN MENU"

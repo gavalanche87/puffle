@@ -86,8 +86,8 @@ func _update_facing() -> void:
 	if sprite:
 		sprite.flip_h = direction > 0 if flip_when_moving_right else direction < 0
 
-func die() -> void:
-	var drops := _build_drop_requests()
+func die(kill_context: Dictionary = {}) -> void:
+	var drops := _build_drop_requests(kill_context)
 	var total := drops.size()
 	for i in range(total):
 		var req: Dictionary = drops[i]
@@ -98,7 +98,7 @@ func die() -> void:
 		fx.global_position = global_position
 	queue_free()
 
-func _build_drop_requests() -> Array[Dictionary]:
+func _build_drop_requests(kill_context: Dictionary = {}) -> Array[Dictionary]:
 	var drops: Array[Dictionary] = []
 	if not item_scene:
 		return drops
@@ -118,7 +118,14 @@ func _build_drop_requests() -> Array[Dictionary]:
 		drops.append({"type": 1, "value": 1}) # ItemType.ENERGY
 	elif roll < (h_rate + e_rate + c_rate):
 		drops.append({"type": 2, "value": 1}) # ItemType.COIN
+	if _is_small_head_spike_kill(kill_context):
+		drops.append({"type": 2, "value": 1}) # bonus coin on small-mode head spike kill
 	return drops
+
+func _is_small_head_spike_kill(kill_context: Dictionary) -> bool:
+	if kill_context.is_empty():
+		return false
+	return String(kill_context.get("source", "")) == "head_spike" and String(kill_context.get("player_mode", "")) == "small"
 
 func _get_effective_drop_rate(base_rate: float) -> float:
 	# This can be expanded later to check for player "charms" or modifiers
