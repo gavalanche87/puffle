@@ -4,12 +4,12 @@ enum PlayerMode {SMALL, BIG}
 
 @export var small_speed: float = 320.0
 @export var small_gravity: float = 700.0
-@export var small_scale: Vector2 = Vector2(2.0, 2.0)
+@export var small_scale: Vector2 = Vector2(0.7, 0.7)
 
 @export var big_speed: float = 180.0
 @export var big_gravity: float = 1800.0
 @export var big_damage_multiplier: float = 0.6
-@export var big_scale: Vector2 = Vector2(1.5, 1.5)
+@export var big_scale: Vector2 = Vector2(1.25, 1.25)
 @export var small_frames: SpriteFrames
 @export var big_frames: SpriteFrames
 
@@ -30,6 +30,7 @@ enum PlayerMode {SMALL, BIG}
 @export var midair_spin_delay: float = 0.5
 @export var flip_energy_reward: int = 5
 @export var flip_reward_pickup_count_per_spin: int = 1
+@export var flips_per_energy_reward: int = 5
 @export var death_anim_time: float = 0.4
 @export var death_fade_time: float = 0.22
 @export var xp_growth_multiplier: float = 1.25
@@ -40,7 +41,8 @@ var damage_multiplier: float = 1.0
 @export var max_energy: int = 100
 @export var enemy_contact_damage: int = 20
 @export var hazard_contact_damage: int = 20
-@export var damage_cooldown: float = 0.5
+@export var damage_cooldown: float = 1.1
+@export var damage_input_lock_duration: float = 0.5
 @export var big_mode_energy_cost: int = 10
 @export var stomp_bounce_velocity: float = -520.0
 @export var small_player_knockback: float = 160.0
@@ -49,6 +51,11 @@ var damage_multiplier: float = 1.0
 @export var small_enemy_knockback: float = 120.0
 @export var big_enemy_knockback: float = 220.0
 @export var camera_smoothing_base_speed: float = 4.0
+@export var size_shift_sfx_gain_db: float = 5.0
+@export var run_sfx_interval_small: float = 0.16
+@export var run_sfx_interval_big: float = 0.28
+@export var run_sfx_volume_db_small: float = -14.0
+@export var run_sfx_volume_db_big: float = -8.0
 var current_health: int = max_health
 var current_energy: int = max_energy
 var damage_cooldown_timer: float = 0.0
@@ -59,10 +66,22 @@ var knockback_velocity: float = 0.0
 var wall_normal: Vector2 = Vector2.ZERO
 var air_time: float = 0.0
 var spin_accumulated: float = 0.0
+var spins_since_last_energy_reward: int = 0
 var wall_jump_timer: float = 0.0
 var base_body_size: Vector2 = Vector2.ZERO
 var base_hurt_size: Vector2 = Vector2.ZERO
+var base_body_collision_position: Vector2 = Vector2.ZERO
+var base_hurtbox_position: Vector2 = Vector2.ZERO
+var base_hurt_collision_position: Vector2 = Vector2.ZERO
+var base_head_attachment_position: Vector2 = Vector2.ZERO
+var base_head_attachment_sprite_position: Vector2 = Vector2.ZERO
+var base_spike_hitbox_position: Vector2 = Vector2.ZERO
+var base_spike_hitbox_shape_position: Vector2 = Vector2.ZERO
 var input_lock_timer: float = 0.0
+var spawn_position: Vector2 = Vector2.ZERO
+var wall_slide_sfx_timer: float = 0.0
+var run_sfx_timer: float = 0.0
+var is_killplane_respawning: bool = false
 static var pending_coin_restore: bool = false
 static var stored_coin_balance: int = 0
 static var pending_fade_in: bool = false
@@ -81,11 +100,20 @@ var coin_count_label: Label
 var commentary_panel: Panel
 var commentary_label: Label
 var commentary_energy_item: Node2D
+var consumable_panel: Panel
+var consumable_left_button: Button
+var consumable_right_button: Button
+var consumable_health_item: Node2D
+var consumable_energy_item: Node2D
+var consumable_count_label: Label
+var selected_consumable_key: String = "health"
+var consumable_buttons_bound: bool = false
 @onready var floating_text_scene: PackedScene = preload("res://scenes/FloatingText.tscn")
 @onready var item_pickup_scene: PackedScene = preload("res://scenes/ItemPickup.tscn")
 @onready var coin_item_scene: PackedScene = preload("res://scenes/CoinItem.tscn")
 @onready var health_item_scene: PackedScene = preload("res://scenes/HealthItem.tscn")
-@onready var hud_font: Font = preload("res://assets/fonts/LuckiestGuy-Regular.ttf")
+@onready var energy_item_scene: PackedScene = preload("res://scenes/EnergyItem.tscn")
+@onready var hud_font: Font = preload("res://assets/fonts/gemunu-libre-v8-latin-700.ttf")
 @onready var hurtbox: Area2D = $Hurtbox
 @onready var body_collision: CollisionShape2D = $CollisionShape2D
 @onready var sfx_jump: AudioStreamPlayer = $SfxJump
@@ -95,8 +123,15 @@ var commentary_energy_item: Node2D
 @onready var sfx_coin: AudioStreamPlayer = $SfxCoin
 @onready var sfx_item_land: AudioStreamPlayer = $SfxItemLand
 @onready var sfx_death: AudioStreamPlayer = $SfxDeath
+@onready var sfx_land: AudioStreamPlayer = $SfxLand
+@onready var sfx_wall_slide: AudioStreamPlayer = $SfxWallSlide
+@onready var sfx_run: AudioStreamPlayer = $SfxRun
 @onready var camera: Camera2D = $Camera2D
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var head_attachment: Node2D = $AnimatedSprite2D/Head_Attachment
+@onready var head_attachment_sprite: AnimatedSprite2D = $AnimatedSprite2D/Head_Attachment/AnimatedSprite2D
+@onready var spike_hitbox: Area2D = $AnimatedSprite2D/Head_Attachment/SpikeHitbox
+@onready var spike_hitbox_shape: CollisionShape2D = $AnimatedSprite2D/Head_Attachment/SpikeHitbox/CollisionShape2D
 @onready var body_shape: RectangleShape2D = $CollisionShape2D.shape
 @onready var hurt_shape: RectangleShape2D = $Hurtbox/CollisionShape2D.shape
 
@@ -109,6 +144,7 @@ var xp_to_next_level: float = 100.0
 var is_dying: bool = false
 var hud_flash_tween: Tween
 var commentary_tween: Tween
+var head_attachment_tween: Tween
 var hud_base_modulates: Dictionary = {}
 
 func _ready() -> void:
@@ -117,23 +153,58 @@ func _ready() -> void:
 	if pending_coin_restore:
 		coins = stored_coin_balance
 		pending_coin_restore = false
+		_sync_coins_to_game_data()
+	else:
+		_pull_coins_from_game_data()
 	current_health = max_health
 	current_energy = max_energy
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data and game_data.has_signal("inventory_changed"):
+		if not game_data.inventory_changed.is_connected(_refresh_consumable_ui):
+			game_data.inventory_changed.connect(_refresh_consumable_ui)
+	_pull_xp_from_game_data()
 	_cache_hud()
 	_update_health_ui()
 	_update_energy_ui()
 	_update_xp_ui()
 	_update_coins_ui()
+	_refresh_consumable_ui()
+	spawn_position = global_position
+	_ensure_unique_collision_shapes()
+	mode = PlayerMode.SMALL
+	if sprite:
+		sprite.rotation = 0.0
 	if body_shape:
 		base_body_size = body_shape.size
+	if body_collision:
+		base_body_collision_position = body_collision.position
 	if hurt_shape:
 		base_hurt_size = hurt_shape.size
+	if hurtbox:
+		base_hurtbox_position = hurtbox.position
+		var hurt_collision := hurtbox.get_node_or_null("CollisionShape2D") as CollisionShape2D
+		if hurt_collision:
+			base_hurt_collision_position = hurt_collision.position
+	if head_attachment:
+		base_head_attachment_position = head_attachment.position
+	if head_attachment_sprite:
+		base_head_attachment_sprite_position = head_attachment_sprite.position
+	if spike_hitbox:
+		base_spike_hitbox_position = spike_hitbox.position
+		if not spike_hitbox.area_entered.is_connected(_on_spike_hitbox_area_entered):
+			spike_hitbox.area_entered.connect(_on_spike_hitbox_area_entered)
+	if spike_hitbox_shape:
+		base_spike_hitbox_shape_position = spike_hitbox_shape.position
 	_apply_mode(mode, false)
+	_set_head_attachment_active(head_attachment != null and head_attachment.visible, false)
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	# Camera now uses Godot's built-in offset and position_smoothing
 	# No manual positioning needed
 	if sprite:
 		sprite.flip_h = true
+	if sfx_switch:
+		sfx_switch.volume_db = size_shift_sfx_gain_db
+	_play_spawn_pop_tween()
 	if pending_fade_in:
 		pending_fade_in = false
 		call_deferred("_fade_in_from_black")
@@ -155,11 +226,23 @@ func _physics_process(delta: float) -> void:
 			mode = PlayerMode.SMALL
 			_apply_mode(mode, true)
 			_play_sfx(sfx_switch)
+	if Input.is_action_just_pressed("consumable_prev"):
+		_cycle_consumable(-1)
+	if Input.is_action_just_pressed("consumable_next"):
+		_cycle_consumable(1)
+	if Input.is_action_just_pressed("consumable_use"):
+		_use_selected_consumable()
+	if Input.is_action_just_pressed("toggle_head_attachment"):
+		_toggle_head_attachment()
 
 	if input_lock_timer > 0.0:
 		input_lock_timer -= delta
 	if damage_cooldown_timer > 0.0:
 		damage_cooldown_timer -= delta
+	if wall_slide_sfx_timer > 0.0:
+		wall_slide_sfx_timer -= delta
+	if run_sfx_timer > 0.0:
+		run_sfx_timer -= delta
 	if knockback_velocity != 0.0:
 		knockback_velocity = move_toward(knockback_velocity, 0.0, knockback_decay * delta)
 
@@ -210,20 +293,45 @@ func _physics_process(delta: float) -> void:
 		if spin_accumulated >= TAU:
 			var spins := int(floor(spin_accumulated / TAU))
 			if spins > 0:
-				_spawn_flip_energy_pickups(spins)
-				_play_sfx(sfx_switch)
-				_show_commentary_message("Nice Flip!", true)
+				spins_since_last_energy_reward += spins
+				var reward_every := maxi(1, flips_per_energy_reward)
+				var reward_batches: int = int(spins_since_last_energy_reward / reward_every)
+				if reward_batches > 0:
+					_spawn_flip_energy_pickups(reward_batches)
+					_play_sfx(sfx_switch)
+					_show_commentary_message("Nice Flips!", true)
+					spins_since_last_energy_reward -= reward_batches * reward_every
 				spin_accumulated -= spins * TAU
 	else:
 		_reset_sprite_rotation()
 
 	var was_falling := velocity.y > 0.0
+	var was_on_floor := is_on_floor()
 	move_and_slide()
-	_try_break_destroyable_platform(was_falling)
+	if is_on_floor() and not was_on_floor and was_falling:
+		_play_sfx(sfx_land)
 	if is_on_floor():
 		grounded_timer = grounded_grace
 	else:
 		grounded_timer = max(0.0, grounded_timer - delta)
+	if wall_sliding and absf(velocity.y) > 10.0:
+		if wall_slide_sfx_timer <= 0.0:
+			_play_sfx(sfx_wall_slide)
+			wall_slide_sfx_timer = 0.25
+	else:
+		wall_slide_sfx_timer = 0.0
+	var moving_on_ground := is_on_floor() and absf(velocity.x) > 40.0 and not wall_sliding
+	if moving_on_ground:
+		if run_sfx_timer <= 0.0:
+			if mode == PlayerMode.BIG:
+				sfx_run.volume_db = run_sfx_volume_db_big
+				run_sfx_timer = run_sfx_interval_big
+			else:
+				sfx_run.volume_db = run_sfx_volume_db_small
+				run_sfx_timer = run_sfx_interval_small
+			_play_sfx(sfx_run)
+	else:
+		run_sfx_timer = 0.0
 	_update_facing(wall_sliding)
 	_update_animation(wall_sliding)
 	
@@ -254,15 +362,31 @@ func take_damage(amount: float) -> float:
 		return 0.0
 	damage_cooldown_timer = damage_cooldown
 	current_health = max(0, current_health - int(round(final_amount)))
-	input_lock_timer = 0.5
+	input_lock_timer = damage_input_lock_duration
 	_update_health_ui()
 	_flash_left_panel(Color(1.0, 0.56, 0.78, 1.0))
-	_spawn_floating_text_with_item("-%d" % int(round(final_amount)), Color(1, 0.2, 0.2), health_item_scene, global_position, Color(0.4, 0.03, 0.06), 2, 0.92, true)
 	if current_health <= 0 and not is_dying:
 		call_deferred("_start_death_sequence")
 	return final_amount
 
+func _ensure_unique_collision_shapes() -> void:
+	if body_collision and body_collision.shape:
+		if not body_collision.shape.resource_local_to_scene:
+			var body_shape_copy := body_collision.shape.duplicate(true)
+			body_shape_copy.resource_local_to_scene = true
+			body_collision.shape = body_shape_copy
+		body_shape = body_collision.shape as RectangleShape2D
+	if hurtbox:
+		var hurt_collision := hurtbox.get_node_or_null("CollisionShape2D") as CollisionShape2D
+		if hurt_collision and hurt_collision.shape:
+			if not hurt_collision.shape.resource_local_to_scene:
+				var hurt_shape_copy := hurt_collision.shape.duplicate(true)
+				hurt_shape_copy.resource_local_to_scene = true
+				hurt_collision.shape = hurt_shape_copy
+			hurt_shape = hurt_collision.shape as RectangleShape2D
+
 func _apply_mode(new_mode: PlayerMode, animate: bool) -> void:
+	_play_mode_switch_glow()
 	if new_mode == PlayerMode.SMALL:
 		_set_mode_scale(small_scale, animate)
 		damage_multiplier = 1.0
@@ -272,7 +396,49 @@ func _apply_mode(new_mode: PlayerMode, animate: bool) -> void:
 		_set_mode_scale(big_scale, animate)
 		damage_multiplier = big_damage_multiplier
 		_set_frames(big_frames)
-		_apply_collision_scale(3.0)
+		var collision_scale := big_scale.y / maxf(0.001, small_scale.y)
+		_apply_collision_scale(collision_scale)
+
+func _play_spawn_pop_tween() -> void:
+	if not sprite:
+		return
+	var base_scale := sprite.scale
+	var base_modulate := sprite.modulate
+	sprite.scale = base_scale * 0.7
+	sprite.modulate = Color(base_modulate.r, base_modulate.g, base_modulate.b, 0.0)
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(sprite, "modulate:a", 1.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(sprite, "scale", base_scale * 1.15, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.chain().tween_property(sprite, "scale", base_scale, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func respawn_from_kill_plane(damage_amount: int = 30) -> void:
+	if is_dying or is_killplane_respawning:
+		return
+	is_killplane_respawning = true
+	velocity = Vector2.ZERO
+	knockback_velocity = 0.0
+	var fade_rect := _ensure_fade_overlay(0.0)
+	if fade_rect:
+		var fade_out := create_tween()
+		fade_out.tween_property(fade_rect, "color:a", 0.85, 0.08).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
+		await fade_out.finished
+	global_position = spawn_position
+	velocity = Vector2.ZERO
+	knockback_velocity = 0.0
+	grounded_timer = 0.0
+	air_time = 0.0
+	_reset_sprite_rotation()
+	_play_spawn_pop_tween()
+	if fade_rect:
+		var fade_in := create_tween()
+		fade_in.tween_property(fade_rect, "color:a", 0.0, 0.12).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+		await fade_in.finished
+		var fade_layer := fade_rect.get_parent()
+		if fade_layer:
+			fade_layer.queue_free()
+	damage_cooldown_timer = 0.0
+	take_damage(float(damage_amount))
+	is_killplane_respawning = false
 
 func _current_speed() -> float:
 	return small_speed if mode == PlayerMode.SMALL else big_speed
@@ -285,16 +451,66 @@ func _current_jump_velocity() -> float:
 
 func _ensure_toggle_action() -> void:
 	if InputMap.has_action("toggle_mode"):
+		pass
+	else:
+		InputMap.add_action("toggle_mode")
+		var key_event := InputEventKey.new()
+		key_event.keycode = KEY_Z
+		InputMap.action_add_event("toggle_mode", key_event)
+	if not InputMap.has_action("consumable_prev"):
+		InputMap.add_action("consumable_prev")
+		var prev_event := InputEventKey.new()
+		prev_event.keycode = KEY_Q
+		InputMap.action_add_event("consumable_prev", prev_event)
+	if not InputMap.has_action("consumable_next"):
+		InputMap.add_action("consumable_next")
+		var next_event := InputEventKey.new()
+		next_event.keycode = KEY_E
+		InputMap.action_add_event("consumable_next", next_event)
+	if not InputMap.has_action("consumable_use"):
+		InputMap.add_action("consumable_use")
+		var use_event := InputEventKey.new()
+		use_event.keycode = KEY_W
+		InputMap.action_add_event("consumable_use", use_event)
+	if not InputMap.has_action("toggle_head_attachment"):
+		InputMap.add_action("toggle_head_attachment")
+		var head_event := InputEventKey.new()
+		head_event.keycode = KEY_X
+		InputMap.action_add_event("toggle_head_attachment", head_event)
+
+func _toggle_head_attachment() -> void:
+	if not head_attachment:
 		return
-	InputMap.add_action("toggle_mode")
-	var key_event := InputEventKey.new()
-	key_event.keycode = KEY_Z
-	InputMap.action_add_event("toggle_mode", key_event)
+	_set_head_attachment_active(not head_attachment.visible, true)
+
+func _set_head_attachment_active(active: bool, animate: bool) -> void:
+	if not head_attachment:
+		return
+	head_attachment.visible = active
+	if spike_hitbox:
+		spike_hitbox.monitoring = active
+		spike_hitbox.monitorable = active
+	if spike_hitbox_shape:
+		spike_hitbox_shape.set_deferred("disabled", not active)
+	if not head_attachment_sprite:
+		return
+	if head_attachment_tween and head_attachment_tween.is_running():
+		head_attachment_tween.kill()
+	if active:
+		if animate:
+			head_attachment_sprite.scale = Vector2(1.0, 0.0)
+			head_attachment_tween = create_tween()
+			head_attachment_tween.tween_property(head_attachment_sprite, "scale:y", 1.0, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		else:
+			head_attachment_sprite.scale = Vector2.ONE
+		if sprite:
+			_sync_head_attachment_animation(String(sprite.animation))
+	else:
+		head_attachment_sprite.scale = Vector2.ONE
 
 func _on_hurtbox_area_entered(area: Area2D) -> void:
 	if is_dying:
 		return
-	var is_stomp := velocity.y > 0.0 and global_position.y < area.global_position.y - 6.0
 
 	if area.is_in_group("items"):
 		if area.has_method("collect"):
@@ -304,11 +520,6 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 		return
 
 	if area.is_in_group("destroyable_platforms"):
-		var target := area.get_parent()
-		if is_stomp and mode == PlayerMode.BIG and target and target.has_method("break_platform"):
-			target.call("break_platform")
-			velocity.y = stomp_bounce_velocity
-			_play_sfx(sfx_stomp)
 		return
 
 	if area.is_in_group("hazards"):
@@ -322,36 +533,31 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 
 	if not area.is_in_group("enemies"):
 		return
-	if is_stomp and mode == PlayerMode.BIG:
-		if area.has_method("die"):
-			area.call("die")
-		velocity.y = stomp_bounce_velocity
-		_play_sfx(sfx_stomp)
-	else:
-		_apply_knockback(area)
-		_play_sfx(sfx_hurt)
-		take_damage(enemy_contact_damage)
+	_apply_knockback(area)
+	_play_sfx(sfx_hurt)
+	take_damage(enemy_contact_damage)
 
-func _try_break_destroyable_platform(was_falling: bool) -> void:
-	if not was_falling or mode != PlayerMode.BIG:
+func _on_spike_hitbox_area_entered(area: Area2D) -> void:
+	if area == null:
 		return
-
-	var broken := false
-	for i in range(get_slide_collision_count()):
-		var col := get_slide_collision(i)
-		if col == null:
-			continue
-		if col.get_normal().y > -0.6:
-			continue
-		var collider := col.get_collider()
-		if collider and collider.has_method("break_platform"):
-			collider.call("break_platform")
-			broken = true
-			break
-
-	if broken:
+	if is_dying:
+		return
+	if not head_attachment or not head_attachment.visible:
+		return
+	if area.is_in_group("enemies"):
+		if area.has_method("die"):
+			area.call_deferred("die")
+		elif area.get_parent() and area.get_parent().has_method("die"):
+			area.get_parent().call_deferred("die")
 		velocity.y = stomp_bounce_velocity
 		_play_sfx(sfx_stomp)
+		return
+	if area.is_in_group("destroyable_platforms"):
+		var target := area.get_parent()
+		if target and target.has_method("break_platform"):
+			target.call_deferred("break_platform")
+			velocity.y = stomp_bounce_velocity
+			_play_sfx(sfx_stomp)
 
 func _update_health_ui() -> void:
 	if not health_bar_bg or not health_bar_fill:
@@ -379,6 +585,7 @@ func _add_coins(amount: int, play_sound: bool = true) -> void:
 	if amount <= 0:
 		return
 	coins += amount
+	_sync_coins_to_game_data()
 	_update_coins_ui()
 	if play_sound:
 		_play_sfx(sfx_coin)
@@ -469,6 +676,7 @@ func add_xp(amount: int) -> void:
 		xp_to_next_level = ceil(xp_to_next_level * xp_growth_multiplier)
 		leveled_up = true
 	_update_xp_ui()
+	_sync_xp_to_game_data()
 	if leveled_up:
 		_spawn_screen_text("LEVEL UP!", Color(1.0, 0.95, 0.35), Vector2(-52.0, -100.0), true, Color(0.35, 0.25, 0.0), 3)
 
@@ -529,6 +737,36 @@ func _get_flip_reward_spawn_world_pos() -> Vector2:
 	var screen_pos := Vector2(rect.size.x * 0.5, 54.0)
 	return viewport.get_canvas_transform().affine_inverse() * screen_pos
 
+func _play_mode_switch_glow() -> void:
+	if not energy_item_scene:
+		return
+	var root := get_tree().current_scene
+	if root == null:
+		return
+	var fx := energy_item_scene.instantiate() as Node2D
+	if fx == null:
+		return
+	root.add_child(fx)
+	fx.global_position = sprite.global_position if sprite else global_position
+	var icon := fx.get_node_or_null("EnergyIcon") as CanvasItem
+	var outline := fx.get_node_or_null("EnergyIconOutline") as CanvasItem
+	if icon:
+		icon.visible = false
+	if outline:
+		outline.visible = false
+	var backing := fx.get_node_or_null("EnergyIconBacking") as Sprite2D
+	if backing == null:
+		fx.queue_free()
+		return
+	var base_scale := backing.scale
+	backing.modulate = Color(0.62, 0.85, 1.0, 0.9)
+	backing.scale = base_scale * 0.75
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(backing, "scale", base_scale * 4.0, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(backing, "modulate:a", 0.0, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await tween.finished
+	fx.queue_free()
+
 func _show_commentary_message(text: String, show_energy_icon: bool) -> void:
 	if not commentary_panel or not commentary_label:
 		_cache_hud()
@@ -577,11 +815,19 @@ func _cache_hud() -> void:
 	commentary_panel = hud.get_node_or_null("CommentaryPanel")
 	commentary_label = hud.get_node_or_null("CommentaryPanel/CommentaryLabel")
 	commentary_energy_item = hud.get_node_or_null("CommentaryPanel/CommentaryEnergyItem") as Node2D
+	consumable_panel = hud.get_node_or_null("ConsumablePanel")
+	consumable_left_button = hud.get_node_or_null("ConsumablePanel/ConsumableLeftButton")
+	consumable_right_button = hud.get_node_or_null("ConsumablePanel/ConsumableRightButton")
+	consumable_health_item = hud.get_node_or_null("ConsumablePanel/ConsumableHealthItem") as Node2D
+	consumable_energy_item = hud.get_node_or_null("ConsumablePanel/ConsumableEnergyItem") as Node2D
+	consumable_count_label = hud.get_node_or_null("ConsumablePanel/ConsumableCountLabel")
 	var health_backing := hud.get_node_or_null("HealthItem/HealthIconBacking") as CanvasItem
 	var energy_backing := hud.get_node_or_null("EnergyItem/EnergyIconBacking") as CanvasItem
 	var xp_backing := hud.get_node_or_null("XpItem/XpIconBacking") as CanvasItem
 	var coin_backing := hud.get_node_or_null("CoinItem/CoinIconBacking") as CanvasItem
 	var commentary_energy_backing := hud.get_node_or_null("CommentaryPanel/CommentaryEnergyItem/EnergyIconBacking") as CanvasItem
+	var consumable_health_backing := hud.get_node_or_null("ConsumablePanel/ConsumableHealthItem/HealthIconBacking") as CanvasItem
+	var consumable_energy_backing := hud.get_node_or_null("ConsumablePanel/ConsumableEnergyItem/EnergyIconBacking") as CanvasItem
 	if health_backing:
 		health_backing.visible = false
 	if energy_backing:
@@ -592,27 +838,126 @@ func _cache_hud() -> void:
 		coin_backing.visible = false
 	if commentary_energy_backing:
 		commentary_energy_backing.visible = false
+	if consumable_health_backing:
+		consumable_health_backing.visible = false
+	if consumable_energy_backing:
+		consumable_energy_backing.visible = false
+	_bind_consumable_buttons()
+	_refresh_consumable_ui()
 	if commentary_panel and not commentary_panel.visible:
 		commentary_panel.modulate.a = 0.0
 	for node in [
 		left_panel, right_panel,
 		health_bar_bg, health_bar_fill,
 		energy_bar_bg, energy_bar_fill,
-		xp_bar_bg, xp_bar_fill
+		xp_bar_bg, xp_bar_fill,
+		consumable_panel
 	]:
 		if node is CanvasItem:
 			_register_hud_base_modulate(node as CanvasItem)
 
+func _bind_consumable_buttons() -> void:
+	if consumable_buttons_bound:
+		return
+	if consumable_left_button and not consumable_left_button.pressed.is_connected(_on_consumable_left_pressed):
+		consumable_left_button.pressed.connect(_on_consumable_left_pressed)
+	if consumable_right_button and not consumable_right_button.pressed.is_connected(_on_consumable_right_pressed):
+		consumable_right_button.pressed.connect(_on_consumable_right_pressed)
+	consumable_buttons_bound = true
+
+func _on_consumable_left_pressed() -> void:
+	_cycle_consumable(-1)
+
+func _on_consumable_right_pressed() -> void:
+	_cycle_consumable(1)
+
+func _cycle_consumable(direction: int) -> void:
+	var available := _get_available_consumables()
+	if available.is_empty():
+		_refresh_consumable_ui()
+		return
+	var current_index := available.find(selected_consumable_key)
+	if current_index == -1:
+		current_index = 0
+	var next_index := int(posmod(current_index + direction, available.size()))
+	selected_consumable_key = String(available[next_index])
+	_refresh_consumable_ui()
+
+func _get_available_consumables() -> Array[String]:
+	var available: Array[String] = []
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return available
+	for key in ["health", "energy"]:
+		var count: int = int(game_data.call("get_inventory_count", key))
+		if count > 0:
+			available.append(key)
+	return available
+
+func _refresh_consumable_ui() -> void:
+	if not consumable_panel:
+		return
+	var available := _get_available_consumables()
+	consumable_panel.visible = not available.is_empty()
+	if available.is_empty():
+		return
+	if not available.has(selected_consumable_key):
+		selected_consumable_key = "health" if available.has("health") else String(available[0])
+	var game_data: Node = get_node_or_null("/root/GameData")
+	var count := 0
+	if game_data:
+		count = int(game_data.call("get_inventory_count", selected_consumable_key))
+	if consumable_count_label:
+		consumable_count_label.text = "%d" % count
+	if consumable_health_item:
+		consumable_health_item.visible = selected_consumable_key == "health"
+	if consumable_energy_item:
+		consumable_energy_item.visible = selected_consumable_key == "energy"
+	if consumable_left_button:
+		consumable_left_button.visible = available.size() > 1
+	if consumable_right_button:
+		consumable_right_button.visible = available.size() > 1
+
+func _use_selected_consumable() -> void:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return
+	var key := selected_consumable_key
+	if key == "health":
+		if current_health >= max_health:
+			return
+	elif key == "energy":
+		if current_energy >= max_energy:
+			return
+	else:
+		return
+	var consumed: bool = bool(game_data.call("consume_consumable", key, 1))
+	if not consumed:
+		_refresh_consumable_ui()
+		return
+	if key == "health":
+		current_health = min(max_health, current_health + 25)
+		_update_health_ui()
+		_flash_left_panel(Color(1.0, 0.56, 0.78, 1.0))
+	else:
+		current_energy = min(max_energy, current_energy + 25)
+		_update_energy_ui()
+		_flash_left_panel(Color(0.52, 0.86, 1.0, 1.0))
+	_play_sfx(sfx_item_land)
+	_refresh_consumable_ui()
+
 func _set_mode_scale(target_scale: Vector2, animate: bool) -> void:
+	if not sprite:
+		return
 	if not animate:
-		scale = target_scale
+		sprite.scale = target_scale
 		return
 	if mode_tween and mode_tween.is_running():
 		mode_tween.kill()
 	var squash := Vector2(target_scale.x * 1.2, target_scale.y * 0.8)
-	scale = squash
+	sprite.scale = squash
 	mode_tween = create_tween()
-	mode_tween.tween_property(self, "scale", target_scale, squash_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	mode_tween.tween_property(sprite, "scale", target_scale, squash_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _play_sfx(player: AudioStreamPlayer) -> void:
 	if player and player.stream:
@@ -682,6 +1027,40 @@ func _update_coins_ui() -> void:
 	if coin_count_label:
 		coin_count_label.text = "%d" % coins
 
+func _pull_coins_from_game_data() -> void:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return
+	if game_data.has_method("get_balance"):
+		coins = int(game_data.call("get_balance", "coins"))
+
+func _pull_xp_from_game_data() -> void:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return
+	if game_data.has_method("get_xp_state"):
+		var state: Dictionary = game_data.call("get_xp_state")
+		xp_level = max(1, int(state.get("xp_level", xp_level)))
+		xp_to_next_level = maxf(1.0, float(state.get("xp_to_next_level", xp_to_next_level)))
+		xp_current = clampf(float(state.get("xp_current", xp_current)), 0.0, xp_to_next_level)
+
+func _sync_coins_to_game_data() -> void:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return
+	if game_data.has_method("add_currency"):
+		var current: int = int(game_data.call("get_balance", "coins"))
+		var delta := coins - current
+		if delta != 0:
+			game_data.call("add_currency", "coins", delta)
+
+func _sync_xp_to_game_data() -> void:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return
+	if game_data.has_method("set_xp_state"):
+		game_data.call("set_xp_state", xp_level, xp_current, xp_to_next_level)
+
 func _set_frames(frames: SpriteFrames) -> void:
 	if not sprite or not frames:
 		return
@@ -694,6 +1073,7 @@ func _set_frames(frames: SpriteFrames) -> void:
 		sprite.play("idle")
 	if not is_playing:
 		sprite.stop()
+	_sync_head_attachment_animation(String(sprite.animation))
 
 func _apply_knockback(enemy_area: Area2D) -> void:
 	# Reset all existing velocities/forces first
@@ -726,6 +1106,36 @@ func _update_facing(wall_sliding: bool) -> void:
 		sprite.flip_v = false
 	else:
 		sprite.flip_v = velocity.y > 0.0 and mode == PlayerMode.BIG
+	_update_head_attachment_transform()
+
+func _update_head_attachment_transform() -> void:
+	if not sprite:
+		return
+	if head_attachment_sprite:
+		head_attachment_sprite.flip_h = sprite.flip_h
+		head_attachment_sprite.flip_v = sprite.flip_v
+	if head_attachment:
+		var target_pos := base_head_attachment_position
+		if sprite.flip_v:
+			target_pos.y = absf(base_head_attachment_position.y)
+		head_attachment.position = target_pos
+	if head_attachment_sprite:
+		var sprite_target_pos := base_head_attachment_sprite_position
+		if sprite.flip_v:
+			sprite_target_pos.y = absf(base_head_attachment_sprite_position.y)
+		head_attachment_sprite.position = sprite_target_pos
+	if spike_hitbox:
+		var hitbox_target_pos := base_spike_hitbox_position
+		if sprite.flip_h:
+			hitbox_target_pos.x = -base_spike_hitbox_position.x
+		if sprite.flip_v:
+			hitbox_target_pos.y = absf(base_spike_hitbox_position.y)
+		spike_hitbox.position = hitbox_target_pos
+	if spike_hitbox_shape:
+		var shape_target_pos := base_spike_hitbox_shape_position
+		if sprite.flip_v:
+			shape_target_pos.y = absf(base_spike_hitbox_shape_position.y)
+		spike_hitbox_shape.position = shape_target_pos
 
 func _update_animation(wall_sliding: bool) -> void:
 	if not sprite:
@@ -748,6 +1158,20 @@ func _update_animation(wall_sliding: bool) -> void:
 			next_anim = "jump" if velocity.y < 0.0 else "fall"
 	if sprite.animation != next_anim:
 		sprite.play(next_anim)
+	_sync_head_attachment_animation(next_anim)
+
+func _sync_head_attachment_animation(anim_name: String) -> void:
+	if not head_attachment_sprite:
+		return
+	if head_attachment_sprite.sprite_frames == null:
+		return
+	if head_attachment_sprite.sprite_frames.has_animation(anim_name):
+		if head_attachment_sprite.animation != anim_name or not head_attachment_sprite.is_playing():
+			head_attachment_sprite.play(anim_name)
+		return
+	if head_attachment_sprite.sprite_frames.has_animation("idle"):
+		if head_attachment_sprite.animation != "idle" or not head_attachment_sprite.is_playing():
+			head_attachment_sprite.play("idle")
 
 func _should_spin_midair(snapped: bool) -> bool:
 	if mode != PlayerMode.SMALL:
@@ -777,8 +1201,15 @@ func _apply_collision_scale(multiplier: float) -> void:
 		return
 	if body_shape:
 		body_shape.size = base_body_size * multiplier
+	if body_collision:
+		body_collision.position = base_body_collision_position * multiplier
 	if hurt_shape:
 		hurt_shape.size = base_hurt_size * multiplier
+	if hurtbox:
+		hurtbox.position = base_hurtbox_position * multiplier
+		var hurt_collision := hurtbox.get_node_or_null("CollisionShape2D") as CollisionShape2D
+		if hurt_collision:
+			hurt_collision.position = base_hurt_collision_position * multiplier
 
 func _is_wall_sliding(snapped: bool) -> bool:
 	if mode != PlayerMode.SMALL:
@@ -847,6 +1278,7 @@ func _start_death_sequence() -> void:
 	if sprite:
 		if sprite.sprite_frames and sprite.sprite_frames.has_animation("hurt"):
 			sprite.play("hurt")
+			_sync_head_attachment_animation("hurt")
 		var death_tween := create_tween().set_parallel(true)
 		death_tween.tween_property(sprite, "rotation", sprite.rotation + deg_to_rad(200.0), death_anim_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 		death_tween.tween_property(sprite, "scale", sprite.scale * 0.7, death_anim_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)

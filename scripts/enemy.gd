@@ -29,10 +29,30 @@ var vertical_velocity: float = 0.0
 
 func _ready() -> void:
 	add_to_group("enemies")
+	area_entered.connect(_on_area_entered)
+	_configure_cast_exceptions()
 	_update_casts()
 	var sprite := $AnimatedSprite2D
 	if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation("walk"):
 		sprite.play("walk")
+
+func _configure_cast_exceptions() -> void:
+	for node in get_tree().get_nodes_in_group("player"):
+		var player_body := node as PhysicsBody2D
+		if player_body == null:
+			continue
+		if floor_cast:
+			floor_cast.add_exception(player_body)
+		if wall_cast:
+			wall_cast.add_exception(player_body)
+		if ground_cast:
+			ground_cast.add_exception(player_body)
+
+func _on_area_entered(area: Area2D) -> void:
+	if area == null:
+		return
+	if area.is_in_group("hazards"):
+		call_deferred("die")
 
 func _physics_process(delta: float) -> void:
 	if knockback_timer > 0.0:

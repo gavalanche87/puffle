@@ -1,5 +1,7 @@
 extends "res://scripts/tiled_body.gd"
 
+signal broken(platform: Node2D)
+
 @onready var _break_area: Area2D = $BreakArea
 @onready var _break_shape: CollisionShape2D = $BreakArea/CollisionShape2D
 @onready var _visual_node: Sprite2D = $Visual
@@ -29,6 +31,7 @@ func break_platform() -> void:
 	if _broken:
 		return
 	_broken = true
+	emit_signal("broken", self)
 	_spawn_break_fx()
 	if _collision:
 		_collision.set_deferred("disabled", true)

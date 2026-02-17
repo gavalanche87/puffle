@@ -251,7 +251,7 @@ position = Vector2(224, -192)
 position = Vector2(-224, 256)
 
 [node name="GreenEnemyB" parent="World/Enemies" unique_id=2052163917 instance=ExtResource("9")]
-position = Vector2(256, 736)
+position = Vector2(416, 736)
 
 [node name="EnemyJ" parent="World/Enemies" unique_id=201743110 instance=ExtResource("2")]
 position = Vector2(-320, -256)
@@ -332,15 +332,33 @@ position = Vector2(-96, 544)
 
 [node name="SawB" parent="World/Hazards" unique_id=2116314263 instance=ExtResource("hazard_saw_scene")]
 position = Vector2(64, 608)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
+
+[node name="SawB2" parent="World/Hazards" unique_id=2010103474 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(128, 576)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
+
+[node name="SawB3" parent="World/Hazards" unique_id=1299344872 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(256, 576)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
+
+[node name="SawB4" parent="World/Hazards" unique_id=1215386600 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(192, 640)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
 
 [node name="SawC" parent="World/Hazards" unique_id=1197850242 instance=ExtResource("hazard_saw_scene")]
 position = Vector2(-256, 320)
 
 [node name="SawD" parent="World/Hazards" unique_id=1002933683 instance=ExtResource("hazard_saw_scene")]
 position = Vector2(320, 160)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformA")
 
 [node name="SawE" parent="World/Hazards" unique_id=1518020777 instance=ExtResource("hazard_saw_scene")]
 position = Vector2(-32, 64)
+
+[node name="SawF" parent="World/Hazards" unique_id=583974554 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(320, 608)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
 
 [node name="Goal" parent="World" unique_id=159913275 instance=ExtResource("3")]
 position = Vector2(320, -4896)

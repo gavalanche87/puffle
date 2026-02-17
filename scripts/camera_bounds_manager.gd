@@ -165,11 +165,10 @@ func setup_camera_bounds(camera: Camera2D, player: Node2D = null) -> void:
 	
 	if bottom_ground:
 		var ground_bounds := _get_body_world_bounds(bottom_ground)
-		var ground_top := _get_top_edge(bottom_ground)
 		var ground_bottom: float = ground_bounds.end.y if ground_bounds.size != Vector2.ZERO else (bottom_ground.global_position.y + 16.0)
 		camera.limit_bottom = int(ground_bottom)
-		print("  Bottom Ground: pos=%v, top_edge=%.1f, bottom_edge=%.1f, limit_bottom=%d" %
-			[bottom_ground.global_position, ground_top, ground_bottom, camera.limit_bottom])
+		print("  Bottom Ground: pos=%v, bottom_edge=%.1f, limit_bottom=%d" %
+			[bottom_ground.global_position, ground_bottom, camera.limit_bottom])
 	else:
 		push_warning("CameraBoundsManager: No bottom ground found")
 	

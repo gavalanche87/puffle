@@ -37,6 +37,7 @@ position = Vector2(-980, 120)
 
 [node name="Ground" parent="World" unique_id=1630327671 instance=ExtResource("ground_scene")]
 position = Vector2(0, 300)
+groups = ["level_boundary_bottom"]
 
 [node name="LeftWall" parent="World" unique_id=183325396 instance=ExtResource("wall_scene")]
 position = Vector2(-1120, 0)

@@ -22,9 +22,9 @@ texture = ExtResource("1")
 
 [node name="EnergyIconBacking" type="Sprite2D" parent="." unique_id=1055998135]
 modulate = Color(0.62, 0.85, 1, 0.9)
-scale = Vector2(0.6, 0.6)
+scale = Vector2(0.55, 0.55)
 texture = SubResource("2")
 
 [node name="EnergyIcon" type="Sprite2D" parent="." unique_id=1902964956]
-scale = Vector2(0.75, 0.75)
+scale = Vector2(0.7, 0.7)
 texture = ExtResource("1")

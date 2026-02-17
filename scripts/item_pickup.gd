@@ -136,6 +136,13 @@ func _physics_process(delta: float) -> void:
 
 	var collision := move_and_collide(velocity * delta)
 	if collision:
+		var collider_obj := collision.get_collider() as Node
+		if collider_obj and collider_obj.is_in_group("player"):
+			var player_body := collider_obj as PhysicsBody2D
+			if player_body:
+				add_collision_exception_with(player_body)
+				player_body.add_collision_exception_with(self)
+			return
 		velocity = velocity.bounce(collision.get_normal()) * bounciness
 		if collision.get_normal().y < -0.7:
 			velocity.x *= friction

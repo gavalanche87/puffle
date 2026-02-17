@@ -50,7 +50,7 @@ scale = Vector2(1, 0.99600405)
 length_tiles = 30
 
 [node name="Ground3" parent="World/Platforms" unique_id=220703249 instance=ExtResource("7")]
-position = Vector2(1386.103, 825.29175)
+position = Vector2(1368.189, 825.29175)
 scale = Vector2(1, 0.99600405)
 length_tiles = 10
 
