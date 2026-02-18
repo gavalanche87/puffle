@@ -4,7 +4,10 @@ extends Node2D
 
 func _ready() -> void:
 	add_child(camera_manager)
+	call_deferred("_setup_level_camera")
 
+func _setup_level_camera() -> void:
+	await get_tree().process_frame
 	var player := get_node_or_null("World/Player")
 	if not player:
 		push_warning("%s: Player not found at World/Player" % [name])

@@ -1,9 +1,10 @@
 extends CharacterBody2D
 
 enum PlayerMode {SMALL, BIG}
-const AMULET_SIZE_SHIFT := "size_shift"
-const AMULET_HEAD_SPIKE := "head_spike"
-const AMULET_DOUBLE_JUMP := "double_jump"
+const ABILITY_SIZE_SHIFT := "size_shift"
+const ABILITY_DOUBLE_JUMP := "double_jump"
+const WEAPON_HEAD_SPIKE := "head_spike"
+const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 
 @export var small_speed: float = 320.0
 @export var small_gravity: float = 700.0
@@ -35,6 +36,7 @@ const AMULET_DOUBLE_JUMP := "double_jump"
 @export var flip_reward_pickup_count_per_spin: int = 1
 @export var flips_per_energy_reward: int = 5
 @export var double_jump_energy_cost: int = 15
+@export var wall_jump_energy_cost: int = 10
 @export var death_anim_time: float = 0.4
 @export var death_fade_time: float = 0.22
 @export var xp_growth_multiplier: float = 1.25
@@ -116,15 +118,13 @@ var equipped_amulet_slot_2: TextureRect
 var equipped_amulet_slot_3: TextureRect
 var selected_consumable_key: String = "health"
 var consumable_buttons_bound: bool = false
-@onready var floating_text_scene: PackedScene = preload("res://scenes/FloatingText.tscn")
-@onready var item_pickup_scene: PackedScene = preload("res://scenes/ItemPickup.tscn")
-@onready var coin_item_scene: PackedScene = preload("res://scenes/CoinItem.tscn")
-@onready var health_item_scene: PackedScene = preload("res://scenes/HealthItem.tscn")
-@onready var energy_item_scene: PackedScene = preload("res://scenes/EnergyItem.tscn")
+@onready var floating_text_scene: PackedScene = preload("res://scenes/ui/FloatingText.tscn")
+@onready var item_pickup_scene: PackedScene = preload("res://scenes/items/ItemPickup.tscn")
+@onready var coin_item_scene: PackedScene = preload("res://scenes/items/CoinItem.tscn")
+@onready var health_item_scene: PackedScene = preload("res://scenes/items/HealthItem.tscn")
+@onready var energy_item_scene: PackedScene = preload("res://scenes/items/EnergyItem.tscn")
 @onready var hud_font: Font = preload("res://assets/fonts/gemunu-libre-v8-latin-700.ttf")
-@onready var amulet_icon_size_shift: Texture2D = preload("res://assets/ui/amulets/Shift_Size_Amulet.png")
-@onready var amulet_icon_head_spike: Texture2D = preload("res://assets/ui/amulets/Head_Spike_Amulet.png")
-@onready var amulet_icon_double_jump: Texture2D = preload("res://assets/ui/amulets/Double_Jump_Amulet.png")
+@onready var amulet_icon_leap_of_faith: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
 @onready var hurtbox: Area2D = $Hurtbox
 @onready var body_collision: CollisionShape2D = $CollisionShape2D
 @onready var sfx_jump: AudioStreamPlayer = $SfxJump
@@ -178,6 +178,12 @@ func _ready() -> void:
 	if game_data and game_data.has_signal("amulets_changed"):
 		if not game_data.amulets_changed.is_connected(_refresh_amulet_state):
 			game_data.amulets_changed.connect(_refresh_amulet_state)
+	if game_data and game_data.has_signal("abilities_changed"):
+		if not game_data.abilities_changed.is_connected(_refresh_amulet_state):
+			game_data.abilities_changed.connect(_refresh_amulet_state)
+	if game_data and game_data.has_signal("weapons_changed"):
+		if not game_data.weapons_changed.is_connected(_refresh_amulet_state):
+			game_data.weapons_changed.connect(_refresh_amulet_state)
 	_pull_xp_from_game_data()
 	_cache_hud()
 	_update_health_ui()
@@ -212,13 +218,16 @@ func _ready() -> void:
 	if spike_hitbox_shape:
 		base_spike_hitbox_shape_position = spike_hitbox_shape.position
 	_apply_mode(mode, false)
-	var spike_allowed := _has_equipped_amulet(AMULET_HEAD_SPIKE)
+	var spike_allowed := _has_equipped_weapon(WEAPON_HEAD_SPIKE)
 	_set_head_attachment_active(spike_allowed and head_attachment != null and head_attachment.visible, false)
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	# Camera now uses Godot's built-in offset and position_smoothing
 	# No manual positioning needed
 	if sprite:
 		sprite.flip_h = true
+	if camera:
+		camera.enabled = true
+		camera.make_current()
 	if sfx_switch:
 		sfx_switch.volume_db = size_shift_sfx_gain_db
 	_refresh_amulet_state()
@@ -233,7 +242,7 @@ func _physics_process(delta: float) -> void:
 	if not health_bar_bg or not health_bar_fill or not energy_bar_bg or not energy_bar_fill or not xp_bar_bg or not xp_bar_fill or not xp_level_label:
 		_cache_hud()
 	if Input.is_action_just_pressed("toggle_mode"):
-		if not _has_equipped_amulet(AMULET_SIZE_SHIFT):
+		if not _has_ability(ABILITY_SIZE_SHIFT):
 			pass
 		elif mode == PlayerMode.SMALL:
 			if current_energy >= big_mode_energy_cost:
@@ -254,7 +263,7 @@ func _physics_process(delta: float) -> void:
 		_use_selected_consumable()
 	if Input.is_action_just_pressed("toggle_head_attachment"):
 		_toggle_head_attachment()
-	if not _has_equipped_amulet(AMULET_HEAD_SPIKE) and head_attachment and head_attachment.visible:
+	if not _has_equipped_weapon(WEAPON_HEAD_SPIKE) and head_attachment and head_attachment.visible:
 		_set_head_attachment_active(false, false)
 
 	if input_lock_timer > 0.0:
@@ -293,9 +302,12 @@ func _physics_process(delta: float) -> void:
 		if wall_sliding:
 			velocity.y = min(velocity.y + _current_gravity() * delta, wall_slide_speed)
 		if jump_pressed and (wall_sliding or snapped):
-			_wall_jump()
-			extra_jumps_used = 0
-			_play_sfx(sfx_jump)
+			if current_energy >= wall_jump_energy_cost and _wall_jump():
+				current_energy = max(0, current_energy - wall_jump_energy_cost)
+				_update_energy_ui()
+				extra_jumps_used = 0
+				_play_mode_switch_glow()
+				_play_sfx(sfx_jump)
 		elif jump_pressed and _can_double_jump():
 			current_energy = max(0, current_energy - double_jump_energy_cost)
 			_update_energy_ui()
@@ -327,8 +339,6 @@ func _physics_process(delta: float) -> void:
 			if spins > 0:
 				spins_since_last_energy_reward += spins
 				var reward_every := maxi(1, flips_per_energy_reward)
-				if _has_equipped_amulet(AMULET_DOUBLE_JUMP):
-					reward_every *= 3
 				var reward_batches: int = int(spins_since_last_energy_reward / reward_every)
 				if reward_batches > 0:
 					_spawn_flip_energy_pickups(reward_batches)
@@ -481,7 +491,9 @@ func _current_gravity() -> float:
 	return small_gravity if mode == PlayerMode.SMALL else big_gravity
 
 func _current_jump_velocity() -> float:
-	return small_jump_velocity if mode == PlayerMode.SMALL else big_jump_velocity
+	var base_jump := small_jump_velocity if mode == PlayerMode.SMALL else big_jump_velocity
+	var jump_mult := 2.0 if _has_equipped_amulet(AMULET_LEAP_OF_FAITH) else 1.0
+	return base_jump * jump_mult
 
 func _ensure_toggle_action() -> void:
 	if InputMap.has_action("toggle_mode"):
@@ -515,7 +527,7 @@ func _ensure_toggle_action() -> void:
 func _toggle_head_attachment() -> void:
 	if not head_attachment:
 		return
-	if not _has_equipped_amulet(AMULET_HEAD_SPIKE):
+	if not _has_equipped_weapon(WEAPON_HEAD_SPIKE):
 		_set_head_attachment_active(false, false)
 		return
 	_set_head_attachment_active(not head_attachment.visible, true)
@@ -565,14 +577,14 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 			amount = int(area.call("get_damage_amount"))
 		_apply_knockback(area)
 		_play_sfx(sfx_hurt)
-		take_damage(amount)
+		take_damage(amount * _hazard_damage_multiplier_from_amulets())
 		return
 
 	if not area.is_in_group("enemies"):
 		return
 	_apply_knockback(area)
 	_play_sfx(sfx_hurt)
-	take_damage(enemy_contact_damage * _enemy_damage_multiplier_from_amulets())
+	take_damage(enemy_contact_damage)
 
 func _on_spike_hitbox_area_entered(area: Area2D) -> void:
 	if area == null:
@@ -1250,28 +1262,43 @@ func _has_equipped_amulet(amulet_id: String) -> bool:
 		return bool(game_data.call("is_amulet_equipped", amulet_id))
 	return false
 
+func _has_ability(ability_id: String) -> bool:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return false
+	if game_data.has_method("has_ability"):
+		return bool(game_data.call("has_ability", ability_id))
+	return false
+
+func _has_equipped_weapon(weapon_id: String) -> bool:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return false
+	if game_data.has_method("is_weapon_equipped"):
+		return bool(game_data.call("is_weapon_equipped", weapon_id))
+	return false
+
 func _can_double_jump() -> bool:
 	if _is_grounded():
 		return false
-	if not _has_equipped_amulet(AMULET_DOUBLE_JUMP):
+	if not _has_ability(ABILITY_DOUBLE_JUMP):
 		return false
 	if current_energy < double_jump_energy_cost:
 		return false
 	return extra_jumps_used < 1
 
-func _enemy_damage_multiplier_from_amulets() -> float:
-	return 1.5 if _has_equipped_amulet(AMULET_SIZE_SHIFT) else 1.0
+func _hazard_damage_multiplier_from_amulets() -> float:
+	return 1.2 if _has_equipped_amulet(AMULET_LEAP_OF_FAITH) else 1.0
 
 func _refresh_amulet_state() -> void:
-	var size_shift_equipped := _has_equipped_amulet(AMULET_SIZE_SHIFT)
-	var head_spike_equipped := _has_equipped_amulet(AMULET_HEAD_SPIKE)
-	if not size_shift_equipped and mode == PlayerMode.BIG:
+	var size_shift_owned := _has_ability(ABILITY_SIZE_SHIFT)
+	var head_spike_equipped := _has_equipped_weapon(WEAPON_HEAD_SPIKE)
+	if not size_shift_owned and mode == PlayerMode.BIG:
 		mode = PlayerMode.SMALL
 		_apply_mode(mode, false)
 		_reset_sprite_rotation()
 	extra_jumps_used = 0
-	var health_factor := 0.9 if head_spike_equipped else 1.0
-	max_health = max(1, int(round(float(base_max_health) * health_factor)))
+	max_health = base_max_health
 	current_health = min(current_health, max_health)
 	_update_health_ui()
 	if not head_spike_equipped:
@@ -1302,12 +1329,8 @@ func _update_equipped_amulet_icons() -> void:
 
 func _get_amulet_icon_texture(amulet_id: String) -> Texture2D:
 	match amulet_id:
-		AMULET_SIZE_SHIFT:
-			return amulet_icon_size_shift
-		AMULET_HEAD_SPIKE:
-			return amulet_icon_head_spike
-		AMULET_DOUBLE_JUMP:
-			return amulet_icon_double_jump
+		AMULET_LEAP_OF_FAITH:
+			return amulet_icon_leap_of_faith
 		_:
 			return null
 
@@ -1359,7 +1382,7 @@ func _try_wall_snap() -> bool:
 		return true
 	return false
 
-func _wall_jump() -> void:
+func _wall_jump() -> bool:
 	if wall_normal == Vector2.ZERO:
 		if is_on_wall():
 			wall_normal = get_wall_normal()
@@ -1369,12 +1392,13 @@ func _wall_jump() -> void:
 			elif test_move(global_transform, Vector2(-wall_snap_distance, 0.0)):
 				wall_normal = Vector2(1.0, 0.0)
 	if wall_normal == Vector2.ZERO:
-		return
+		return false
 	var away_dir := signf(wall_normal.x)
 	wall_jump_timer = wall_jump_lock_time
 	velocity.x = wall_jump_horizontal * away_dir
 	velocity.y = wall_jump_vertical
 	knockback_velocity = 0.0
+	return true
 
 func _start_death_sequence() -> void:
 	if is_dying:

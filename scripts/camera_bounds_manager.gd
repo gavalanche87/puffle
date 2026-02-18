@@ -4,15 +4,29 @@ class_name CameraBoundsManager
 ## Automatically configures camera bounds based on level geometry
 ## Reusable across all levels - no hardcoded values
 
+func _current_scene_root() -> Node:
+	var tree := get_tree()
+	if tree and tree.current_scene:
+		return tree.current_scene
+	return get_tree().root
+
+func _is_in_current_scene(node: Node) -> bool:
+	var root := _current_scene_root()
+	return node != null and root != null and (node == root or root.is_ancestor_of(node))
+
 ## Finds the leftmost wall in the level
 func _find_leftmost_wall() -> Node2D:
 	var walls = get_tree().get_nodes_in_group("level_boundary_left")
-	if not walls.is_empty():
-		return walls[0]
+	var scene_walls: Array = []
+	for wall in walls:
+		if wall is Node2D and _is_in_current_scene(wall):
+			scene_walls.append(wall)
+	if not scene_walls.is_empty():
+		return scene_walls[0]
 	
 	# Fallback: find all Wall nodes and return leftmost
 	var all_walls = []
-	_find_nodes_by_script(get_tree().root, "res://scripts/tiled_body.gd", all_walls)
+	_find_nodes_by_script(_current_scene_root(), "res://scripts/tiled_body.gd", all_walls)
 	
 	var leftmost: Node2D = null
 	var leftmost_x = INF
@@ -26,12 +40,16 @@ func _find_leftmost_wall() -> Node2D:
 ## Finds the rightmost wall in the level
 func _find_rightmost_wall() -> Node2D:
 	var walls = get_tree().get_nodes_in_group("level_boundary_right")
-	if not walls.is_empty():
-		return walls[0]
+	var scene_walls: Array = []
+	for wall in walls:
+		if wall is Node2D and _is_in_current_scene(wall):
+			scene_walls.append(wall)
+	if not scene_walls.is_empty():
+		return scene_walls[0]
 	
 	# Fallback: find all Wall nodes and return rightmost
 	var all_walls = []
-	_find_nodes_by_script(get_tree().root, "res://scripts/tiled_body.gd", all_walls)
+	_find_nodes_by_script(_current_scene_root(), "res://scripts/tiled_body.gd", all_walls)
 	
 	var rightmost: Node2D = null
 	var rightmost_x = - INF
@@ -45,11 +63,15 @@ func _find_rightmost_wall() -> Node2D:
 ## Finds the lowest ground in the level
 func _find_lowest_ground() -> Node2D:
 	var grounds = get_tree().get_nodes_in_group("level_boundary_bottom")
-	if not grounds.is_empty():
+	var scene_grounds: Array = []
+	for ground in grounds:
+		if ground is Node2D and _is_in_current_scene(ground):
+			scene_grounds.append(ground)
+	if not scene_grounds.is_empty():
 		# Return the lowest one if multiple
-		var lowest_ground: Node2D = grounds[0]
-		var lowest_ground_y = grounds[0].global_position.y
-		for ground in grounds:
+		var lowest_ground: Node2D = scene_grounds[0]
+		var lowest_ground_y = scene_grounds[0].global_position.y
+		for ground in scene_grounds:
 			if ground.global_position.y > lowest_ground_y:
 				lowest_ground_y = ground.global_position.y
 				lowest_ground = ground
@@ -57,7 +79,7 @@ func _find_lowest_ground() -> Node2D:
 	
 	# Fallback: find all Ground nodes and return lowest
 	var all_grounds = []
-	_find_nodes_by_script(get_tree().root, "res://scripts/tiled_body.gd", all_grounds)
+	_find_nodes_by_script(_current_scene_root(), "res://scripts/tiled_body.gd", all_grounds)
 	
 	var lowest: Node2D = null
 	var lowest_y = - INF

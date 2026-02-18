@@ -7,7 +7,7 @@ extends Area2D
 @export var attach_search_radius: float = 72.0
 @export var release_speed_min: float = 85.0
 @export var release_speed_max: float = 145.0
-@export var falling_saw_scene: PackedScene = preload("res://scenes/FallingSaw.tscn")
+@export var falling_saw_scene: PackedScene = preload("res://scenes/hazards/FallingSaw.tscn")
 
 var _is_on_screen: bool = false
 var _notifier: VisibleOnScreenNotifier2D

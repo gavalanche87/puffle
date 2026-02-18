@@ -15,25 +15,32 @@ const COLOR_ITEM_DESC := Color(0.74902, 0.74902, 0.74902, 1.0)
 const COLOR_ITEM_PRICE := Color(0.980392, 0.972549, 0.67451, 1.0)
 const COLOR_ITEM_PRICE_OUTLINE := Color(0.796078, 0.682353, 0.145098, 1.0)
 const COLOR_ITEM_STATE := Color(0.368627, 0.901961, 0.682353, 1.0)
-const ICON_SIZE_SHIFT: Texture2D = preload("res://assets/ui/amulets/Shift_Size_Amulet.png")
-const ICON_HEAD_SPIKE: Texture2D = preload("res://assets/ui/amulets/Head_Spike_Amulet.png")
-const ICON_DOUBLE_JUMP: Texture2D = preload("res://assets/ui/amulets/Double_Jump_Amulet.png")
+const ICON_LEAP_OF_FAITH: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
+const ICON_SIZE_SHIFT: Texture2D = preload("res://assets/ui/abilities/Shift_Size_Ability.png")
+const ICON_DOUBLE_JUMP: Texture2D = preload("res://assets/ui/abilities/Double_Jump_Ability.png")
+const ICON_HEAD_SPIKE: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Weapon.png")
 
 signal buy_requested(offer_id: String)
 
 func setup(data: Dictionary, status_text: String, can_buy: bool, bought: bool) -> void:
 	offer_id = String(data.get("id", ""))
-	var is_amulet: bool = String(data.get("kind", "")) == "amulet"
+	var kind: String = String(data.get("kind", ""))
+	var uses_magenta_style: bool = kind == "amulet"
 	title_label.text = String(data.get("title", "Item"))
 	description_label.text = String(data.get("description", ""))
 	price_label.text = "%d %s" % [int(data.get("cost", 0)), String(data.get("currency", "coins")).capitalize()]
 	state_label.text = status_text
 	buy_button.disabled = (not can_buy) or bought
 	buy_button.text = "Owned" if bought else "Buy"
-	if is_amulet:
+	if kind == "amulet" or kind == "ability" or kind == "weapon":
 		if icon_rect:
 			icon_rect.visible = true
-			icon_rect.texture = _get_amulet_icon(offer_id)
+			icon_rect.texture = _get_offer_icon(offer_id)
+	else:
+		if icon_rect:
+			icon_rect.visible = false
+			icon_rect.texture = null
+	if uses_magenta_style:
 		title_label.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
 		title_label.add_theme_color_override("font_outline_color", COLOR_MAGENTA_OUTLINE)
 		description_label.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
@@ -43,9 +50,6 @@ func setup(data: Dictionary, status_text: String, can_buy: bool, bought: bool) -
 		state_label.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
 		state_label.add_theme_color_override("font_outline_color", COLOR_MAGENTA_OUTLINE)
 	else:
-		if icon_rect:
-			icon_rect.visible = false
-			icon_rect.texture = null
 		title_label.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
 		title_label.add_theme_color_override("font_outline_color", COLOR_ITEM_PRICE_OUTLINE)
 		description_label.add_theme_color_override("font_color", COLOR_ITEM_DESC)
@@ -60,13 +64,15 @@ func _ready() -> void:
 		emit_signal("buy_requested", offer_id)
 	)
 
-func _get_amulet_icon(amulet_id: String) -> Texture2D:
-	match amulet_id:
+func _get_offer_icon(offer_kind_id: String) -> Texture2D:
+	match offer_kind_id:
+		"leap_of_faith":
+			return ICON_LEAP_OF_FAITH
 		"size_shift":
 			return ICON_SIZE_SHIFT
-		"head_spike":
-			return ICON_HEAD_SPIKE
 		"double_jump":
 			return ICON_DOUBLE_JUMP
+		"head_spike":
+			return ICON_HEAD_SPIKE
 		_:
 			return null

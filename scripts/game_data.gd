@@ -5,6 +5,8 @@ signal progression_changed
 signal currencies_changed
 signal inventory_changed
 signal amulets_changed
+signal abilities_changed
+signal weapons_changed
 
 const SAVE_PATH := "user://save_data.json"
 const LEVEL_SELECT_SCENE := "res://scenes/ui/LevelSelect.tscn"
@@ -12,16 +14,26 @@ const LEVEL_SELECT_SCENE := "res://scenes/ui/LevelSelect.tscn"
 const WORLD_COUNT := 3
 const LEVELS_PER_WORLD := 10
 
+const ABILITY_SIZE_SHIFT := "size_shift"
+const ABILITY_DOUBLE_JUMP := "double_jump"
+const AMULET_LEAP_OF_FAITH := "leap_of_faith"
+const WEAPON_HEAD_SPIKE := "head_spike"
+
 var coins: int = 0
 var tokens: int = 3
 var unlocked_worlds: int = 1
 var unlocked_levels: Dictionary = {1: 1, 2: 0, 3: 0}
 var completed_levels: Array[String] = []
 var consumable_inventory: Dictionary = {"health": 0, "energy": 0}
+
+var owned_abilities: Array[String] = []
 var owned_amulets: Array[String] = []
-var equipped_amulet: String = ""
+var owned_weapons: Array[String] = []
+
 var equipped_amulets: Array[String] = []
 var amulet_slots_unlocked: int = 3
+var equipped_weapon: String = ""
+
 var amulet_screen_manage_mode: bool = false
 var amulet_return_scene_path: String = ""
 var amulet_return_to_pause: bool = false
@@ -58,50 +70,76 @@ const SHOP_ITEMS := [
 	}
 ]
 
-const SHOP_AMULETS := [
+const SHOP_ABILITIES := [
 	{
-		"id": "size_shift",
-		"kind": "amulet",
+		"id": ABILITY_SIZE_SHIFT,
+		"kind": "ability",
 		"title": "Size Shift",
-		"description": "Boon: Toggle Big/Small Mode | Grievance: Enemy Damage x1.5",
+		"description": "Boon: Toggle Big/Small Mode",
 		"currency": "tokens",
 		"cost": 2
 	},
 	{
-		"id": "head_spike",
-		"kind": "amulet",
-		"title": "Head Spike",
-		"description": "Boon: Spike Attack (X) | Grievance: Max Health -10%",
-		"currency": "tokens",
-		"cost": 2
-	},
-	{
-		"id": "double_jump",
-		"kind": "amulet",
+		"id": ABILITY_DOUBLE_JUMP,
+		"kind": "ability",
 		"title": "Double Jump",
-		"description": "Boon: +1 Mid-air Jump | Grievance: Bonus Reward Rate x3",
+		"description": "Boon: Gain one extra jump in mid-air",
 		"currency": "tokens",
 		"cost": 3
 	}
 ]
 
-const AMULET_INFO := {
-	"size_shift": {
+const SHOP_AMULETS := [
+	{
+		"id": AMULET_LEAP_OF_FAITH,
+		"kind": "amulet",
+		"title": "Leap of Faith",
+		"description": "Boon: Jump Height x2 | Grievance: Hazard Damage x1.2",
+		"currency": "tokens",
+		"cost": 3
+	}
+]
+
+const SHOP_WEAPONS := [
+	{
+		"id": WEAPON_HEAD_SPIKE,
+		"kind": "weapon",
+		"title": "Head Spike",
+		"description": "Boon: Head-mounted spike attack",
+		"currency": "tokens",
+		"cost": 3
+	}
+]
+
+const ABILITY_INFO := {
+	ABILITY_SIZE_SHIFT: {
 		"title": "Size Shift",
 		"boon": "Toggle Big and Small form with Z",
-		"grievance": "Enemy Damage x1.5",
+		"grievance": "None",
 		"shop_cost_tokens": 2
 	},
-	"head_spike": {
-		"title": "Head Spike",
-		"boon": "Enable head spike attacks with X",
-		"grievance": "Max Health -10%",
-		"shop_cost_tokens": 2
-	},
-	"double_jump": {
+	ABILITY_DOUBLE_JUMP: {
 		"title": "Double Jump",
 		"boon": "Gain one extra jump in mid-air",
-		"grievance": "Bonus Reward Rate x3",
+		"grievance": "None",
+		"shop_cost_tokens": 3
+	}
+}
+
+const AMULET_INFO := {
+	AMULET_LEAP_OF_FAITH: {
+		"title": "Leap of Faith",
+		"boon": "Jump height increased x2",
+		"grievance": "Take 20% more damage from hazards",
+		"shop_cost_tokens": 3
+	}
+}
+
+const WEAPON_INFO := {
+	WEAPON_HEAD_SPIKE: {
+		"title": "Head Spike",
+		"boon": "Enable head spike attacks with X",
+		"grievance": "Destroy platforms only in Big Mode",
 		"shop_cost_tokens": 3
 	}
 }
@@ -111,11 +149,49 @@ func _ready() -> void:
 	_load_data()
 	_apply_audio_settings()
 
+func wipe_save_data() -> void:
+	coins = 0
+	tokens = 3
+	unlocked_worlds = 1
+	unlocked_levels = {1: 1, 2: 0, 3: 0}
+	completed_levels.clear()
+	consumable_inventory = {"health": 0, "energy": 0}
+	owned_abilities.clear()
+	owned_amulets.clear()
+	owned_weapons.clear()
+	equipped_amulets.clear()
+	amulet_slots_unlocked = 3
+	equipped_weapon = ""
+	current_world = 0
+	current_level = 0
+	level_flow_active = false
+	xp_level = 1
+	xp_current = 0.0
+	xp_to_next_level = 100.0
+	amulet_screen_manage_mode = false
+	amulet_return_scene_path = ""
+	amulet_return_to_pause = false
+	open_pause_on_next_hud = false
+	_save_data()
+	emit_signal("progression_changed")
+	emit_signal("currencies_changed")
+	emit_signal("inventory_changed")
+	emit_signal("amulets_changed")
+	emit_signal("abilities_changed")
+	emit_signal("weapons_changed")
+	emit_signal("data_changed")
+
 func get_shop_items() -> Array:
 	return SHOP_ITEMS.duplicate(true)
 
+func get_shop_abilities() -> Array:
+	return SHOP_ABILITIES.duplicate(true)
+
 func get_shop_amulets() -> Array:
 	return SHOP_AMULETS.duplicate(true)
+
+func get_shop_weapons() -> Array:
+	return SHOP_WEAPONS.duplicate(true)
 
 func is_world_unlocked(world: int) -> bool:
 	return world >= 1 and world <= unlocked_worlds
@@ -137,9 +213,9 @@ func is_level_completed(world: int, level: int) -> bool:
 
 func get_level_scene(world: int, level: int) -> String:
 	var cycle := [
-		"res://scenes/Level_1.tscn",
-		"res://scenes/MainLevel.tscn",
-		"res://scenes/VerticalTestScene.tscn"
+		"res://scenes/levels/world_1/Level_1_1.tscn",
+		"res://scenes/levels/test/MainLevel.tscn",
+		"res://scenes/levels/test/VerticalTestScene.tscn"
 	]
 	var idx := ((world - 1) * LEVELS_PER_WORLD + (level - 1)) % cycle.size()
 	return cycle[idx]
@@ -227,11 +303,20 @@ func purchase_offer(offer_id: String) -> Dictionary:
 	if not can_afford(currency, cost):
 		return {"ok": false, "message": "Not enough %s" % currency}
 
-	if String(offer.get("kind", "")) == "amulet":
-		var amulet_id := String(offer.get("id", ""))
-		if owned_amulets.has(amulet_id):
+	var kind := String(offer.get("kind", ""))
+	var id := String(offer.get("id", ""))
+	if kind == "amulet":
+		if owned_amulets.has(id):
 			return {"ok": false, "message": "Already owned"}
-		owned_amulets.append(amulet_id)
+		owned_amulets.append(id)
+	elif kind == "ability":
+		if owned_abilities.has(id):
+			return {"ok": false, "message": "Already owned"}
+		owned_abilities.append(id)
+	elif kind == "weapon":
+		if owned_weapons.has(id):
+			return {"ok": false, "message": "Already owned"}
+		owned_weapons.append(id)
 	else:
 		var inv_key := String(offer.get("inventory_key", ""))
 		if inv_key != "":
@@ -242,6 +327,8 @@ func purchase_offer(offer_id: String) -> Dictionary:
 	emit_signal("inventory_changed")
 	emit_signal("currencies_changed")
 	emit_signal("amulets_changed")
+	emit_signal("abilities_changed")
+	emit_signal("weapons_changed")
 	emit_signal("data_changed")
 	return {"ok": true, "message": "Purchased %s" % String(offer.get("title", "item"))}
 
@@ -274,6 +361,26 @@ func set_xp_state(level: int, current: float, to_next: float, save_now: bool = t
 	if save_now:
 		_save_data()
 	emit_signal("data_changed")
+
+func has_ability(ability_id: String) -> bool:
+	return owned_abilities.has(ability_id)
+
+func get_ability_catalog() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for offer in SHOP_ABILITIES:
+		var id := String(offer.get("id", ""))
+		var info: Dictionary = ABILITY_INFO.get(id, {})
+		out.append({
+			"id": id,
+			"title": String(info.get("title", String(offer.get("title", id)))),
+			"boon": String(info.get("boon", "")),
+			"grievance": String(info.get("grievance", "")),
+			"cost_tokens": int(info.get("shop_cost_tokens", int(offer.get("cost", 0))))
+		})
+	return out
+
+func get_owned_abilities() -> Array[String]:
+	return owned_abilities.duplicate()
 
 func has_amulet(amulet_id: String) -> bool:
 	return owned_amulets.has(amulet_id)
@@ -315,7 +422,6 @@ func equip_amulet(amulet_id: String, slot_index: int = 0) -> Dictionary:
 	while equipped_amulets.size() <= slot_index:
 		equipped_amulets.append("")
 	equipped_amulets[slot_index] = amulet_id
-	equipped_amulet = equipped_amulets[0] if not equipped_amulets.is_empty() else ""
 	_save_data()
 	emit_signal("amulets_changed")
 	emit_signal("inventory_changed")
@@ -328,9 +434,52 @@ func unequip_amulet(slot_index: int = 0) -> Dictionary:
 	while equipped_amulets.size() <= slot_index:
 		equipped_amulets.append("")
 	equipped_amulets[slot_index] = ""
-	equipped_amulet = equipped_amulets[0] if not equipped_amulets.is_empty() else ""
 	_save_data()
 	emit_signal("amulets_changed")
+	emit_signal("inventory_changed")
+	emit_signal("data_changed")
+	return {"ok": true, "message": "Unequipped"}
+
+func has_weapon(weapon_id: String) -> bool:
+	return owned_weapons.has(weapon_id)
+
+func get_weapon_catalog() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for offer in SHOP_WEAPONS:
+		var id := String(offer.get("id", ""))
+		var info: Dictionary = WEAPON_INFO.get(id, {})
+		out.append({
+			"id": id,
+			"title": String(info.get("title", String(offer.get("title", id)))),
+			"boon": String(info.get("boon", "")),
+			"grievance": String(info.get("grievance", "")),
+			"cost_tokens": int(info.get("shop_cost_tokens", int(offer.get("cost", 0))))
+		})
+	return out
+
+func get_owned_weapons() -> Array[String]:
+	return owned_weapons.duplicate()
+
+func get_equipped_weapon() -> String:
+	return equipped_weapon
+
+func is_weapon_equipped(weapon_id: String) -> bool:
+	return equipped_weapon == weapon_id and weapon_id != ""
+
+func equip_weapon(weapon_id: String) -> Dictionary:
+	if not has_weapon(weapon_id):
+		return {"ok": false, "message": "Weapon not owned"}
+	equipped_weapon = weapon_id
+	_save_data()
+	emit_signal("weapons_changed")
+	emit_signal("inventory_changed")
+	emit_signal("data_changed")
+	return {"ok": true, "message": "Equipped %s" % weapon_id}
+
+func unequip_weapon() -> Dictionary:
+	equipped_weapon = ""
+	_save_data()
+	emit_signal("weapons_changed")
 	emit_signal("inventory_changed")
 	emit_signal("data_changed")
 	return {"ok": true, "message": "Unequipped"}
@@ -377,7 +526,13 @@ func _find_offer(offer_id: String) -> Dictionary:
 	for offer in SHOP_ITEMS:
 		if String(offer.get("id", "")) == offer_id:
 			return offer
+	for offer in SHOP_ABILITIES:
+		if String(offer.get("id", "")) == offer_id:
+			return offer
 	for offer in SHOP_AMULETS:
+		if String(offer.get("id", "")) == offer_id:
+			return offer
+	for offer in SHOP_WEAPONS:
 		if String(offer.get("id", "")) == offer_id:
 			return offer
 	return {}
@@ -390,10 +545,12 @@ func _save_data() -> void:
 		"unlocked_levels": unlocked_levels,
 		"completed_levels": completed_levels,
 		"consumable_inventory": consumable_inventory,
+		"owned_abilities": owned_abilities,
 		"owned_amulets": owned_amulets,
-		"equipped_amulet": equipped_amulet,
+		"owned_weapons": owned_weapons,
 		"equipped_amulets": equipped_amulets,
 		"amulet_slots_unlocked": amulet_slots_unlocked,
+		"equipped_weapon": equipped_weapon,
 		"music_volume_linear": music_volume_linear,
 		"sfx_volume_linear": sfx_volume_linear,
 		"xp_level": xp_level,
@@ -435,26 +592,69 @@ func _load_data() -> void:
 	var loaded_inventory: Dictionary = data.get("consumable_inventory", {})
 	consumable_inventory["health"] = int(loaded_inventory.get("health", consumable_inventory.get("health", 0)))
 	consumable_inventory["energy"] = int(loaded_inventory.get("energy", consumable_inventory.get("energy", 0)))
-	var loaded_amulets: Array = data.get("owned_amulets", [])
+
+	owned_abilities.clear()
 	owned_amulets.clear()
-	for amulet in loaded_amulets:
-		owned_amulets.append(String(amulet))
-	equipped_amulet = String(data.get("equipped_amulet", equipped_amulet))
-	var loaded_equipped: Array = data.get("equipped_amulets", [])
+	owned_weapons.clear()
 	equipped_amulets.clear()
+
+	var loaded_abilities: Array = data.get("owned_abilities", [])
+	for ability in loaded_abilities:
+		var ability_id := String(ability)
+		if not owned_abilities.has(ability_id):
+			owned_abilities.append(ability_id)
+
+	var loaded_amulets: Array = data.get("owned_amulets", [])
+	for amulet in loaded_amulets:
+		var amulet_id := String(amulet)
+		if amulet_id == "size_shift":
+			if not owned_abilities.has(ABILITY_SIZE_SHIFT):
+				owned_abilities.append(ABILITY_SIZE_SHIFT)
+			continue
+		if amulet_id == "double_jump":
+			if not owned_abilities.has(ABILITY_DOUBLE_JUMP):
+				owned_abilities.append(ABILITY_DOUBLE_JUMP)
+			continue
+		if amulet_id == "head_spike":
+			if not owned_weapons.has(WEAPON_HEAD_SPIKE):
+				owned_weapons.append(WEAPON_HEAD_SPIKE)
+			continue
+		if AMULET_INFO.has(amulet_id) and not owned_amulets.has(amulet_id):
+			owned_amulets.append(amulet_id)
+
+	var loaded_weapons: Array = data.get("owned_weapons", [])
+	for weapon in loaded_weapons:
+		var weapon_id := String(weapon)
+		if WEAPON_INFO.has(weapon_id) and not owned_weapons.has(weapon_id):
+			owned_weapons.append(weapon_id)
+
+	var loaded_equipped: Array = data.get("equipped_amulets", [])
+	if loaded_equipped.is_empty():
+		var legacy_equipped := String(data.get("equipped_amulet", ""))
+		if legacy_equipped != "":
+			loaded_equipped.append(legacy_equipped)
 	for entry in loaded_equipped:
-		equipped_amulets.append(String(entry))
+		var equipped_id := String(entry)
+		if equipped_id == "head_spike":
+			equipped_weapon = WEAPON_HEAD_SPIKE
+			continue
+		if equipped_id == "size_shift" or equipped_id == "double_jump":
+			continue
+		if owned_amulets.has(equipped_id):
+			equipped_amulets.append(equipped_id)
+
 	amulet_slots_unlocked = max(3, int(data.get("amulet_slots_unlocked", amulet_slots_unlocked)))
 	while equipped_amulets.size() < amulet_slots_unlocked:
 		equipped_amulets.append("")
-	if equipped_amulets.is_empty() and equipped_amulet != "":
-		equipped_amulets.append(equipped_amulet)
 	if equipped_amulets.size() > amulet_slots_unlocked:
 		equipped_amulets.resize(amulet_slots_unlocked)
-	if not equipped_amulets.is_empty():
-		equipped_amulet = String(equipped_amulets[0])
-	else:
-		equipped_amulet = ""
+
+	var loaded_equipped_weapon := String(data.get("equipped_weapon", equipped_weapon))
+	if loaded_equipped_weapon != "" and owned_weapons.has(loaded_equipped_weapon):
+		equipped_weapon = loaded_equipped_weapon
+	elif equipped_weapon != "" and not owned_weapons.has(equipped_weapon):
+		equipped_weapon = ""
+
 	music_volume_linear = float(data.get("music_volume_linear", music_volume_linear))
 	sfx_volume_linear = float(data.get("sfx_volume_linear", sfx_volume_linear))
 	xp_level = max(1, int(data.get("xp_level", xp_level)))

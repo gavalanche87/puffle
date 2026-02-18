@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://brhojjt7oc5pj"
-path="res://.godot/imported/Double_Jump_Amulet.png-303d4441c8bc0b3c001506a411513e95.ctex"
+uid="uid://c2uiro63bnc24"
+path="res://.godot/imported/Shift_Size.png-64f9b7574d97ba61a80c977228ce7a3e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/amulets/Double_Jump_Amulet.png"
-dest_files=["res://.godot/imported/Double_Jump_Amulet.png-303d4441c8bc0b3c001506a411513e95.ctex"]
+source_file="res://assets/ui/abilities/Shift_Size.png"
+dest_files=["res://.godot/imported/Shift_Size.png-64f9b7574d97ba61a80c977228ce7a3e.ctex"]
 
 [params]
 

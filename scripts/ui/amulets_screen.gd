@@ -2,13 +2,9 @@ extends "res://scripts/ui/menu_transitions.gd"
 signal overlay_closed(from_pause_menu: bool)
 
 const NAV_BUTTON_SCENE := preload("res://scenes/ui/NavButton.tscn")
-const ICON_SIZE_SHIFT: Texture2D = preload("res://assets/ui/amulets/Shift_Size_Amulet.png")
-const ICON_HEAD_SPIKE: Texture2D = preload("res://assets/ui/amulets/Head_Spike_Amulet.png")
-const ICON_DOUBLE_JUMP: Texture2D = preload("res://assets/ui/amulets/Double_Jump_Amulet.png")
+const ICON_LEAP_OF_FAITH: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
 const AMULET_ICON_MAP := {
-	"size_shift": ICON_SIZE_SHIFT,
-	"head_spike": ICON_HEAD_SPIKE,
-	"double_jump": ICON_DOUBLE_JUMP
+	"leap_of_faith": ICON_LEAP_OF_FAITH
 }
 
 @onready var back_button: Button = $Layout/VBox/Header/BackButton
@@ -26,6 +22,12 @@ var _selected_amulet_id: String = ""
 var _manage_mode: bool = false
 var _overlay_mode: bool = false
 var _opened_from_pause_menu: bool = false
+var _embedded_mode: bool = false
+
+func set_embedded_mode(enabled: bool) -> void:
+	_embedded_mode = enabled
+	if is_inside_tree():
+		_apply_embedded_mode()
 
 func set_overlay_mode(enabled: bool, from_pause_menu: bool) -> void:
 	_overlay_mode = enabled
@@ -43,7 +45,16 @@ func _ready() -> void:
 	_bind_slot_buttons(slot_1, 0)
 	_bind_slot_buttons(slot_2, 1)
 	_bind_slot_buttons(slot_3, 2)
+	_apply_embedded_mode()
 	_refresh()
+
+func _apply_embedded_mode() -> void:
+	var bg := get_node_or_null("Background") as CanvasItem
+	var header := get_node_or_null("Layout/VBox/Header") as CanvasItem
+	if bg:
+		bg.visible = not _embedded_mode
+	if header:
+		header.visible = not _embedded_mode
 
 func _bind_slot_buttons(slot_node: VBoxContainer, slot_index: int) -> void:
 	var action_btn: Button = slot_node.get_node("ActionButton")
@@ -52,6 +63,8 @@ func _bind_slot_buttons(slot_node: VBoxContainer, slot_index: int) -> void:
 	)
 
 func _on_back_pressed() -> void:
+	if _embedded_mode:
+		return
 	if _overlay_mode:
 		emit_signal("overlay_closed", _opened_from_pause_menu)
 		return
@@ -65,7 +78,7 @@ func _on_back_pressed() -> void:
 			return
 	if gd and gd.has_method("set_amulet_screen_manage_mode"):
 		gd.call("set_amulet_screen_manage_mode", false)
-	go_to_scene("res://scenes/ui/MainMenu.tscn")
+	go_to_scene("res://scenes/ui/Character.tscn")
 
 func _refresh() -> void:
 	var gd: Node = get_node_or_null("/root/GameData")

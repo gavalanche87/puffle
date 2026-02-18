@@ -137,6 +137,19 @@ text = "Items"
 layout_mode = 2
 theme_override_constants/separation = 8
 
+[node name="AbilitiesTitle" type="Label" parent="Layout/VBox/Scroll/Margin/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.647059, 0.823529, 0.952941, 1)
+theme_override_colors/font_outline_color = Color(0.298039, 0.588235, 0.843137, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 26
+text = "Abilities"
+
+[node name="AbilitiesList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
 [node name="AmuletsTitle" type="Label" parent="Layout/VBox/Scroll/Margin/Content"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.87451, 0.486275, 0.827451, 1)
@@ -147,5 +160,18 @@ theme_override_font_sizes/font_size = 26
 text = "Amulets"
 
 [node name="AmuletsList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WeaponsTitle" type="Label" parent="Layout/VBox/Scroll/Margin/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_outline_color = Color(0.254902, 0.254902, 0.254902, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 26
+text = "Weapons"
+
+[node name="WeaponsList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin/Content"]
 layout_mode = 2
 theme_override_constants/separation = 8

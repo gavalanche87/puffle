@@ -37,9 +37,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -170.0
-offset_top = -150.0
+offset_top = -170.0
 offset_right = 170.0
-offset_bottom = 150.0
+offset_bottom = 170.0
 
 [node name="Panel" type="Panel" parent="Layout"]
 layout_mode = 2
@@ -65,26 +65,36 @@ theme_override_colors/font_color = Color(0.980392, 0.972549, 0.67451, 1)
 theme_override_colors/font_outline_color = Color(0.796078, 0.682353, 0.145098, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 54
+theme_override_font_sizes/font_size = 44
 text = "PUFFLE"
 horizontal_alignment = 1
 
 [node name="PlayButton" parent="Layout/Panel/Margin/Buttons" instance=ExtResource("2")]
+custom_minimum_size = Vector2(190, 40)
 layout_mode = 2
 text = "PLAY"
 
 [node name="ShopButton" parent="Layout/Panel/Margin/Buttons" instance=ExtResource("2")]
+custom_minimum_size = Vector2(190, 40)
 layout_mode = 2
 text = "SHOP"
 
 [node name="AmuletsButton" parent="Layout/Panel/Margin/Buttons" instance=ExtResource("2")]
+custom_minimum_size = Vector2(190, 40)
 layout_mode = 2
-text = "AMULETS"
+text = "CHARACTER"
 
 [node name="HowToPlayButton" parent="Layout/Panel/Margin/Buttons" instance=ExtResource("2")]
+custom_minimum_size = Vector2(190, 40)
 layout_mode = 2
 text = "HOW TO PLAY"
 
 [node name="SettingsButton" parent="Layout/Panel/Margin/Buttons" instance=ExtResource("2")]
+custom_minimum_size = Vector2(190, 40)
 layout_mode = 2
 text = "SETTINGS"
+
+[node name="WipeSaveButton" parent="Layout/Panel/Margin/Buttons" instance=ExtResource("2")]
+custom_minimum_size = Vector2(190, 40)
+layout_mode = 2
+text = "WIPE SAVE"

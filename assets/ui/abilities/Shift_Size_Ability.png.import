@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dx4xlaww65v1e"
-path="res://.godot/imported/Shift_Size_Amulet.png-e5f90412ad09ec6eef1f21a475e4edd1.ctex"
+path="res://.godot/imported/Shift_Size_Ability.png-1689620d4dc7807d91d34ebab68bee12.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/amulets/Shift_Size_Amulet.png"
-dest_files=["res://.godot/imported/Shift_Size_Amulet.png-e5f90412ad09ec6eef1f21a475e4edd1.ctex"]
+source_file="res://assets/ui/abilities/Shift_Size_Ability.png"
+dest_files=["res://.godot/imported/Shift_Size_Ability.png-1689620d4dc7807d91d34ebab68bee12.ctex"]
 
 [params]
 

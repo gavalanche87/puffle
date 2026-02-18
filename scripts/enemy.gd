@@ -16,7 +16,7 @@ extends Area2D
 @export_range(0, 100) var energy_drop_rate: float = 30.0
 @export_range(0, 100) var coin_drop_rate: float = 30.0
 @export var xp_drop_value: int = 10
-@export var item_scene: PackedScene = preload("res://scenes/ItemPickup.tscn")
+@export var item_scene: PackedScene = preload("res://scenes/items/ItemPickup.tscn")
 
 @onready var floor_cast: RayCast2D = $FloorCast
 @onready var wall_cast: RayCast2D = $WallCast

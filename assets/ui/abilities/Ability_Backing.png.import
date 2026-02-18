@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c2uiro63bnc24"
-path="res://.godot/imported/Shift_Size.png-d8e78e2508085f4ef79686b5cecac707.ctex"
+uid="uid://bo1lm1cyq6wto"
+path="res://.godot/imported/Ability_Backing.png-27069f030f1653945cf12788ffe94e25.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/amulets/Shift_Size.png"
-dest_files=["res://.godot/imported/Shift_Size.png-d8e78e2508085f4ef79686b5cecac707.ctex"]
+source_file="res://assets/ui/abilities/Ability_Backing.png"
+dest_files=["res://.godot/imported/Ability_Backing.png-27069f030f1653945cf12788ffe94e25.ctex"]
 
 [params]
 

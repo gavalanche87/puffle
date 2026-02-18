@@ -1,0 +1,169 @@
+extends "res://scripts/ui/menu_transitions.gd"
+
+const NAV_BUTTON_SCENE := preload("res://scenes/ui/NavButton.tscn")
+const ICON_HEAD_SPIKE: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Weapon.png")
+const WEAPON_ICON_MAP := {
+	"head_spike": ICON_HEAD_SPIKE
+}
+
+@onready var back_button: Button = $Layout/VBox/Header/BackButton
+@onready var background: ColorRect = $Background
+@onready var header: Control = $Layout/VBox/Header
+@onready var slot_1: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1
+@onready var slot_2: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot2
+@onready var slot_3: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot3
+@onready var owned_list: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Left/OwnedScroll/OwnedList
+@onready var selected_title: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedRow/SelectedTitle
+@onready var selected_icon: TextureRect = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedRow/SelectedIcon
+@onready var boon_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/BoonLabel
+@onready var grievance_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/GrievanceLabel
+@onready var slots_section: Panel = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection
+
+var _selected_weapon_id: String = ""
+var _manage_mode: bool = false
+var _embedded_mode: bool = false
+
+func set_embedded_mode(enabled: bool) -> void:
+	_embedded_mode = enabled
+	if is_inside_tree():
+		_apply_embedded_mode()
+
+func _ready() -> void:
+	super._ready()
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd and gd.has_method("get_amulet_screen_manage_mode"):
+		_manage_mode = bool(gd.call("get_amulet_screen_manage_mode"))
+	if gd and gd.has_signal("weapons_changed"):
+		if not gd.weapons_changed.is_connected(_refresh):
+			gd.weapons_changed.connect(_refresh)
+	if back_button:
+		back_button.pressed.connect(func() -> void:
+			go_to_scene("res://scenes/ui/Character.tscn")
+		)
+	_bind_slot_button(slot_1)
+	if slot_2:
+		slot_2.visible = false
+	if slot_3:
+		slot_3.visible = false
+	_apply_embedded_mode()
+	_refresh()
+
+func _apply_embedded_mode() -> void:
+	if background:
+		background.visible = not _embedded_mode
+	if header:
+		header.visible = not _embedded_mode
+
+func _bind_slot_button(slot_node: VBoxContainer) -> void:
+	if slot_node == null:
+		return
+	var action_btn: Button = slot_node.get_node_or_null("ActionButton") as Button
+	if action_btn == null:
+		return
+	action_btn.pressed.connect(func() -> void:
+		_on_slot_action_pressed()
+	)
+
+func _refresh() -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if not gd:
+		return
+	slots_section.visible = _manage_mode
+	_clear_owned_list()
+	var owned: Array = gd.call("get_owned_weapons")
+	var catalog: Array = gd.call("get_weapon_catalog")
+	var selected_exists := false
+	for entry_variant in catalog:
+		var entry: Dictionary = entry_variant
+		var weapon_id := String(entry.get("id", ""))
+		if not owned.has(weapon_id):
+			continue
+		selected_exists = selected_exists or weapon_id == _selected_weapon_id
+		_add_owned_button(entry)
+	if not selected_exists:
+		_selected_weapon_id = String(owned[0]) if not owned.is_empty() else ""
+	_update_details(gd)
+	_update_slot_ui(gd)
+
+func _add_owned_button(entry: Dictionary) -> void:
+	var weapon_id := String(entry.get("id", ""))
+	var button: Button = NAV_BUTTON_SCENE.instantiate() as Button
+	if button == null:
+		return
+	button.text = String(entry.get("title", weapon_id))
+	button.icon = _get_weapon_icon(weapon_id)
+	button.expand_icon = true
+	button.modulate = Color(0.98, 0.92, 0.56, 1.0) if _selected_weapon_id == weapon_id else Color(1, 1, 1, 1)
+	button.pressed.connect(func() -> void:
+		_selected_weapon_id = weapon_id
+		_refresh()
+	)
+	owned_list.add_child(button)
+
+func _update_details(gd: Node) -> void:
+	if _selected_weapon_id == "":
+		selected_title.text = "No Weapon Selected"
+		selected_icon.texture = null
+		boon_label.text = "Boon:"
+		grievance_label.text = "Grievance:"
+		return
+	var catalog: Array = gd.call("get_weapon_catalog")
+	for entry_variant in catalog:
+		var entry: Dictionary = entry_variant
+		if String(entry.get("id", "")) != _selected_weapon_id:
+			continue
+		selected_title.text = String(entry.get("title", _selected_weapon_id))
+		selected_icon.texture = _get_weapon_icon(_selected_weapon_id)
+		boon_label.text = "Boon: %s" % String(entry.get("boon", ""))
+		grievance_label.text = "Grievance: %s" % String(entry.get("grievance", ""))
+		return
+
+func _update_slot_ui(gd: Node) -> void:
+	if slot_1 == null:
+		return
+	var equipped_id := String(gd.call("get_equipped_weapon"))
+	var icon: TextureRect = slot_1.get_node_or_null("Backing/Icon") as TextureRect
+	var value: Label = slot_1.get_node_or_null("Value") as Label
+	var action_btn: Button = slot_1.get_node_or_null("ActionButton") as Button
+	if icon:
+		icon.texture = _get_weapon_icon(equipped_id)
+	if value:
+		value.text = "Slot 1: %s" % (_get_weapon_title(gd, equipped_id) if equipped_id != "" else "Empty")
+	if action_btn:
+		if equipped_id == "":
+			action_btn.text = "EQUIP"
+			action_btn.disabled = (not _manage_mode) or _selected_weapon_id == "" or (not bool(gd.call("has_weapon", _selected_weapon_id)))
+		else:
+			action_btn.text = "UNEQUIP"
+			action_btn.disabled = not _manage_mode
+
+func _on_slot_action_pressed() -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if not gd:
+		return
+	var equipped_id := String(gd.call("get_equipped_weapon"))
+	if equipped_id != "":
+		gd.call("unequip_weapon")
+		_refresh()
+		return
+	if _selected_weapon_id == "":
+		return
+	gd.call("equip_weapon", _selected_weapon_id)
+	_refresh()
+
+func _clear_owned_list() -> void:
+	for child in owned_list.get_children():
+		child.queue_free()
+
+func _get_weapon_icon(weapon_id: String) -> Texture2D:
+	return WEAPON_ICON_MAP.get(weapon_id, null)
+
+func _get_weapon_title(gd: Node, weapon_id: String) -> String:
+	if weapon_id == "":
+		return ""
+	var catalog: Array = gd.call("get_weapon_catalog")
+	for entry_variant in catalog:
+		var entry: Dictionary = entry_variant
+		if String(entry.get("id", "")) == weapon_id:
+			return String(entry.get("title", weapon_id))
+	return weapon_id

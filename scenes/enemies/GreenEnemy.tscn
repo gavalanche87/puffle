@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://f767h5kliylu" path="res://assets/enemies/green/frame_000.png" id="3_hhaxu"]
 [ext_resource type="Texture2D" uid="uid://cv5rknj3loxde" path="res://assets/enemies/green/frame_001.png" id="4_ou8np"]
 [ext_resource type="Texture2D" uid="uid://c8m8jyn5hg7s1" path="res://assets/enemies/green/frame_002.png" id="5_j76y4"]
-[ext_resource type="PackedScene" path="res://scenes/EnemyDeath.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/EnemyDeath.tscn" id="6"]
 [ext_resource type="Texture2D" uid="uid://dsx2ns8in6p77" path="res://assets/enemies/green/frame_003.png" id="6_ngj74"]
 [ext_resource type="Texture2D" uid="uid://bb08a41k1h1uy" path="res://assets/enemies/green/frame_004.png" id="7_r1iab"]
 [ext_resource type="Texture2D" uid="uid://dq7mkpd432ro7" path="res://assets/enemies/green/frame_005.png" id="8_1lkbp"]

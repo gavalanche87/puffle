@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c4hi1jgpf5nu7"
-path="res://.godot/imported/Double_Jump_Amulet.png-e3bb79a1a473f4ee0e5c9f08c88e2abd.ctex"
+path="res://.godot/imported/Leap_Of_Faith_Amulet.png-d3161e03bc2600d219a00060b48a7337.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/Double_Jump_Amulet.png"
-dest_files=["res://.godot/imported/Double_Jump_Amulet.png-e3bb79a1a473f4ee0e5c9f08c88e2abd.ctex"]
+source_file="res://assets/ui/amulets/Leap_Of_Faith_Amulet.png"
+dest_files=["res://.godot/imported/Leap_Of_Faith_Amulet.png-d3161e03bc2600d219a00060b48a7337.ctex"]
 
 [params]
 

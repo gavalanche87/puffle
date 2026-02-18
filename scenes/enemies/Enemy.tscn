@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bdlw4efq2llwq"]
 
 [ext_resource type="Script" uid="uid://ds7v1inio53dw" path="res://scripts/enemy.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/EnemyDeath.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/EnemyDeath.tscn" id="3"]
 [ext_resource type="Texture2D" uid="uid://dkvm4h4yv2q2w" path="res://assets/enemies/wom/frame_006.png" id="3_isvm2"]
 [ext_resource type="Texture2D" uid="uid://ck3k6uxdmgv3c" path="res://assets/enemies/wom/frame_007.png" id="4_gr8dl"]
 [ext_resource type="Texture2D" uid="uid://bcqi7dbnb7wxw" path="res://assets/enemies/wom/frame_008.png" id="5_axa8o"]

@@ -23,7 +23,7 @@ func _ready() -> void:
 		go_to_scene("res://scenes/ui/MainMenu.tscn")
 	)
 	test_scene_button.pressed.connect(func() -> void:
-		go_to_scene("res://scenes/VerticalTestScene.tscn")
+		go_to_scene("res://scenes/levels/test/VerticalTestScene.tscn")
 	)
 	for i in range(world_buttons.size()):
 		var world_id := i + 1

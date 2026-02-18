@@ -31,10 +31,10 @@ var item_backing: CanvasItem
 var item_backing_base_scale: Vector2 = Vector2.ONE
 var player_body_collision_disabled: bool = false
 
-const HEALTH_ITEM_SCENE: PackedScene = preload("res://scenes/HealthItem.tscn")
-const ENERGY_ITEM_SCENE: PackedScene = preload("res://scenes/EnergyItem.tscn")
-const XP_ITEM_SCENE: PackedScene = preload("res://scenes/XPItem.tscn")
-const COIN_ITEM_SCENE: PackedScene = preload("res://scenes/CoinItem.tscn")
+const HEALTH_ITEM_SCENE: PackedScene = preload("res://scenes/items/HealthItem.tscn")
+const ENERGY_ITEM_SCENE: PackedScene = preload("res://scenes/items/EnergyItem.tscn")
+const XP_ITEM_SCENE: PackedScene = preload("res://scenes/items/XPItem.tscn")
+const COIN_ITEM_SCENE: PackedScene = preload("res://scenes/items/CoinItem.tscn")
 
 func _ready() -> void:
 	add_to_group("items")

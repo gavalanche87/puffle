@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://6e6dkged1fju"]
+[gd_scene format=3 uid="uid://bg882w6or57o"]
 
 [ext_resource type="Script" uid="uid://nfki18fq1gmc" path="res://scripts/player.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://44urmurwlk54" path="res://assets/player/Idle.png" id="10"]

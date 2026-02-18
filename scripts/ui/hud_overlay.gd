@@ -1,14 +1,14 @@
 extends CanvasLayer
 
-const AMULETS_SCENE := preload("res://scenes/ui/Amulets.tscn")
+const CHARACTER_SCENE := preload("res://scenes/ui/Character.tscn")
 
 @onready var pause_button: Button = $PauseButton
 @onready var complete_level_test_button: Button = $CompleteLevelTestButton
 @onready var pause_menu: Control = $PauseMenuPopup
 @onready var amulets_hud_button: Button = $EquippedAmuletsPanel/AmuletsHudButton
 
-var _amulets_overlay: Control = null
-var _amulets_overlay_from_pause: bool = false
+var _character_overlay: Control = null
+var _character_overlay_from_pause: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -35,9 +35,9 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
-		if _amulets_overlay:
-			_close_amulets_overlay(not _amulets_overlay_from_pause)
-			if _amulets_overlay_from_pause and not _is_pause_open():
+		if _character_overlay:
+			_close_character_overlay(not _character_overlay_from_pause)
+			if _character_overlay_from_pause and not _is_pause_open():
 				_open_pause()
 			get_viewport().set_input_as_handled()
 			return
@@ -63,13 +63,13 @@ func _on_settings_requested() -> void:
 	_change_scene_from_pause("res://scenes/ui/Settings.tscn")
 
 func _on_amulets_requested() -> void:
-	_open_amulets_overlay(true)
+	_open_character_overlay(true)
 
 func _on_main_menu_requested() -> void:
 	_change_scene_from_pause("res://scenes/ui/MainMenu.tscn")
 
 func _on_amulets_hud_pressed() -> void:
-	_open_amulets_overlay(false)
+	_open_character_overlay(false)
 
 func _open_pause() -> void:
 	if pause_menu and pause_menu.has_method("open_popup"):
@@ -84,47 +84,47 @@ func _is_pause_open() -> bool:
 	return pause_menu != null and pause_menu.visible
 
 func _change_scene_from_pause(path: String) -> void:
-	_close_amulets_overlay(false)
+	_close_character_overlay(false)
 	get_tree().paused = false
 	get_tree().change_scene_to_file(path)
 
-func _open_amulets_overlay(from_pause_menu: bool) -> void:
-	if _amulets_overlay != null:
+func _open_character_overlay(from_pause_menu: bool) -> void:
+	if _character_overlay != null:
 		return
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd and gd.has_method("set_amulet_screen_manage_mode"):
 		gd.call("set_amulet_screen_manage_mode", true)
-	var instance: Node = AMULETS_SCENE.instantiate()
+	var instance: Node = CHARACTER_SCENE.instantiate()
 	var screen: Control = instance as Control
 	if screen == null:
 		if instance:
 			instance.queue_free()
 		return
-	_amulets_overlay = screen
-	_amulets_overlay_from_pause = from_pause_menu
-	_amulets_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
-	if _amulets_overlay.has_method("set_overlay_mode"):
-		_amulets_overlay.call("set_overlay_mode", true, from_pause_menu)
-	if _amulets_overlay.has_signal("overlay_closed"):
-		_amulets_overlay.connect("overlay_closed", _on_amulets_overlay_closed)
-	add_child(_amulets_overlay)
+	_character_overlay = screen
+	_character_overlay_from_pause = from_pause_menu
+	_character_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
+	if _character_overlay.has_method("set_overlay_mode"):
+		_character_overlay.call("set_overlay_mode", true, from_pause_menu)
+	if _character_overlay.has_signal("overlay_closed"):
+		_character_overlay.connect("overlay_closed", _on_amulets_overlay_closed)
+	add_child(_character_overlay)
 	if not from_pause_menu:
 		_close_pause()
 	get_tree().paused = true
 
 func _on_amulets_overlay_closed(from_pause_menu: bool) -> void:
-	_close_amulets_overlay(not from_pause_menu)
+	_close_character_overlay(not from_pause_menu)
 	_refresh_player_amulet_state()
 	if from_pause_menu and not _is_pause_open():
 		_open_pause()
 
-func _close_amulets_overlay(resume_game: bool) -> void:
-	if _amulets_overlay:
-		_amulets_overlay.queue_free()
-		_amulets_overlay = null
+func _close_character_overlay(resume_game: bool) -> void:
+	if _character_overlay:
+		_character_overlay.queue_free()
+		_character_overlay = null
 	if resume_game:
 		get_tree().paused = false
-	_amulets_overlay_from_pause = false
+	_character_overlay_from_pause = false
 
 func _refresh_player_amulet_state() -> void:
 	for node in get_tree().get_nodes_in_group("player"):

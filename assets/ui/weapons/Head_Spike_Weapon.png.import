@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dncqybq6tdn1t"
-path="res://.godot/imported/Double_Jump.png-923016da41c1abb3ff4227b985b857f5.ctex"
+uid="uid://b21h2rtgws7wf"
+path="res://.godot/imported/Head_Spike_Weapon.png-f0922a23e34fe336e3747df88bc8b9c1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/amulets/Double_Jump.png"
-dest_files=["res://.godot/imported/Double_Jump.png-923016da41c1abb3ff4227b985b857f5.ctex"]
+source_file="res://assets/ui/weapons/Head_Spike_Weapon.png"
+dest_files=["res://.godot/imported/Head_Spike_Weapon.png-f0922a23e34fe336e3747df88bc8b9c1.ctex"]
 
 [params]
 
