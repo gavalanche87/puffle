@@ -3,9 +3,13 @@ extends "res://scripts/ui/menu_transitions.gd"
 const NAV_BUTTON_SCENE := preload("res://scenes/ui/NavButton.tscn")
 const ICON_SIZE_SHIFT: Texture2D = preload("res://assets/ui/abilities/Shift_Size_Ability.png")
 const ICON_DOUBLE_JUMP: Texture2D = preload("res://assets/ui/abilities/Double_Jump_Ability.png")
+const ICON_WALL_JUMP: Texture2D = preload("res://assets/ui/abilities/Wall_Jump_Ability.png")
+const COLOR_ABILITY_OUTLINE := Color(0.980392, 0.513725, 0.203922, 1.0) # #fa8334
+const COLOR_LIGHT_TEXT := Color(0.933333, 0.898039, 0.913725, 1.0) # #eee5e9
 const ABILITY_ICON_MAP := {
 	"size_shift": ICON_SIZE_SHIFT,
-	"double_jump": ICON_DOUBLE_JUMP
+	"double_jump": ICON_DOUBLE_JUMP,
+	"wall_jump": ICON_WALL_JUMP
 }
 
 @onready var back_button: Button = $Layout/VBox/Header/BackButton
@@ -14,8 +18,7 @@ const ABILITY_ICON_MAP := {
 @onready var owned_list: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Left/OwnedScroll/OwnedList
 @onready var selected_title: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedRow/SelectedTitle
 @onready var selected_icon: TextureRect = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedRow/SelectedIcon
-@onready var boon_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/BoonLabel
-@onready var grievance_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/GrievanceLabel
+@onready var description_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/DescriptionLabel
 @onready var slots_section: Panel = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection
 
 var _selected_ability_id: String = ""
@@ -33,6 +36,8 @@ func _ready() -> void:
 			go_to_scene("res://scenes/ui/Character.tscn")
 		)
 	_apply_embedded_mode()
+	selected_title.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
+	selected_title.add_theme_color_override("font_outline_color", COLOR_ABILITY_OUTLINE)
 	_refresh()
 
 func _apply_embedded_mode() -> void:
@@ -70,7 +75,9 @@ func _add_owned_button(entry: Dictionary) -> void:
 	button.text = String(entry.get("title", ability_id))
 	button.icon = _get_ability_icon(ability_id)
 	button.expand_icon = true
-	button.modulate = Color(0.98, 0.92, 0.56, 1.0) if _selected_ability_id == ability_id else Color(1, 1, 1, 1)
+	button.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
+	button.add_theme_color_override("font_outline_color", COLOR_ABILITY_OUTLINE)
+	button.modulate = Color(1, 1, 1, 1)
 	button.pressed.connect(func() -> void:
 		_selected_ability_id = ability_id
 		_refresh()
@@ -81,8 +88,7 @@ func _update_details(gd: Node) -> void:
 	if _selected_ability_id == "":
 		selected_title.text = "No Ability Selected"
 		selected_icon.texture = null
-		boon_label.text = "Boon:"
-		grievance_label.text = "Grievance:"
+		description_label.text = ""
 		return
 	var catalog: Array = gd.call("get_ability_catalog")
 	for entry_variant in catalog:
@@ -91,8 +97,7 @@ func _update_details(gd: Node) -> void:
 			continue
 		selected_title.text = String(entry.get("title", _selected_ability_id))
 		selected_icon.texture = _get_ability_icon(_selected_ability_id)
-		boon_label.text = "Boon: %s" % String(entry.get("boon", ""))
-		grievance_label.text = "Grievance: %s" % String(entry.get("grievance", ""))
+		description_label.text = String(entry.get("boon", ""))
 		return
 
 func _clear_owned_list() -> void:

@@ -3,6 +3,7 @@ extends CharacterBody2D
 enum PlayerMode {SMALL, BIG}
 const ABILITY_SIZE_SHIFT := "size_shift"
 const ABILITY_DOUBLE_JUMP := "double_jump"
+const ABILITY_WALL_JUMP := "wall_jump"
 const WEAPON_HEAD_SPIKE := "head_spike"
 const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 
@@ -36,7 +37,7 @@ const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 @export var flip_reward_pickup_count_per_spin: int = 1
 @export var flips_per_energy_reward: int = 5
 @export var double_jump_energy_cost: int = 15
-@export var wall_jump_energy_cost: int = 10
+@export var wall_jump_energy_cost: int = 5
 @export var death_anim_time: float = 0.4
 @export var death_fade_time: float = 0.22
 @export var xp_growth_multiplier: float = 1.25
@@ -219,7 +220,7 @@ func _ready() -> void:
 		base_spike_hitbox_shape_position = spike_hitbox_shape.position
 	_apply_mode(mode, false)
 	var spike_allowed := _has_equipped_weapon(WEAPON_HEAD_SPIKE)
-	_set_head_attachment_active(spike_allowed and head_attachment != null and head_attachment.visible, false)
+	_set_head_attachment_active(spike_allowed, false)
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	# Camera now uses Godot's built-in offset and position_smoothing
 	# No manual positioning needed
@@ -261,8 +262,6 @@ func _physics_process(delta: float) -> void:
 		_cycle_consumable(1)
 	if Input.is_action_just_pressed("consumable_use"):
 		_use_selected_consumable()
-	if Input.is_action_just_pressed("toggle_head_attachment"):
-		_toggle_head_attachment()
 	if not _has_equipped_weapon(WEAPON_HEAD_SPIKE) and head_attachment and head_attachment.visible:
 		_set_head_attachment_active(false, false)
 
@@ -496,41 +495,21 @@ func _current_jump_velocity() -> float:
 	return base_jump * jump_mult
 
 func _ensure_toggle_action() -> void:
-	if InputMap.has_action("toggle_mode"):
-		pass
-	else:
-		InputMap.add_action("toggle_mode")
-		var key_event := InputEventKey.new()
-		key_event.keycode = KEY_Z
-		InputMap.action_add_event("toggle_mode", key_event)
-	if not InputMap.has_action("consumable_prev"):
-		InputMap.add_action("consumable_prev")
-		var prev_event := InputEventKey.new()
-		prev_event.keycode = KEY_Q
-		InputMap.action_add_event("consumable_prev", prev_event)
-	if not InputMap.has_action("consumable_next"):
-		InputMap.add_action("consumable_next")
-		var next_event := InputEventKey.new()
-		next_event.keycode = KEY_E
-		InputMap.action_add_event("consumable_next", next_event)
-	if not InputMap.has_action("consumable_use"):
-		InputMap.add_action("consumable_use")
-		var use_event := InputEventKey.new()
-		use_event.keycode = KEY_W
-		InputMap.action_add_event("consumable_use", use_event)
-	if not InputMap.has_action("toggle_head_attachment"):
-		InputMap.add_action("toggle_head_attachment")
-		var head_event := InputEventKey.new()
-		head_event.keycode = KEY_X
-		InputMap.action_add_event("toggle_head_attachment", head_event)
+	_ensure_action_has_key("toggle_mode", KEY_Z)
+	_ensure_action_has_key("consumable_prev", KEY_Q)
+	_ensure_action_has_key("consumable_next", KEY_E)
+	_ensure_action_has_key("consumable_use", KEY_W)
 
-func _toggle_head_attachment() -> void:
-	if not head_attachment:
-		return
-	if not _has_equipped_weapon(WEAPON_HEAD_SPIKE):
-		_set_head_attachment_active(false, false)
-		return
-	_set_head_attachment_active(not head_attachment.visible, true)
+func _ensure_action_has_key(action_name: String, keycode: Key) -> void:
+	if not InputMap.has_action(action_name):
+		InputMap.add_action(action_name)
+	for event_variant in InputMap.action_get_events(action_name):
+		var key_event := event_variant as InputEventKey
+		if key_event and key_event.keycode == keycode:
+			return
+	var new_event := InputEventKey.new()
+	new_event.keycode = keycode
+	InputMap.action_add_event(action_name, new_event)
 
 func _set_head_attachment_active(active: bool, animate: bool) -> void:
 	if not head_attachment:
@@ -1301,8 +1280,7 @@ func _refresh_amulet_state() -> void:
 	max_health = base_max_health
 	current_health = min(current_health, max_health)
 	_update_health_ui()
-	if not head_spike_equipped:
-		_set_head_attachment_active(false, false)
+	_set_head_attachment_active(head_spike_equipped, false)
 	_update_equipped_amulet_icons()
 
 func validate_ability_state_from_amulets() -> void:
@@ -1350,6 +1328,8 @@ func _apply_collision_scale(multiplier: float) -> void:
 			hurt_collision.position = base_hurt_collision_position * multiplier
 
 func _is_wall_sliding(snapped: bool) -> bool:
+	if not _has_ability(ABILITY_WALL_JUMP):
+		return false
 	if mode != PlayerMode.SMALL:
 		return false
 	if _is_grounded():
@@ -1363,6 +1343,8 @@ func _is_wall_sliding(snapped: bool) -> bool:
 	return true
 
 func _try_wall_snap() -> bool:
+	if not _has_ability(ABILITY_WALL_JUMP):
+		return false
 	if mode != PlayerMode.SMALL:
 		return false
 	if _is_grounded():
@@ -1383,6 +1365,8 @@ func _try_wall_snap() -> bool:
 	return false
 
 func _wall_jump() -> bool:
+	if not _has_ability(ABILITY_WALL_JUMP):
+		return false
 	if wall_normal == Vector2.ZERO:
 		if is_on_wall():
 			wall_normal = get_wall_normal()

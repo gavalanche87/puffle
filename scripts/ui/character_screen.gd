@@ -17,10 +17,15 @@ var _opened_from_pause_menu: bool = false
 var _manage_mode: bool = false
 var _current_tab: String = "amulets"
 var _current_view: Control = null
+const TAB_OUTLINE_WEAPONS := Color(0.113725, 0.701961, 0.482353, 1.0) # #1db37b
+const TAB_OUTLINE_AMULETS := Color(0.87451, 0.486275, 0.827451, 1.0) # #df7cd3
+const TAB_OUTLINE_ABILITIES := Color(0.980392, 0.513725, 0.203922, 1.0) # #fa8334
 
 func set_overlay_mode(enabled: bool, from_pause_menu: bool) -> void:
 	_overlay_mode = enabled
 	_opened_from_pause_menu = from_pause_menu
+	if enabled:
+		_manage_mode = true
 
 func _ready() -> void:
 	super._ready()
@@ -81,6 +86,8 @@ func _show_tab(tab_id: String) -> void:
 	_current_view = view
 	if _current_view.has_method("set_embedded_mode"):
 		_current_view.call("set_embedded_mode", true)
+	if _current_view.has_method("set_manage_mode"):
+		_current_view.call("set_manage_mode", _manage_mode)
 	_current_view.anchor_left = 0.0
 	_current_view.anchor_top = 0.0
 	_current_view.anchor_right = 1.0
@@ -94,8 +101,14 @@ func _show_tab(tab_id: String) -> void:
 
 func _update_tab_visuals() -> void:
 	if abilities_button:
+		abilities_button.add_theme_color_override("font_outline_color", TAB_OUTLINE_ABILITIES)
+	if abilities_button:
 		abilities_button.modulate = Color(1, 1, 1, 1) if _current_tab == "abilities" else Color(0.75, 0.75, 0.75, 1)
 	if amulets_button:
+		amulets_button.add_theme_color_override("font_outline_color", TAB_OUTLINE_AMULETS)
+	if amulets_button:
 		amulets_button.modulate = Color(1, 1, 1, 1) if _current_tab == "amulets" else Color(0.75, 0.75, 0.75, 1)
+	if weapons_button:
+		weapons_button.add_theme_color_override("font_outline_color", TAB_OUTLINE_WEAPONS)
 	if weapons_button:
 		weapons_button.modulate = Color(1, 1, 1, 1) if _current_tab == "weapons" else Color(0.75, 0.75, 0.75, 1)

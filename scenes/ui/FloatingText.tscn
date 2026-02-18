@@ -12,7 +12,7 @@ position = Vector2(-14, 0)
 [node name="Label" type="Label" parent="." unique_id=419900359]
 offset_top = -8.0
 offset_bottom = -8.0
-theme_override_colors/font_color = Color(0.98039216, 0.972549, 0.6745098, 1)
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("2_fc4js")

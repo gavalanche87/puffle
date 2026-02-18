@@ -58,13 +58,17 @@ text = "BACK"
 [node name="Title" type="Label" parent="Layout/VBox/Header/TopRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
-theme_override_colors/font_outline_color = Color(0.74902, 0.184314, 0.686275, 1)
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
+theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 42
 text = "LEVEL SELECT"
 horizontal_alignment = 1
+
+[node name="HeaderSpacer" type="Control" parent="Layout/VBox/Header/TopRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 50)
 
 [node name="WorldTabs" type="HBoxContainer" parent="Layout/VBox/Header"]
 layout_mode = 2
@@ -87,7 +91,7 @@ text = "WORLD 3"
 
 [node name="WorldStatus" type="Label" parent="Layout/VBox/Header"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.647059, 0.823529, 0.952941, 1)
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.254902, 0.254902, 0.254902, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")

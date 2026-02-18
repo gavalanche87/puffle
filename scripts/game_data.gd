@@ -16,6 +16,7 @@ const LEVELS_PER_WORLD := 10
 
 const ABILITY_SIZE_SHIFT := "size_shift"
 const ABILITY_DOUBLE_JUMP := "double_jump"
+const ABILITY_WALL_JUMP := "wall_jump"
 const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 const WEAPON_HEAD_SPIKE := "head_spike"
 
@@ -86,6 +87,14 @@ const SHOP_ABILITIES := [
 		"description": "Boon: Gain one extra jump in mid-air",
 		"currency": "tokens",
 		"cost": 3
+	},
+	{
+		"id": ABILITY_WALL_JUMP,
+		"kind": "ability",
+		"title": "Wall Jump",
+		"description": "Boon: Enables wall slide and wall jump",
+		"currency": "tokens",
+		"cost": 3
 	}
 ]
 
@@ -123,6 +132,12 @@ const ABILITY_INFO := {
 		"boon": "Gain one extra jump in mid-air",
 		"grievance": "None",
 		"shop_cost_tokens": 3
+	},
+	ABILITY_WALL_JUMP: {
+		"title": "Wall Jump",
+		"boon": "Enables wall slide and wall jump",
+		"grievance": "None",
+		"shop_cost_tokens": 3
 	}
 }
 
@@ -138,7 +153,7 @@ const AMULET_INFO := {
 const WEAPON_INFO := {
 	WEAPON_HEAD_SPIKE: {
 		"title": "Head Spike",
-		"boon": "Enable head spike attacks with X",
+		"boon": "Enable head spike attacks",
 		"grievance": "Destroy platforms only in Big Mode",
 		"shop_cost_tokens": 3
 	}

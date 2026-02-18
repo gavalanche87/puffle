@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://gib5735vu35u"
-path="res://.godot/imported/platform_placeholder.png-f2f2ab8f0ee4f8dd4d843ff1e568dcec.ctex"
+uid="uid://x3rmd4l3g3ub"
+path="res://.godot/imported/Wall_Jump_Ability.png-038a7992933a556494835683a25ad5e9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tiles/platform_placeholder.png"
-dest_files=["res://.godot/imported/platform_placeholder.png-f2f2ab8f0ee4f8dd4d843ff1e568dcec.ctex"]
+source_file="res://assets/ui/abilities/Wall_Jump_Ability.png"
+dest_files=["res://.godot/imported/Wall_Jump_Ability.png-038a7992933a556494835683a25ad5e9.ctex"]
 
 [params]
 

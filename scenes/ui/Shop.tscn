@@ -1,10 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://dw6byjjvjnx3i"]
 
-[ext_resource type="Script" path="res://scripts/ui/shop_screen.gd" id="1"]
+[ext_resource type="Script" uid="uid://b8hb21risihan" path="res://scripts/ui/shop_screen.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="2"]
-[ext_resource type="FontFile" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="3"]
+[ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="3"]
 
-[node name="Shop" type="Control"]
+[node name="Shop" type="Control" unique_id=427197080]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=829052743]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,7 +22,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.254902, 0.254902, 0.254902, 1)
 
-[node name="Layout" type="MarginContainer" parent="."]
+[node name="Layout" type="MarginContainer" parent="." unique_id=2004919644]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,147 +31,117 @@ offset_left = 18.0
 offset_top = 12.0
 offset_right = -18.0
 offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Layout"]
+[node name="VBox" type="VBoxContainer" parent="Layout" unique_id=55924362]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Header" type="HBoxContainer" parent="Layout/VBox"]
+[node name="Header" type="HBoxContainer" parent="Layout/VBox" unique_id=901792274]
 layout_mode = 2
 
-[node name="BackButton" parent="Layout/VBox/Header" instance=ExtResource("2")]
+[node name="BackButton" parent="Layout/VBox/Header" unique_id=2096413534 instance=ExtResource("2")]
+custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
-custom_minimum_size = Vector2(126, 46)
 text = "BACK"
 
-[node name="Title" type="Label" parent="Layout/VBox/Header"]
+[node name="Title" type="Label" parent="Layout/VBox/Header" unique_id=1309943649]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
-theme_override_colors/font_outline_color = Color(0.74902, 0.184314, 0.686275, 1)
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
+theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 36
 text = "SHOP"
 horizontal_alignment = 1
 
-[node name="Currencies" type="VBoxContainer" parent="Layout/VBox/Header"]
+[node name="Currencies" type="VBoxContainer" parent="Layout/VBox/Header" unique_id=1394437821]
 layout_mode = 2
 
-[node name="Coins" type="HBoxContainer" parent="Layout/VBox/Header/Currencies"]
+[node name="Coins" type="HBoxContainer" parent="Layout/VBox/Header/Currencies" unique_id=1275529856]
 layout_mode = 2
+alignment = 2
 
-[node name="CoinsLabel" type="Label" parent="Layout/VBox/Header/Currencies/Coins"]
+[node name="CoinsLabel" type="Label" parent="Layout/VBox/Header/Currencies/Coins" unique_id=1942991928]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.980392, 0.972549, 0.67451, 1)
-theme_override_colors/font_outline_color = Color(0.796078, 0.682353, 0.145098, 1)
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
+theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 20
 text = "Coins:"
 
-[node name="CoinsValue" type="Label" parent="Layout/VBox/Header/Currencies/Coins"]
+[node name="CoinsValue" type="Label" parent="Layout/VBox/Header/Currencies/Coins" unique_id=1130389229]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
-theme_override_colors/font_outline_color = Color(0.796078, 0.682353, 0.145098, 1)
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
+theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 20
 text = "0"
 
-[node name="Tokens" type="HBoxContainer" parent="Layout/VBox/Header/Currencies"]
+[node name="Tokens" type="HBoxContainer" parent="Layout/VBox/Header/Currencies" unique_id=2111588388]
 layout_mode = 2
+alignment = 2
 
-[node name="TokensLabel" type="Label" parent="Layout/VBox/Header/Currencies/Tokens"]
+[node name="TokensLabel" type="Label" parent="Layout/VBox/Header/Currencies/Tokens" unique_id=151708254]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.87451, 0.486275, 0.827451, 1)
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.74902, 0.184314, 0.686275, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 20
 text = "Tokens:"
 
-[node name="TokensValue" type="Label" parent="Layout/VBox/Header/Currencies/Tokens"]
+[node name="TokensValue" type="Label" parent="Layout/VBox/Header/Currencies/Tokens" unique_id=919864811]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.74902, 0.184314, 0.686275, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 20
 text = "0"
 
-[node name="Status" type="Label" parent="Layout/VBox"]
+[node name="Tabs" type="HBoxContainer" parent="Layout/VBox" unique_id=950124729]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.647059, 0.823529, 0.952941, 1)
-theme_override_colors/font_outline_color = Color(0.254902, 0.254902, 0.254902, 1)
-theme_override_constants/outline_size = 8
-theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 18
-text = ""
+theme_override_constants/separation = 8
+alignment = 1
 
-[node name="Scroll" type="ScrollContainer" parent="Layout/VBox"]
+[node name="ItemsTab" parent="Layout/VBox/Tabs" unique_id=1579371752 instance=ExtResource("2")]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "ITEMS"
+
+[node name="WeaponsTab" parent="Layout/VBox/Tabs" unique_id=449071570 instance=ExtResource("2")]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "WEAPONS"
+
+[node name="AmuletsTab" parent="Layout/VBox/Tabs" unique_id=409917022 instance=ExtResource("2")]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "AMULETS"
+
+[node name="AbilitiesTab" parent="Layout/VBox/Tabs" unique_id=110650026 instance=ExtResource("2")]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "ABILITIES"
+
+[node name="Scroll" type="ScrollContainer" parent="Layout/VBox" unique_id=1499886116]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Margin" type="MarginContainer" parent="Layout/VBox/Scroll"]
+[node name="Margin" type="MarginContainer" parent="Layout/VBox/Scroll" unique_id=1730580365]
 layout_mode = 2
-offset_left = 8.0
-offset_top = 8.0
-offset_right = 8.0
-offset_bottom = 8.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin"]
+[node name="OffersList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin" unique_id=1442038118]
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="ItemsTitle" type="Label" parent="Layout/VBox/Scroll/Margin/Content"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.368627, 0.901961, 0.682353, 1)
-theme_override_colors/font_outline_color = Color(0.113725, 0.701961, 0.482353, 1)
-theme_override_constants/outline_size = 8
-theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 26
-text = "Items"
-
-[node name="ItemsList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin/Content"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="AbilitiesTitle" type="Label" parent="Layout/VBox/Scroll/Margin/Content"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.647059, 0.823529, 0.952941, 1)
-theme_override_colors/font_outline_color = Color(0.298039, 0.588235, 0.843137, 1)
-theme_override_constants/outline_size = 8
-theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 26
-text = "Abilities"
-
-[node name="AbilitiesList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin/Content"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="AmuletsTitle" type="Label" parent="Layout/VBox/Scroll/Margin/Content"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.87451, 0.486275, 0.827451, 1)
-theme_override_colors/font_outline_color = Color(0.74902, 0.184314, 0.686275, 1)
-theme_override_constants/outline_size = 8
-theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 26
-text = "Amulets"
-
-[node name="AmuletsList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin/Content"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="WeaponsTitle" type="Label" parent="Layout/VBox/Scroll/Margin/Content"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
-theme_override_colors/font_outline_color = Color(0.254902, 0.254902, 0.254902, 1)
-theme_override_constants/outline_size = 8
-theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 26
-text = "Weapons"
-
-[node name="WeaponsList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin/Content"]
-layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10

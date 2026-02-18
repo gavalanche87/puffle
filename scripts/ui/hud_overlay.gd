@@ -122,6 +122,9 @@ func _close_character_overlay(resume_game: bool) -> void:
 	if _character_overlay:
 		_character_overlay.queue_free()
 		_character_overlay = null
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd and gd.has_method("set_amulet_screen_manage_mode"):
+		gd.call("set_amulet_screen_manage_mode", false)
 	if resume_game:
 		get_tree().paused = false
 	_character_overlay_from_pause = false

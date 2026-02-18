@@ -2,6 +2,9 @@ extends "res://scripts/ui/menu_transitions.gd"
 
 const NAV_BUTTON_SCENE := preload("res://scenes/ui/NavButton.tscn")
 const ICON_HEAD_SPIKE: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Weapon.png")
+const COLOR_WEAPON_OUTLINE := Color(0.113725, 0.701961, 0.482353, 1.0) # #1db37b
+const COLOR_LIGHT_TEXT := Color(0.933333, 0.898039, 0.913725, 1.0) # #eee5e9
+const COLOR_SLOT_OUTLINE := Color(0.254902, 0.737255, 0.737255, 1.0) # #41bcbc
 const WEAPON_ICON_MAP := {
 	"head_spike": ICON_HEAD_SPIKE
 }
@@ -15,13 +18,17 @@ const WEAPON_ICON_MAP := {
 @onready var owned_list: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Left/OwnedScroll/OwnedList
 @onready var selected_title: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedRow/SelectedTitle
 @onready var selected_icon: TextureRect = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedRow/SelectedIcon
-@onready var boon_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/BoonLabel
-@onready var grievance_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/GrievanceLabel
+@onready var description_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/DescriptionLabel
 @onready var slots_section: Panel = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection
 
 var _selected_weapon_id: String = ""
 var _manage_mode: bool = false
 var _embedded_mode: bool = false
+
+func set_manage_mode(enabled: bool) -> void:
+	_manage_mode = enabled
+	if is_inside_tree():
+		_refresh()
 
 func set_embedded_mode(enabled: bool) -> void:
 	_embedded_mode = enabled
@@ -46,6 +53,8 @@ func _ready() -> void:
 	if slot_3:
 		slot_3.visible = false
 	_apply_embedded_mode()
+	selected_title.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
+	selected_title.add_theme_color_override("font_outline_color", COLOR_WEAPON_OUTLINE)
 	_refresh()
 
 func _apply_embedded_mode() -> void:
@@ -93,7 +102,9 @@ func _add_owned_button(entry: Dictionary) -> void:
 	button.text = String(entry.get("title", weapon_id))
 	button.icon = _get_weapon_icon(weapon_id)
 	button.expand_icon = true
-	button.modulate = Color(0.98, 0.92, 0.56, 1.0) if _selected_weapon_id == weapon_id else Color(1, 1, 1, 1)
+	button.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
+	button.add_theme_color_override("font_outline_color", COLOR_WEAPON_OUTLINE)
+	button.modulate = Color(1, 1, 1, 1)
 	button.pressed.connect(func() -> void:
 		_selected_weapon_id = weapon_id
 		_refresh()
@@ -104,8 +115,7 @@ func _update_details(gd: Node) -> void:
 	if _selected_weapon_id == "":
 		selected_title.text = "No Weapon Selected"
 		selected_icon.texture = null
-		boon_label.text = "Boon:"
-		grievance_label.text = "Grievance:"
+		description_label.text = ""
 		return
 	var catalog: Array = gd.call("get_weapon_catalog")
 	for entry_variant in catalog:
@@ -114,8 +124,7 @@ func _update_details(gd: Node) -> void:
 			continue
 		selected_title.text = String(entry.get("title", _selected_weapon_id))
 		selected_icon.texture = _get_weapon_icon(_selected_weapon_id)
-		boon_label.text = "Boon: %s" % String(entry.get("boon", ""))
-		grievance_label.text = "Grievance: %s" % String(entry.get("grievance", ""))
+		description_label.text = String(entry.get("boon", ""))
 		return
 
 func _update_slot_ui(gd: Node) -> void:
@@ -125,6 +134,9 @@ func _update_slot_ui(gd: Node) -> void:
 	var icon: TextureRect = slot_1.get_node_or_null("Backing/Icon") as TextureRect
 	var value: Label = slot_1.get_node_or_null("Value") as Label
 	var action_btn: Button = slot_1.get_node_or_null("ActionButton") as Button
+	if value:
+		value.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
+		value.add_theme_color_override("font_outline_color", COLOR_SLOT_OUTLINE)
 	if icon:
 		icon.texture = _get_weapon_icon(equipped_id)
 	if value:

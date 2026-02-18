@@ -3,6 +3,9 @@ signal overlay_closed(from_pause_menu: bool)
 
 const NAV_BUTTON_SCENE := preload("res://scenes/ui/NavButton.tscn")
 const ICON_LEAP_OF_FAITH: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
+const COLOR_AMULET_OUTLINE := Color(0.87451, 0.486275, 0.827451, 1.0) # #df7cd3
+const COLOR_LIGHT_TEXT := Color(0.933333, 0.898039, 0.913725, 1.0) # #eee5e9
+const COLOR_SLOT_OUTLINE := Color(0.254902, 0.737255, 0.737255, 1.0) # #41bcbc
 const AMULET_ICON_MAP := {
 	"leap_of_faith": ICON_LEAP_OF_FAITH
 }
@@ -23,6 +26,11 @@ var _manage_mode: bool = false
 var _overlay_mode: bool = false
 var _opened_from_pause_menu: bool = false
 var _embedded_mode: bool = false
+
+func set_manage_mode(enabled: bool) -> void:
+	_manage_mode = enabled
+	if is_inside_tree():
+		_refresh()
 
 func set_embedded_mode(enabled: bool) -> void:
 	_embedded_mode = enabled
@@ -46,6 +54,8 @@ func _ready() -> void:
 	_bind_slot_buttons(slot_2, 1)
 	_bind_slot_buttons(slot_3, 2)
 	_apply_embedded_mode()
+	selected_title.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
+	selected_title.add_theme_color_override("font_outline_color", COLOR_AMULET_OUTLINE)
 	_refresh()
 
 func _apply_embedded_mode() -> void:
@@ -109,7 +119,9 @@ func _add_owned_button(entry: Dictionary) -> void:
 	b.text = String(entry.get("title", amulet_id))
 	b.icon = _get_amulet_icon(amulet_id)
 	b.expand_icon = true
-	b.modulate = Color(0.98, 0.92, 0.56, 1.0) if _selected_amulet_id == amulet_id else Color(1, 1, 1, 1)
+	b.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
+	b.add_theme_color_override("font_outline_color", COLOR_AMULET_OUTLINE)
+	b.modulate = Color(1, 1, 1, 1)
 	b.pressed.connect(func() -> void:
 		_selected_amulet_id = amulet_id
 		_refresh()
@@ -149,6 +161,8 @@ func _apply_slot(slot_node: VBoxContainer, slot_index: int, unlocked: int, equip
 	var icon: TextureRect = slot_node.get_node("Backing/Icon")
 	var value: Label = slot_node.get_node("Value")
 	var action_btn: Button = slot_node.get_node("ActionButton")
+	value.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
+	value.add_theme_color_override("font_outline_color", COLOR_SLOT_OUTLINE)
 	icon.texture = _get_amulet_icon(equipped_id)
 	var slot_text := _get_amulet_title(gd, equipped_id) if equipped_id != "" else "Empty"
 	var owned: Array = gd.call("get_owned_amulets")
