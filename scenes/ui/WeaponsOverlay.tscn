@@ -272,6 +272,7 @@ text = "EQUIP"
 [node name="SelectedTopSpacer2" type="Control" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right" unique_id=146260338]
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
+mouse_behavior_recursive = 1
 
 [node name="SelectedRow" type="HBoxContainer" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right" unique_id=1986022633]
 layout_mode = 2
