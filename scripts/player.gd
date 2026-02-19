@@ -25,6 +25,9 @@ const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 @export var wall_jump_vertical: float = -500.0
 @export var wall_jump_horizontal: float = 750.0
 @export var wall_jump_lock_time: float = 0.18
+@export var variable_jump_hold_time: float = 0.16
+@export var variable_jump_hold_gravity_scale: float = 0.45
+@export var variable_jump_release_velocity_scale: float = 0.45
 @export var wall_snap_distance: float = 6.0
 @export var wall_snap_nudge: float = 1.5
 @export var ground_friction: float = 1400.0
@@ -90,6 +93,7 @@ var wall_slide_sfx_timer: float = 0.0
 var run_sfx_timer: float = 0.0
 var is_killplane_respawning: bool = false
 var extra_jumps_used: int = 0
+var jump_hold_timer: float = 0.0
 static var pending_coin_restore: bool = false
 static var stored_coin_balance: int = 0
 static var pending_fade_in: bool = false
@@ -294,6 +298,8 @@ func _physics_process(delta: float) -> void:
 	velocity.x += knockback_velocity
 
 	var jump_pressed := Input.is_action_just_pressed("ui_accept") and input_lock_timer <= 0.0
+	var jump_held := Input.is_action_pressed("ui_accept") and input_lock_timer <= 0.0
+	var jump_released := Input.is_action_just_released("ui_accept")
 	if not is_on_floor():
 		air_time += delta
 		if wall_sliding or snapped:
@@ -305,6 +311,7 @@ func _physics_process(delta: float) -> void:
 				current_energy = max(0, current_energy - wall_jump_energy_cost)
 				_update_energy_ui()
 				extra_jumps_used = 0
+				_begin_variable_jump()
 				_play_mode_switch_glow()
 				_play_sfx(sfx_jump)
 		elif jump_pressed and _can_double_jump():
@@ -312,6 +319,7 @@ func _physics_process(delta: float) -> void:
 			_update_energy_ui()
 			velocity.y = _current_jump_velocity()
 			extra_jumps_used += 1
+			_begin_variable_jump()
 			_play_mode_switch_glow()
 			_play_sfx(sfx_jump)
 		else:
@@ -321,7 +329,19 @@ func _physics_process(delta: float) -> void:
 		extra_jumps_used = 0
 		if jump_pressed:
 			velocity.y = _current_jump_velocity()
+			_begin_variable_jump()
 			_play_sfx(sfx_jump)
+		else:
+			jump_hold_timer = 0.0
+
+	if jump_released and velocity.y < 0.0:
+		velocity.y *= clampf(variable_jump_release_velocity_scale, 0.0, 1.0)
+		jump_hold_timer = 0.0
+	elif jump_hold_timer > 0.0 and jump_held and velocity.y < 0.0:
+		var hold_scale := clampf(variable_jump_hold_gravity_scale, 0.0, 1.0)
+		var gravity_reduction := _current_gravity() * (1.0 - hold_scale) * delta
+		velocity.y -= gravity_reduction
+		jump_hold_timer = max(0.0, jump_hold_timer - delta)
 
 	if should_spin and sprite and input_lock_timer <= 0.0:
 		var spin_dir := signf(velocity.x)
@@ -493,6 +513,9 @@ func _current_jump_velocity() -> float:
 	var base_jump := small_jump_velocity if mode == PlayerMode.SMALL else big_jump_velocity
 	var jump_mult := 2.0 if _has_equipped_amulet(AMULET_LEAP_OF_FAITH) else 1.0
 	return base_jump * jump_mult
+
+func _begin_variable_jump() -> void:
+	jump_hold_timer = max(0.0, variable_jump_hold_time)
 
 func _ensure_toggle_action() -> void:
 	_ensure_action_has_key("toggle_mode", KEY_Z)
