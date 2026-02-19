@@ -259,6 +259,7 @@ grow_vertical = 2
 [node name="Split" type="HSplitContainer" parent="Layout/VBox/OwnedSection/OwnedMargin" unique_id=1035063868]
 layout_mode = 2
 size_flags_vertical = 3
+dragging_enabled = false
 split_offsets = PackedInt32Array(280)
 split_offset = 280
 

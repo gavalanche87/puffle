@@ -45,6 +45,9 @@ layout_mode = 2
 [node name="BackButton" parent="Layout/VBox/Header" unique_id=198259928 instance=ExtResource("2")]
 custom_minimum_size = Vector2(92, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_pressed_color = Color(0.980392, 0.972549, 0.67451, 1)
+theme_override_colors/font_hover_color = Color(0.980392, 0.972549, 0.67451, 1)
 text = "BACK"
 
 [node name="Center" type="VBoxContainer" parent="Layout/VBox/Header" unique_id=2049173262]
@@ -149,6 +152,9 @@ alignment = 1
 [node name="Action" parent="Layout/VBox/SlotsSection/SlotsMargin/SlotsVBox/SlotsScroll/SlotsRow/Slot1/Buttons" unique_id=1967543974 instance=ExtResource("2")]
 custom_minimum_size = Vector2(84, 28)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_pressed_color = Color(0.980392, 0.972549, 0.67451, 1)
+theme_override_colors/font_hover_color = Color(0.980392, 0.972549, 0.67451, 1)
 text = "EQUIP"
 
 [node name="Slot2" type="VBoxContainer" parent="Layout/VBox/SlotsSection/SlotsMargin/SlotsVBox/SlotsScroll/SlotsRow" unique_id=1381240154]
@@ -193,6 +199,9 @@ alignment = 1
 [node name="Action" parent="Layout/VBox/SlotsSection/SlotsMargin/SlotsVBox/SlotsScroll/SlotsRow/Slot2/Buttons" unique_id=660725641 instance=ExtResource("2")]
 custom_minimum_size = Vector2(84, 28)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_pressed_color = Color(0.980392, 0.972549, 0.67451, 1)
+theme_override_colors/font_hover_color = Color(0.980392, 0.972549, 0.67451, 1)
 text = "EQUIP"
 
 [node name="Slot3" type="VBoxContainer" parent="Layout/VBox/SlotsSection/SlotsMargin/SlotsVBox/SlotsScroll/SlotsRow" unique_id=470567251]
@@ -237,6 +246,9 @@ alignment = 1
 [node name="Action" parent="Layout/VBox/SlotsSection/SlotsMargin/SlotsVBox/SlotsScroll/SlotsRow/Slot3/Buttons" unique_id=1597065995 instance=ExtResource("2")]
 custom_minimum_size = Vector2(84, 28)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_pressed_color = Color(0.980392, 0.972549, 0.67451, 1)
+theme_override_colors/font_hover_color = Color(0.980392, 0.972549, 0.67451, 1)
 text = "EQUIP"
 
 [node name="OwnedSection" type="Panel" parent="Layout/VBox" unique_id=1355797234]
@@ -259,6 +271,8 @@ grow_vertical = 2
 [node name="Split" type="HSplitContainer" parent="Layout/VBox/OwnedSection/OwnedMargin" unique_id=1035063868]
 layout_mode = 2
 size_flags_vertical = 3
+dragging_enabled = false
+dragger_visibility = 2
 split_offsets = PackedInt32Array(280)
 split_offset = 280
 
@@ -343,17 +357,12 @@ theme_override_font_sizes/font_size = 13
 text = "Slot 1"
 horizontal_alignment = 1
 
-[node name="SlotButton" type="Button" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1" unique_id=173173315]
-visible = false
-z_index = 10
-layout_mode = 2
-focus_mode = 0
-mouse_filter = 1
-flat = true
-
-[node name="ActionButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1" unique_id=1410068781 instance=ExtResource("2")]
+[node name="EquipButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1" unique_id=1410068781 instance=ExtResource("2")]
 custom_minimum_size = Vector2(74, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_pressed_color = Color(0.980392, 0.972549, 0.67451, 1)
+theme_override_colors/font_hover_color = Color(0.980392, 0.972549, 0.67451, 1)
 theme_override_font_sizes/font_size = 20
 text = "EQUIP"
 
@@ -395,17 +404,12 @@ theme_override_font_sizes/font_size = 13
 text = "Slot 2"
 horizontal_alignment = 1
 
-[node name="SlotButton" type="Button" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot2" unique_id=235472869]
-visible = false
-z_index = 10
-layout_mode = 2
-focus_mode = 0
-mouse_filter = 1
-flat = true
-
-[node name="ActionButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot2" unique_id=1755965425 instance=ExtResource("2")]
+[node name="EquipButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot2" unique_id=1755965425 instance=ExtResource("2")]
 custom_minimum_size = Vector2(74, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_pressed_color = Color(0.980392, 0.972549, 0.67451, 1)
+theme_override_colors/font_hover_color = Color(0.980392, 0.972549, 0.67451, 1)
 theme_override_font_sizes/font_size = 20
 text = "EQUIP"
 
@@ -447,17 +451,12 @@ theme_override_font_sizes/font_size = 13
 text = "Slot 3"
 horizontal_alignment = 1
 
-[node name="SlotButton" type="Button" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot3" unique_id=1228867430]
-visible = false
-z_index = 10
-layout_mode = 2
-focus_mode = 0
-mouse_filter = 1
-flat = true
-
-[node name="ActionButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot3" unique_id=1057827642 instance=ExtResource("2")]
+[node name="EquipButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot3" unique_id=1057827642 instance=ExtResource("2")]
 custom_minimum_size = Vector2(74, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.964706, 0.964706, 0.964706, 1)
+theme_override_colors/font_pressed_color = Color(0.980392, 0.972549, 0.67451, 1)
+theme_override_colors/font_hover_color = Color(0.980392, 0.972549, 0.67451, 1)
 theme_override_font_sizes/font_size = 20
 text = "EQUIP"
 

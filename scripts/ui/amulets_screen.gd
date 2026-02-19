@@ -5,13 +5,14 @@ const NAV_BUTTON_SCENE := preload("res://scenes/ui/NavButton.tscn")
 const ICON_LEAP_OF_FAITH: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
 const COLOR_AMULET_OUTLINE := Color(0.87451, 0.486275, 0.827451, 1.0) # #df7cd3
 const COLOR_LIGHT_TEXT := Color(0.933333, 0.898039, 0.913725, 1.0) # #eee5e9
-const COLOR_SLOT_OUTLINE := Color(0.254902, 0.737255, 0.737255, 1.0) # #41bcbc
 const AMULET_ICON_MAP := {
 	"leap_of_faith": ICON_LEAP_OF_FAITH
 }
 
 @onready var back_button: Button = $Layout/VBox/Header/BackButton
+@onready var split: HSplitContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split
 @onready var slots_section: Panel = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection
+@onready var slots_scroll: ScrollContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll
 @onready var slot_1: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1
 @onready var slot_2: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot2
 @onready var slot_3: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot3
@@ -37,6 +38,10 @@ func set_embedded_mode(enabled: bool) -> void:
 	if is_inside_tree():
 		_apply_embedded_mode()
 
+func set_compact_mode(_enabled: bool) -> void:
+	if is_inside_tree():
+		_apply_embedded_mode()
+
 func set_overlay_mode(enabled: bool, from_pause_menu: bool) -> void:
 	_overlay_mode = enabled
 	_opened_from_pause_menu = from_pause_menu
@@ -44,7 +49,7 @@ func set_overlay_mode(enabled: bool, from_pause_menu: bool) -> void:
 func _ready() -> void:
 	super._ready()
 	var gd: Node = get_node_or_null("/root/GameData")
-	if gd and gd.has_method("get_amulet_screen_manage_mode"):
+	if (not _manage_mode) and gd and gd.has_method("get_amulet_screen_manage_mode"):
 		_manage_mode = bool(gd.call("get_amulet_screen_manage_mode"))
 	if gd and gd.has_signal("amulets_changed"):
 		if not gd.amulets_changed.is_connected(_refresh):
@@ -65,9 +70,21 @@ func _apply_embedded_mode() -> void:
 		bg.visible = not _embedded_mode
 	if header:
 		header.visible = not _embedded_mode
+	if split:
+		split.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		split.dragger_visibility = 2
+	if slots_scroll:
+		slots_scroll.horizontal_scroll_mode = 2
+		slots_scroll.vertical_scroll_mode = 0
+		var hbar := slots_scroll.get_h_scroll_bar()
+		if hbar:
+			hbar.modulate.a = 0.0
+			hbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _bind_slot_buttons(slot_node: VBoxContainer, slot_index: int) -> void:
-	var action_btn: Button = slot_node.get_node("ActionButton")
+	var action_btn := _get_slot_button(slot_node)
+	if action_btn == null:
+		return
 	action_btn.pressed.connect(func() -> void:
 		_on_slot_action_pressed(slot_index)
 	)
@@ -159,22 +176,18 @@ func _apply_slot(slot_node: VBoxContainer, slot_index: int, unlocked: int, equip
 		return
 	var equipped_id := String(equipped[slot_index]) if equipped.size() > slot_index else ""
 	var icon: TextureRect = slot_node.get_node("Backing/Icon")
-	var value: Label = slot_node.get_node("Value")
-	var action_btn: Button = slot_node.get_node("ActionButton")
-	value.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
-	value.add_theme_color_override("font_outline_color", COLOR_SLOT_OUTLINE)
+	var action_btn := _get_slot_button(slot_node)
+	if action_btn == null:
+		return
 	icon.texture = _get_amulet_icon(equipped_id)
-	var slot_text := _get_amulet_title(gd, equipped_id) if equipped_id != "" else "Empty"
 	var owned: Array = gd.call("get_owned_amulets")
 	if equipped_id == "":
 		var already_equipped_elsewhere := _selected_amulet_id != "" and equipped.has(_selected_amulet_id)
 		action_btn.disabled = (not _manage_mode) or _selected_amulet_id == "" or (not owned.has(_selected_amulet_id)) or already_equipped_elsewhere
 		action_btn.text = "EQUIP"
-		value.text = "Slot %d: %s" % [slot_index + 1, slot_text]
 	else:
 		action_btn.disabled = not _manage_mode
 		action_btn.text = "UNEQUIP"
-		value.text = "Slot %d: %s" % [slot_index + 1, slot_text]
 
 func _on_slot_action_pressed(slot_index: int) -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
@@ -200,12 +213,12 @@ func _clear_owned_list() -> void:
 func _get_amulet_icon(amulet_id: String) -> Texture2D:
 	return AMULET_ICON_MAP.get(amulet_id, null)
 
-func _get_amulet_title(gd: Node, amulet_id: String) -> String:
-	if amulet_id == "":
-		return ""
-	var catalog: Array = gd.call("get_amulet_catalog")
-	for entry_variant in catalog:
-		var entry: Dictionary = entry_variant
-		if String(entry.get("id", "")) == amulet_id:
-			return String(entry.get("title", amulet_id))
-	return amulet_id
+func _get_slot_button(slot_node: VBoxContainer) -> Button:
+	var btn := slot_node.get_node_or_null("EquipButton") as Button
+	if btn:
+		return btn
+	for child in slot_node.get_children():
+		var child_button := child as Button
+		if child_button and String(child_button.name).begins_with("EquipButton"):
+			return child_button
+	return slot_node.get_node_or_null("ActionButton") as Button

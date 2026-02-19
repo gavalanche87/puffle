@@ -35,7 +35,7 @@ func _ready() -> void:
 		_overlay_mode = true
 		_manage_mode = true
 	var gd: Node = get_node_or_null("/root/GameData")
-	if gd and gd.has_method("get_amulet_screen_manage_mode"):
+	if (not _manage_mode) and gd and gd.has_method("get_amulet_screen_manage_mode"):
 		_manage_mode = bool(gd.call("get_amulet_screen_manage_mode"))
 	if back_button:
 		back_button.pressed.connect(_on_back_pressed)
@@ -79,9 +79,9 @@ func _show_tab(tab_id: String) -> void:
 		"abilities":
 			scene = SCENE_ABILITIES
 		"weapons":
-			scene = SCENE_WEAPONS_OVERLAY if _overlay_mode else SCENE_WEAPONS
+			scene = SCENE_WEAPONS_OVERLAY
 		_:
-			scene = SCENE_AMULETS_OVERLAY if _overlay_mode else SCENE_AMULETS
+			scene = SCENE_AMULETS_OVERLAY
 	var node: Node = scene.instantiate()
 	var view: Control = node as Control
 	if view == null:
@@ -104,9 +104,6 @@ func _show_tab(tab_id: String) -> void:
 	_current_view.offset_right = 0.0
 	_current_view.offset_bottom = 0.0
 	content.add_child(_current_view)
-	if _overlay_mode:
-		_apply_overlay_compact_layout(_current_view)
-		call_deferred("_apply_overlay_compact_layout", _current_view)
 	_update_tab_visuals()
 
 func _update_tab_visuals() -> void:
@@ -123,40 +120,8 @@ func _update_tab_visuals() -> void:
 	if weapons_button:
 		weapons_button.modulate = Color(1, 1, 1, 1) if _current_tab == "weapons" else Color(0.75, 0.75, 0.75, 1)
 
-func _apply_overlay_compact_layout(view: Control) -> void:
-	if view == null or not is_instance_valid(view):
-		return
-	var owned_section := view.get_node_or_null("Layout/VBox/OwnedSection") as Control
-	if owned_section:
-		owned_section.size_flags_stretch_ratio = 0.86
-		owned_section.custom_minimum_size = Vector2(0, 0)
-	var owned_margin := view.get_node_or_null("Layout/VBox/OwnedSection/OwnedMargin") as MarginContainer
-	if owned_margin:
-		owned_margin.offset_top = 4.0
-		owned_margin.offset_bottom = -6.0
-	var split := view.get_node_or_null("Layout/VBox/OwnedSection/OwnedMargin/Split") as HSplitContainer
-	if split:
-		split.split_offset = 230
-	var left := view.get_node_or_null("Layout/VBox/OwnedSection/OwnedMargin/Split/Left") as Control
-	if left:
-		left.custom_minimum_size = Vector2(0, 0)
-	var right := view.get_node_or_null("Layout/VBox/OwnedSection/OwnedMargin/Split/Right") as Control
-	if right:
-		right.custom_minimum_size = Vector2(0, 0)
-	var slots := view.get_node_or_null("Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection") as Control
-	if slots:
-		slots.custom_minimum_size = Vector2(0, 92)
-	var selected_spacer := view.get_node_or_null("Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedTopSpacer") as Control
-	if selected_spacer:
-		selected_spacer.custom_minimum_size = Vector2(0, 0)
-	var selected_icon := view.get_node_or_null("Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedRow/SelectedIcon") as TextureRect
-	if selected_icon:
-		selected_icon.custom_minimum_size = Vector2(22, 22)
-		selected_icon.scale = Vector2(0.5, 0.5)
-		selected_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-
 func _is_hud_overlay_context() -> bool:
 	var p := get_parent()
 	if p == null:
 		return false
-	return p.is_in_group("hud")
+	return p is CanvasLayer

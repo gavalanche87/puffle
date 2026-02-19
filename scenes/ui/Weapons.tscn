@@ -259,6 +259,8 @@ grow_vertical = 2
 [node name="Split" type="HSplitContainer" parent="Layout/VBox/OwnedSection/OwnedMargin" unique_id=1035063868]
 layout_mode = 2
 size_flags_vertical = 3
+dragging_enabled = false
+dragger_visibility = 2
 split_offsets = PackedInt32Array(280)
 split_offset = 280
 
@@ -343,15 +345,7 @@ theme_override_font_sizes/font_size = 13
 text = "Slot 1"
 horizontal_alignment = 1
 
-[node name="SlotButton" type="Button" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1" unique_id=173173315]
-visible = false
-z_index = 10
-layout_mode = 2
-focus_mode = 0
-mouse_filter = 1
-flat = true
-
-[node name="ActionButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1" unique_id=1410068781 instance=ExtResource("2")]
+[node name="EquipButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1" unique_id=1410068781 instance=ExtResource("2")]
 custom_minimum_size = Vector2(74, 34)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
@@ -395,15 +389,7 @@ theme_override_font_sizes/font_size = 13
 text = "Slot 2"
 horizontal_alignment = 1
 
-[node name="SlotButton" type="Button" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot2" unique_id=235472869]
-visible = false
-z_index = 10
-layout_mode = 2
-focus_mode = 0
-mouse_filter = 1
-flat = true
-
-[node name="ActionButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot2" unique_id=1755965425 instance=ExtResource("2")]
+[node name="EquipButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot2" unique_id=1755965425 instance=ExtResource("2")]
 custom_minimum_size = Vector2(74, 34)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
@@ -447,15 +433,7 @@ theme_override_font_sizes/font_size = 13
 text = "Slot 3"
 horizontal_alignment = 1
 
-[node name="SlotButton" type="Button" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot3" unique_id=1228867430]
-visible = false
-z_index = 10
-layout_mode = 2
-focus_mode = 0
-mouse_filter = 1
-flat = true
-
-[node name="ActionButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot3" unique_id=1057827642 instance=ExtResource("2")]
+[node name="EquipButton" parent="Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot3" unique_id=1057827642 instance=ExtResource("2")]
 custom_minimum_size = Vector2(74, 34)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20

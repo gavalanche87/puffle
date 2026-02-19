@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-const CHARACTER_SCENE := preload("res://scenes/ui/Character.tscn")
-
 @onready var pause_button: Button = $PauseButton
 @onready var complete_level_test_button: Button = $CompleteLevelTestButton
 @onready var pause_menu: Control = $PauseMenuPopup
@@ -94,7 +92,10 @@ func _open_character_overlay(from_pause_menu: bool) -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd and gd.has_method("set_amulet_screen_manage_mode"):
 		gd.call("set_amulet_screen_manage_mode", true)
-	var instance: Node = CHARACTER_SCENE.instantiate()
+	var packed: PackedScene = load("res://scenes/ui/CharacterOverlay.tscn") as PackedScene
+	if packed == null:
+		return
+	var instance: Node = packed.instantiate()
 	var screen: Control = instance as Control
 	if screen == null:
 		if instance:

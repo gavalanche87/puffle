@@ -4,12 +4,12 @@ const NAV_BUTTON_SCENE := preload("res://scenes/ui/NavButton.tscn")
 const ICON_HEAD_SPIKE: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Weapon.png")
 const COLOR_WEAPON_OUTLINE := Color(0.113725, 0.701961, 0.482353, 1.0) # #1db37b
 const COLOR_LIGHT_TEXT := Color(0.933333, 0.898039, 0.913725, 1.0) # #eee5e9
-const COLOR_SLOT_OUTLINE := Color(0.254902, 0.737255, 0.737255, 1.0) # #41bcbc
 const WEAPON_ICON_MAP := {
 	"head_spike": ICON_HEAD_SPIKE
 }
 
 @onready var back_button: Button = $Layout/VBox/Header/BackButton
+@onready var split: HSplitContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split
 @onready var background: ColorRect = $Background
 @onready var header: Control = $Layout/VBox/Header
 @onready var slot_1: VBoxContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll/SlotsRow/Slot1
@@ -20,6 +20,7 @@ const WEAPON_ICON_MAP := {
 @onready var selected_icon: TextureRect = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/SelectedRow/SelectedIcon
 @onready var description_label: Label = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/DescriptionLabel
 @onready var slots_section: Panel = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection
+@onready var slots_scroll: ScrollContainer = $Layout/VBox/OwnedSection/OwnedMargin/Split/Right/RightSlotsSection/Margin/SlotsScroll
 
 var _selected_weapon_id: String = ""
 var _manage_mode: bool = false
@@ -35,10 +36,14 @@ func set_embedded_mode(enabled: bool) -> void:
 	if is_inside_tree():
 		_apply_embedded_mode()
 
+func set_compact_mode(_enabled: bool) -> void:
+	if is_inside_tree():
+		_apply_embedded_mode()
+
 func _ready() -> void:
 	super._ready()
 	var gd: Node = get_node_or_null("/root/GameData")
-	if gd and gd.has_method("get_amulet_screen_manage_mode"):
+	if (not _manage_mode) and gd and gd.has_method("get_amulet_screen_manage_mode"):
 		_manage_mode = bool(gd.call("get_amulet_screen_manage_mode"))
 	if gd and gd.has_signal("weapons_changed"):
 		if not gd.weapons_changed.is_connected(_refresh):
@@ -62,11 +67,21 @@ func _apply_embedded_mode() -> void:
 		background.visible = not _embedded_mode
 	if header:
 		header.visible = not _embedded_mode
+	if split:
+		split.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		split.dragger_visibility = 2
+	if slots_scroll:
+		slots_scroll.horizontal_scroll_mode = 2
+		slots_scroll.vertical_scroll_mode = 0
+		var hbar := slots_scroll.get_h_scroll_bar()
+		if hbar:
+			hbar.modulate.a = 0.0
+			hbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _bind_slot_button(slot_node: VBoxContainer) -> void:
 	if slot_node == null:
 		return
-	var action_btn: Button = slot_node.get_node_or_null("ActionButton") as Button
+	var action_btn := _get_slot_button(slot_node)
 	if action_btn == null:
 		return
 	action_btn.pressed.connect(func() -> void:
@@ -132,15 +147,9 @@ func _update_slot_ui(gd: Node) -> void:
 		return
 	var equipped_id := String(gd.call("get_equipped_weapon"))
 	var icon: TextureRect = slot_1.get_node_or_null("Backing/Icon") as TextureRect
-	var value: Label = slot_1.get_node_or_null("Value") as Label
-	var action_btn: Button = slot_1.get_node_or_null("ActionButton") as Button
-	if value:
-		value.add_theme_color_override("font_color", COLOR_LIGHT_TEXT)
-		value.add_theme_color_override("font_outline_color", COLOR_SLOT_OUTLINE)
+	var action_btn := _get_slot_button(slot_1)
 	if icon:
 		icon.texture = _get_weapon_icon(equipped_id)
-	if value:
-		value.text = "Slot 1: %s" % (_get_weapon_title(gd, equipped_id) if equipped_id != "" else "Empty")
 	if action_btn:
 		if equipped_id == "":
 			action_btn.text = "EQUIP"
@@ -170,12 +179,12 @@ func _clear_owned_list() -> void:
 func _get_weapon_icon(weapon_id: String) -> Texture2D:
 	return WEAPON_ICON_MAP.get(weapon_id, null)
 
-func _get_weapon_title(gd: Node, weapon_id: String) -> String:
-	if weapon_id == "":
-		return ""
-	var catalog: Array = gd.call("get_weapon_catalog")
-	for entry_variant in catalog:
-		var entry: Dictionary = entry_variant
-		if String(entry.get("id", "")) == weapon_id:
-			return String(entry.get("title", weapon_id))
-	return weapon_id
+func _get_slot_button(slot_node: VBoxContainer) -> Button:
+	var btn := slot_node.get_node_or_null("EquipButton") as Button
+	if btn:
+		return btn
+	for child in slot_node.get_children():
+		var child_button := child as Button
+		if child_button and String(child_button.name).begins_with("EquipButton"):
+			return child_button
+	return slot_node.get_node_or_null("ActionButton") as Button
