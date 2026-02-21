@@ -9,6 +9,7 @@ const SHOP_ENTRY_SCENE := preload("res://scenes/ui/ShopEntry.tscn")
 @onready var weapons_tab: Button = $Layout/VBox/Tabs/WeaponsTab
 @onready var amulets_tab: Button = $Layout/VBox/Tabs/AmuletsTab
 @onready var abilities_tab: Button = $Layout/VBox/Tabs/AbilitiesTab
+@onready var music_tab: Button = $Layout/VBox/Tabs/MusicTab
 @onready var offers_list: VBoxContainer = $Layout/VBox/Scroll/Margin/OffersList
 
 var _active_tab: String = "items"
@@ -16,6 +17,7 @@ const TAB_OUTLINE_ITEMS := Color(0.796078, 0.682353, 0.145098, 1.0)
 const TAB_OUTLINE_WEAPONS := Color(0.113725, 0.701961, 0.482353, 1.0)
 const TAB_OUTLINE_AMULETS := Color(0.87451, 0.486275, 0.827451, 1.0)
 const TAB_OUTLINE_ABILITIES := Color(0.980392, 0.513725, 0.203922, 1.0) # #fa8334
+const TAB_OUTLINE_MUSIC := Color(0.254902, 0.737255, 0.737255, 1.0) # #41bcbc
 
 func _ready() -> void:
 	super._ready()
@@ -33,6 +35,9 @@ func _ready() -> void:
 	)
 	abilities_tab.pressed.connect(func() -> void:
 		_set_active_tab("abilities")
+	)
+	music_tab.pressed.connect(func() -> void:
+		_set_active_tab("music")
 	)
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd:
@@ -77,6 +82,9 @@ func _add_offer(parent: VBoxContainer, offer: Dictionary) -> void:
 	elif kind == "weapon":
 		bought = bool(gd.call("has_weapon", String(offer.get("id", ""))))
 		status = "Owned" if bought else ""
+	elif kind == "music_track":
+		bought = bool(gd.call("has_music_track", String(offer.get("id", ""))))
+		status = "Owned" if bought else ""
 	else:
 		var count: int = int(gd.call("get_inventory_count", String(offer.get("inventory_key", ""))))
 		status = "Owned: %d" % count
@@ -115,6 +123,11 @@ func _get_offers_for_tab(gd: Node, tab_id: String) -> Array:
 				if bool(gd.call("has_ability", String(offer.get("id", "")))):
 					continue
 				out.append(offer)
+		"music":
+			for offer in gd.call("get_shop_music_tracks"):
+				if bool(gd.call("has_music_track", String(offer.get("id", "")))):
+					continue
+				out.append(offer)
 		_:
 			out = []
 	return out
@@ -128,7 +141,9 @@ func _update_tab_visuals() -> void:
 	weapons_tab.add_theme_color_override("font_outline_color", TAB_OUTLINE_WEAPONS)
 	amulets_tab.add_theme_color_override("font_outline_color", TAB_OUTLINE_AMULETS)
 	abilities_tab.add_theme_color_override("font_outline_color", TAB_OUTLINE_ABILITIES)
+	music_tab.add_theme_color_override("font_outline_color", TAB_OUTLINE_MUSIC)
 	items_tab.modulate = Color(1, 1, 1, 1) if _active_tab == "items" else Color(0.75, 0.75, 0.75, 1)
 	weapons_tab.modulate = Color(1, 1, 1, 1) if _active_tab == "weapons" else Color(0.75, 0.75, 0.75, 1)
 	amulets_tab.modulate = Color(1, 1, 1, 1) if _active_tab == "amulets" else Color(0.75, 0.75, 0.75, 1)
 	abilities_tab.modulate = Color(1, 1, 1, 1) if _active_tab == "abilities" else Color(0.75, 0.75, 0.75, 1)
+	music_tab.modulate = Color(1, 1, 1, 1) if _active_tab == "music" else Color(0.75, 0.75, 0.75, 1)

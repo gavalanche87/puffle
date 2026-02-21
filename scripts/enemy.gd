@@ -8,6 +8,7 @@ extends Area2D
 @export var wall_ray_length: float = 12.0
 @export var knockback_decay: float = 900.0
 @export var knockback_duration: float = 0.18
+@export var max_health: int = 1
 @export var death_scene: PackedScene
 @export var flip_when_moving_right: bool = true
 
@@ -26,9 +27,11 @@ extends Area2D
 var knockback_velocity: float = 0.0
 var knockback_timer: float = 0.0
 var vertical_velocity: float = 0.0
+var current_health: int = 1
 
 func _ready() -> void:
 	add_to_group("enemies")
+	current_health = max(1, max_health)
 	area_entered.connect(_on_area_entered)
 	_configure_cast_exceptions()
 	_update_casts()
@@ -52,7 +55,7 @@ func _on_area_entered(area: Area2D) -> void:
 	if area == null:
 		return
 	if area.is_in_group("hazards"):
-		call_deferred("die")
+		take_damage(float(max_health))
 
 func _physics_process(delta: float) -> void:
 	if knockback_timer > 0.0:
@@ -80,6 +83,15 @@ func _physics_process(delta: float) -> void:
 func apply_knockback(force: float, dir: float) -> void:
 	knockback_velocity = force * signf(dir)
 	knockback_timer = knockback_duration
+
+func get_player_knockback_multiplier() -> float:
+	return 1.0
+
+func take_damage(amount: float = 1.0, kill_context: Dictionary = {}) -> void:
+	var damage := maxi(1, int(ceil(amount)))
+	current_health = max(0, current_health - damage)
+	if current_health <= 0:
+		die(kill_context)
 
 func _update_facing() -> void:
 	var sprite := $AnimatedSprite2D

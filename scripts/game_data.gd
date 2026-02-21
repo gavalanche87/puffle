@@ -17,8 +17,10 @@ const LEVELS_PER_WORLD := 10
 const ABILITY_SIZE_SHIFT := "size_shift"
 const ABILITY_DOUBLE_JUMP := "double_jump"
 const ABILITY_WALL_JUMP := "wall_jump"
+const ABILITY_HEADBUTT := "headbutt"
 const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 const WEAPON_HEAD_SPIKE := "head_spike"
+const MUSIC_TRACK_LEVEL_1 := "level_music_1"
 
 var coins: int = 0
 var tokens: int = 3
@@ -34,6 +36,7 @@ var owned_weapons: Array[String] = []
 var equipped_amulets: Array[String] = []
 var amulet_slots_unlocked: int = 3
 var equipped_weapon: String = ""
+var unlocked_music_tracks: Array[String] = [MUSIC_TRACK_LEVEL_1]
 
 var amulet_screen_manage_mode: bool = false
 var amulet_return_scene_path: String = ""
@@ -95,6 +98,14 @@ const SHOP_ABILITIES := [
 		"description": "Boon: Enables wall slide and wall jump",
 		"currency": "tokens",
 		"cost": 3
+	},
+	{
+		"id": ABILITY_HEADBUTT,
+		"kind": "ability",
+		"title": "Headbutt",
+		"description": "Boon: Press C to dash attack (requires Head Spike)",
+		"currency": "tokens",
+		"cost": 4
 	}
 ]
 
@@ -120,6 +131,66 @@ const SHOP_WEAPONS := [
 	}
 ]
 
+const SHOP_MUSIC_TRACKS := [
+	{
+		"id": "level_music_1",
+		"kind": "music_track",
+		"title": "Level Music 1",
+		"description": "Gameplay music track",
+		"currency": "tokens",
+		"cost": 0
+	},
+	{
+		"id": "level_music_2",
+		"kind": "music_track",
+		"title": "Level Music 2",
+		"description": "Gameplay music track",
+		"currency": "tokens",
+		"cost": 2
+	},
+	{
+		"id": "level_music_3",
+		"kind": "music_track",
+		"title": "Level Music 3",
+		"description": "Gameplay music track",
+		"currency": "tokens",
+		"cost": 2
+	},
+	{
+		"id": "level_music_4",
+		"kind": "music_track",
+		"title": "Level Music 4",
+		"description": "Gameplay music track",
+		"currency": "tokens",
+		"cost": 3
+	},
+	{
+		"id": "level_music_5",
+		"kind": "music_track",
+		"title": "Level Music 5",
+		"description": "Gameplay music track",
+		"currency": "tokens",
+		"cost": 3
+	},
+	{
+		"id": "level_music_6",
+		"kind": "music_track",
+		"title": "Level Music 6",
+		"description": "Gameplay music track",
+		"currency": "tokens",
+		"cost": 4
+	}
+]
+
+const MUSIC_TRACK_PATHS := {
+	"level_music_1": "res://assets/sound/level_music_1.mp3",
+	"level_music_2": "res://assets/sound/level_music_2.mp3",
+	"level_music_3": "res://assets/sound/level_music_3.mp3",
+	"level_music_4": "res://assets/sound/level_music_4.mp3",
+	"level_music_5": "res://assets/sound/level_music_5.mp3",
+	"level_music_6": "res://assets/sound/level_music_6.mp3"
+}
+
 const ABILITY_INFO := {
 	ABILITY_SIZE_SHIFT: {
 		"title": "Size Shift",
@@ -138,6 +209,12 @@ const ABILITY_INFO := {
 		"boon": "Enables wall slide and wall jump",
 		"grievance": "None",
 		"shop_cost_tokens": 3
+	},
+	ABILITY_HEADBUTT: {
+		"title": "Headbutt",
+		"boon": "Press C to perform a headbutt dash (requires Head Spike equipped)",
+		"grievance": "Consumes Energy per use",
+		"shop_cost_tokens": 4
 	}
 }
 
@@ -177,6 +254,7 @@ func wipe_save_data() -> void:
 	equipped_amulets.clear()
 	amulet_slots_unlocked = 3
 	equipped_weapon = ""
+	unlocked_music_tracks = [MUSIC_TRACK_LEVEL_1]
 	current_world = 0
 	current_level = 0
 	level_flow_active = false
@@ -207,6 +285,9 @@ func get_shop_amulets() -> Array:
 
 func get_shop_weapons() -> Array:
 	return SHOP_WEAPONS.duplicate(true)
+
+func get_shop_music_tracks() -> Array:
+	return SHOP_MUSIC_TRACKS.duplicate(true)
 
 func is_world_unlocked(world: int) -> bool:
 	return world >= 1 and world <= unlocked_worlds
@@ -332,6 +413,10 @@ func purchase_offer(offer_id: String) -> Dictionary:
 		if owned_weapons.has(id):
 			return {"ok": false, "message": "Already owned"}
 		owned_weapons.append(id)
+	elif kind == "music_track":
+		if unlocked_music_tracks.has(id):
+			return {"ok": false, "message": "Already owned"}
+		unlocked_music_tracks.append(id)
 	else:
 		var inv_key := String(offer.get("inventory_key", ""))
 		if inv_key != "":
@@ -481,6 +566,22 @@ func get_equipped_weapon() -> String:
 func is_weapon_equipped(weapon_id: String) -> bool:
 	return equipped_weapon == weapon_id and weapon_id != ""
 
+func has_music_track(track_id: String) -> bool:
+	return unlocked_music_tracks.has(track_id)
+
+func get_unlocked_music_tracks() -> Array[String]:
+	var out: Array[String] = []
+	for track_id_variant in unlocked_music_tracks:
+		var track_id := String(track_id_variant)
+		if MUSIC_TRACK_PATHS.has(track_id):
+			out.append(track_id)
+	if out.is_empty():
+		out.append(MUSIC_TRACK_LEVEL_1)
+	return out
+
+func get_music_track_path(track_id: String) -> String:
+	return String(MUSIC_TRACK_PATHS.get(track_id, MUSIC_TRACK_PATHS[MUSIC_TRACK_LEVEL_1]))
+
 func equip_weapon(weapon_id: String) -> Dictionary:
 	if not has_weapon(weapon_id):
 		return {"ok": false, "message": "Weapon not owned"}
@@ -550,6 +651,9 @@ func _find_offer(offer_id: String) -> Dictionary:
 	for offer in SHOP_WEAPONS:
 		if String(offer.get("id", "")) == offer_id:
 			return offer
+	for offer in SHOP_MUSIC_TRACKS:
+		if String(offer.get("id", "")) == offer_id:
+			return offer
 	return {}
 
 func _save_data() -> void:
@@ -566,6 +670,7 @@ func _save_data() -> void:
 		"equipped_amulets": equipped_amulets,
 		"amulet_slots_unlocked": amulet_slots_unlocked,
 		"equipped_weapon": equipped_weapon,
+		"unlocked_music_tracks": unlocked_music_tracks,
 		"music_volume_linear": music_volume_linear,
 		"sfx_volume_linear": sfx_volume_linear,
 		"xp_level": xp_level,
@@ -669,6 +774,15 @@ func _load_data() -> void:
 		equipped_weapon = loaded_equipped_weapon
 	elif equipped_weapon != "" and not owned_weapons.has(equipped_weapon):
 		equipped_weapon = ""
+
+	unlocked_music_tracks.clear()
+	var loaded_tracks: Array = data.get("unlocked_music_tracks", [MUSIC_TRACK_LEVEL_1])
+	for track_variant in loaded_tracks:
+		var track_id := String(track_variant)
+		if MUSIC_TRACK_PATHS.has(track_id) and not unlocked_music_tracks.has(track_id):
+			unlocked_music_tracks.append(track_id)
+	if not unlocked_music_tracks.has(MUSIC_TRACK_LEVEL_1):
+		unlocked_music_tracks.insert(0, MUSIC_TRACK_LEVEL_1)
 
 	music_volume_linear = float(data.get("music_volume_linear", music_volume_linear))
 	sfx_volume_linear = float(data.get("sfx_volume_linear", sfx_volume_linear))

@@ -129,6 +129,11 @@ custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 text = "ABILITIES"
 
+[node name="MusicTab" parent="Layout/VBox/Tabs" unique_id=1319904463 instance=ExtResource("2")]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "MUSIC"
+
 [node name="Scroll" type="ScrollContainer" parent="Layout/VBox" unique_id=1499886116]
 layout_mode = 2
 size_flags_vertical = 3

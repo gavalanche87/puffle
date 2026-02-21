@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://kxgu7g0bhh5l"]
+
+[ext_resource type="Script" uid="uid://biyqgcornjspe" path="res://scripts/wall_slime.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/EnemyDeath.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://ddohn8yb32fvn" path="res://assets/enemies/slime/slime_breathe_1.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://bo473aufpss82" path="res://assets/enemies/slime/slime_breathe_2.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://60uru416u0sh" path="res://assets/enemies/slime/slime_breathe_3.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://igoe57m2linl" path="res://assets/enemies/slime/slime_breathe_4.png" id="6"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wallslime"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6")
+}],
+"loop": true,
+"name": &"breathing",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wallslime"]
+size = Vector2(18, 18)
+
+[node name="WallSlime" type="Area2D" unique_id=268251483]
+script = ExtResource("1")
+death_scene = ExtResource("2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1487570531]
+scale = Vector2(1.4, 1.4)
+sprite_frames = SubResource("SpriteFrames_wallslime")
+animation = &"breathing"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=842218712]
+shape = SubResource("RectangleShape2D_wallslime")
+
+[node name="EdgeCast" type="RayCast2D" parent="." unique_id=1942019489]
+
+[node name="WallCast" type="RayCast2D" parent="." unique_id=1196918640]
+
+[node name="HazardCast" type="RayCast2D" parent="." unique_id=314926813]

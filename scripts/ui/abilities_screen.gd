@@ -4,12 +4,14 @@ const NAV_BUTTON_SCENE := preload("res://scenes/ui/NavButton.tscn")
 const ICON_SIZE_SHIFT: Texture2D = preload("res://assets/ui/abilities/Shift_Size_Ability.png")
 const ICON_DOUBLE_JUMP: Texture2D = preload("res://assets/ui/abilities/Double_Jump_Ability.png")
 const ICON_WALL_JUMP: Texture2D = preload("res://assets/ui/abilities/Wall_Jump_Ability.png")
+const ICON_HEADBUTT: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Weapon.png")
 const COLOR_ABILITY_OUTLINE := Color(0.980392, 0.513725, 0.203922, 1.0) # #fa8334
 const COLOR_LIGHT_TEXT := Color(0.933333, 0.898039, 0.913725, 1.0) # #eee5e9
 const ABILITY_ICON_MAP := {
 	"size_shift": ICON_SIZE_SHIFT,
 	"double_jump": ICON_DOUBLE_JUMP,
-	"wall_jump": ICON_WALL_JUMP
+	"wall_jump": ICON_WALL_JUMP,
+	"headbutt": ICON_HEADBUTT
 }
 
 @onready var back_button: Button = $Layout/VBox/Header/BackButton

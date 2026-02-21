@@ -70,11 +70,17 @@ func _on_amulets_hud_pressed() -> void:
 	_open_character_overlay(false)
 
 func _open_pause() -> void:
+	var audio_manager := get_node_or_null("/root/AudioManager")
+	if audio_manager and audio_manager.has_method("pause_level_music"):
+		audio_manager.call("pause_level_music")
 	if pause_menu and pause_menu.has_method("open_popup"):
 		pause_menu.call("open_popup")
 
 func _close_pause() -> void:
 	_refresh_player_amulet_state()
+	var audio_manager := get_node_or_null("/root/AudioManager")
+	if audio_manager and audio_manager.has_method("resume_level_music"):
+		audio_manager.call("resume_level_music")
 	if pause_menu and pause_menu.has_method("close_popup"):
 		pause_menu.call("close_popup")
 
@@ -111,6 +117,9 @@ func _open_character_overlay(from_pause_menu: bool) -> void:
 	add_child(_character_overlay)
 	if not from_pause_menu:
 		_close_pause()
+	var audio_manager := get_node_or_null("/root/AudioManager")
+	if audio_manager and audio_manager.has_method("pause_level_music"):
+		audio_manager.call("pause_level_music")
 	get_tree().paused = true
 
 func _on_amulets_overlay_closed(from_pause_menu: bool) -> void:
@@ -128,6 +137,9 @@ func _close_character_overlay(resume_game: bool) -> void:
 		gd.call("set_amulet_screen_manage_mode", false)
 	if resume_game:
 		get_tree().paused = false
+		var audio_manager := get_node_or_null("/root/AudioManager")
+		if audio_manager and audio_manager.has_method("resume_level_music"):
+			audio_manager.call("resume_level_music")
 	_character_overlay_from_pause = false
 
 func _refresh_player_amulet_state() -> void:

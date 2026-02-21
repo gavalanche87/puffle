@@ -4,6 +4,7 @@ enum PlayerMode {SMALL, BIG}
 const ABILITY_SIZE_SHIFT := "size_shift"
 const ABILITY_DOUBLE_JUMP := "double_jump"
 const ABILITY_WALL_JUMP := "wall_jump"
+const ABILITY_HEADBUTT := "headbutt"
 const WEAPON_HEAD_SPIKE := "head_spike"
 const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 
@@ -25,6 +26,14 @@ const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 @export var wall_jump_vertical: float = -500.0
 @export var wall_jump_horizontal: float = 750.0
 @export var wall_jump_lock_time: float = 0.18
+@export var headbutt_energy_cost: int = 12
+@export var headbutt_duration: float = 0.16
+@export var headbutt_dash_speed_small: float = 620.0
+@export var headbutt_dash_speed_big: float = 780.0
+@export var headbutt_knockback_small: float = 240.0
+@export var headbutt_knockback_big: float = 360.0
+@export var headbutt_damage_small: int = 1
+@export var headbutt_damage_big_multiplier: float = 1.5
 @export var variable_jump_hold_time: float = 0.16
 @export var variable_jump_hold_gravity_scale: float = 0.45
 @export var variable_jump_release_velocity_scale: float = 0.45
@@ -94,6 +103,10 @@ var run_sfx_timer: float = 0.0
 var is_killplane_respawning: bool = false
 var extra_jumps_used: int = 0
 var jump_hold_timer: float = 0.0
+var is_headbutting: bool = false
+var headbutt_timer: float = 0.0
+var headbutt_dir: float = 1.0
+var headbutt_hit_targets: Dictionary = {}
 static var pending_coin_restore: bool = false
 static var stored_coin_balance: int = 0
 static var pending_fade_in: bool = false
@@ -142,6 +155,7 @@ var consumable_buttons_bound: bool = false
 @onready var sfx_land: AudioStreamPlayer = $SfxLand
 @onready var sfx_wall_slide: AudioStreamPlayer = $SfxWallSlide
 @onready var sfx_run: AudioStreamPlayer = $SfxRun
+@onready var sfx_headbutt: AudioStreamPlayer = $SfxHeadbutt
 @onready var camera: Camera2D = $Camera2D
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var head_attachment: Node2D = $AnimatedSprite2D/Head_Attachment
@@ -266,6 +280,8 @@ func _physics_process(delta: float) -> void:
 		_cycle_consumable(1)
 	if Input.is_action_just_pressed("consumable_use"):
 		_use_selected_consumable()
+	if Input.is_action_just_pressed("headbutt") and input_lock_timer <= 0.0:
+		_try_start_headbutt()
 	if not _has_equipped_weapon(WEAPON_HEAD_SPIKE) and head_attachment and head_attachment.visible:
 		_set_head_attachment_active(false, false)
 
@@ -289,26 +305,40 @@ func _physics_process(delta: float) -> void:
 	var should_spin := _should_spin_midair(snapped)
 	var target_speed := input_dir * _current_speed()
 	var accel := ground_accel if _is_grounded() else air_accel
-	if input_dir != 0.0:
-		velocity.x = move_toward(velocity.x, target_speed, accel * delta)
-	elif _is_grounded():
-		velocity.x = move_toward(velocity.x, 0.0, ground_friction * delta)
-	elif air_brake > 0.0:
-		velocity.x = move_toward(velocity.x, 0.0, air_brake * delta)
+	if is_headbutting:
+		headbutt_timer = max(0.0, headbutt_timer - delta)
+		velocity.x = _current_headbutt_speed() * headbutt_dir
+		velocity.y = 0.0
+		if sprite:
+			sprite.rotation = _current_headbutt_rotation()
+		if headbutt_timer <= 0.0:
+			_end_headbutt()
+	else:
+		if input_dir != 0.0:
+			velocity.x = move_toward(velocity.x, target_speed, accel * delta)
+		elif _is_grounded():
+			velocity.x = move_toward(velocity.x, 0.0, ground_friction * delta)
+		elif air_brake > 0.0:
+			velocity.x = move_toward(velocity.x, 0.0, air_brake * delta)
 	velocity.x += knockback_velocity
 
 	var jump_pressed := Input.is_action_just_pressed("ui_accept") and input_lock_timer <= 0.0
 	var jump_held := Input.is_action_pressed("ui_accept") and input_lock_timer <= 0.0
 	var jump_released := Input.is_action_just_released("ui_accept")
-	if not is_on_floor():
+	if is_headbutting:
+		air_time = 0.0
+		extra_jumps_used = 0
+		jump_hold_timer = 0.0
+	elif not is_on_floor():
 		air_time += delta
 		if wall_sliding or snapped:
 			air_time = 0.0
 		if wall_sliding:
 			velocity.y = min(velocity.y + _current_gravity() * delta, wall_slide_speed)
 		if jump_pressed and (wall_sliding or snapped):
-			if current_energy >= wall_jump_energy_cost and _wall_jump():
-				current_energy = max(0, current_energy - wall_jump_energy_cost)
+			var wall_jump_cost := _current_wall_jump_energy_cost()
+			if current_energy >= wall_jump_cost and _wall_jump():
+				current_energy = max(0, current_energy - wall_jump_cost)
 				_update_energy_ui()
 				extra_jumps_used = 0
 				_begin_variable_jump()
@@ -522,6 +552,7 @@ func _ensure_toggle_action() -> void:
 	_ensure_action_has_key("consumable_prev", KEY_Q)
 	_ensure_action_has_key("consumable_next", KEY_E)
 	_ensure_action_has_key("consumable_use", KEY_W)
+	_ensure_action_has_key("headbutt", KEY_C)
 
 func _ensure_action_has_key(action_name: String, keycode: Key) -> void:
 	if not InputMap.has_action(action_name):
@@ -596,15 +627,24 @@ func _on_spike_hitbox_area_entered(area: Area2D) -> void:
 	if not head_attachment or not head_attachment.visible:
 		return
 	if area.is_in_group("enemies"):
+		if is_headbutting:
+			_apply_headbutt_hit(area)
+			return
 		var enemy_node: Node = area
 		if not enemy_node.has_method("die") and area.get_parent() and area.get_parent().has_method("die"):
 			enemy_node = area.get_parent()
-		if enemy_node and enemy_node.has_method("die"):
+		if enemy_node and enemy_node.has_method("take_damage"):
 			var kill_context: Dictionary = {
 				"source": "head_spike",
 				"player_mode": ("small" if mode == PlayerMode.SMALL else "big")
 			}
-			enemy_node.call_deferred("die", kill_context)
+			enemy_node.call("take_damage", 1.0, kill_context)
+		elif enemy_node and enemy_node.has_method("die"):
+			var kill_context_legacy: Dictionary = {
+				"source": "head_spike",
+				"player_mode": ("small" if mode == PlayerMode.SMALL else "big")
+			}
+			enemy_node.call_deferred("die", kill_context_legacy)
 		velocity.y = stomp_bounce_velocity
 		_play_sfx(sfx_stomp)
 		return
@@ -1143,7 +1183,10 @@ func _apply_knockback(enemy_area: Area2D) -> void:
 	var dir := signf(global_position.x - enemy_area.global_position.x)
 	if dir == 0.0:
 		dir = -1.0
-	var player_force := (small_player_knockback if mode == PlayerMode.SMALL else big_player_knockback) * 0.5
+	var enemy_knockback_mult := 1.0
+	if enemy_area and enemy_area.has_method("get_player_knockback_multiplier"):
+		enemy_knockback_mult = maxf(0.0, float(enemy_area.call("get_player_knockback_multiplier")))
+	var player_force := (small_player_knockback if mode == PlayerMode.SMALL else big_player_knockback) * 0.5 * enemy_knockback_mult
 	knockback_velocity = clamp(player_force * dir, -max_knockback, max_knockback)
 	velocity.y = -300.0 # Significant upward bounce
 
@@ -1157,6 +1200,9 @@ func _update_camera(force: bool = false) -> void:
 
 func _update_facing(wall_sliding: bool) -> void:
 	if not sprite:
+		return
+	if is_headbutting:
+		_update_head_attachment_transform()
 		return
 	if wall_sliding and wall_normal != Vector2.ZERO:
 		sprite.flip_h = wall_normal.x > 0.0
@@ -1249,6 +1295,8 @@ func _should_spin_midair(snapped: bool) -> bool:
 func _reset_sprite_rotation() -> void:
 	if not sprite:
 		return
+	if is_headbutting:
+		return
 	if absf(sprite.rotation) > 0.001:
 		sprite.rotation = 0.0
 	spin_accumulated = 0.0
@@ -1295,6 +1343,8 @@ func _hazard_damage_multiplier_from_amulets() -> float:
 func _refresh_amulet_state() -> void:
 	var size_shift_owned := _has_ability(ABILITY_SIZE_SHIFT)
 	var head_spike_equipped := _has_equipped_weapon(WEAPON_HEAD_SPIKE)
+	if not _has_ability(ABILITY_HEADBUTT) or not head_spike_equipped:
+		_end_headbutt()
 	if not size_shift_owned and mode == PlayerMode.BIG:
 		mode = PlayerMode.SMALL
 		_apply_mode(mode, false)
@@ -1406,6 +1456,82 @@ func _wall_jump() -> bool:
 	velocity.y = wall_jump_vertical
 	knockback_velocity = 0.0
 	return true
+
+func _current_wall_jump_energy_cost() -> int:
+	return maxi(1, int(floor(float(wall_jump_energy_cost) * 0.5)))
+
+func _try_start_headbutt() -> void:
+	if is_dying or is_headbutting:
+		return
+	if not _has_ability(ABILITY_HEADBUTT):
+		return
+	if not _has_equipped_weapon(WEAPON_HEAD_SPIKE):
+		return
+	if current_energy < headbutt_energy_cost:
+		return
+	current_energy = max(0, current_energy - headbutt_energy_cost)
+	_update_energy_ui()
+	is_headbutting = true
+	headbutt_timer = max(0.05, headbutt_duration)
+	headbutt_hit_targets.clear()
+	knockback_velocity = 0.0
+	var facing_sign := 1.0 if sprite and sprite.flip_h else -1.0
+	if absf(velocity.x) > 1.0:
+		facing_sign = signf(velocity.x)
+	headbutt_dir = facing_sign
+	velocity.x = _current_headbutt_speed() * headbutt_dir
+	velocity.y = 0.0
+	if sfx_headbutt and sfx_headbutt.stream:
+		sfx_headbutt.stop()
+		sfx_headbutt.play()
+	if sprite:
+		sprite.rotation = _current_headbutt_rotation()
+
+func _end_headbutt() -> void:
+	if not is_headbutting:
+		return
+	is_headbutting = false
+	headbutt_timer = 0.0
+	headbutt_hit_targets.clear()
+	_reset_sprite_rotation()
+
+func _current_headbutt_speed() -> float:
+	return headbutt_dash_speed_small if mode == PlayerMode.SMALL else headbutt_dash_speed_big
+
+func _current_headbutt_rotation() -> float:
+	return PI * 0.5 if headbutt_dir >= 0.0 else PI * 1.5
+
+func _apply_headbutt_hit(area: Area2D) -> void:
+	if area == null:
+		return
+	var enemy_node: Node = area
+	if not enemy_node.has_method("die") and area.get_parent() and area.get_parent().has_method("die"):
+		enemy_node = area.get_parent()
+	if enemy_node == null:
+		return
+	var enemy_key := enemy_node.get_instance_id()
+	if headbutt_hit_targets.has(enemy_key):
+		return
+	headbutt_hit_targets[enemy_key] = true
+	var knockback_force := headbutt_knockback_small if mode == PlayerMode.SMALL else headbutt_knockback_big
+	if enemy_node.has_method("apply_knockback"):
+		enemy_node.call("apply_knockback", knockback_force, headbutt_dir)
+	var damage_value := float(headbutt_damage_small)
+	if mode == PlayerMode.BIG:
+		damage_value *= headbutt_damage_big_multiplier
+	if enemy_node.has_method("take_damage"):
+		enemy_node.call("take_damage", damage_value, {
+			"source": "headbutt",
+			"player_mode": ("small" if mode == PlayerMode.SMALL else "big"),
+			"damage": damage_value
+		})
+	elif enemy_node.has_method("die"):
+		var kill_context: Dictionary = {
+			"source": "headbutt",
+			"player_mode": ("small" if mode == PlayerMode.SMALL else "big"),
+			"damage": damage_value
+		}
+		enemy_node.call_deferred("die", kill_context)
 
 func _start_death_sequence() -> void:
 	if is_dying:
