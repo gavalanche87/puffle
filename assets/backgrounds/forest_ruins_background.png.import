@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bxxd7qmpakhm6"
-path="res://.godot/imported/background_2.png-48a12e93281742a40cb23c0a3c3e472e.ctex"
+uid="uid://x8rwn1wqhqts"
+path="res://.godot/imported/forest_ruins_background.png-89a1766f58f84ce4d3f460e4a5e0530d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/background_2.png"
-dest_files=["res://.godot/imported/background_2.png-48a12e93281742a40cb23c0a3c3e472e.ctex"]
+source_file="res://assets/backgrounds/forest_ruins_background.png"
+dest_files=["res://.godot/imported/forest_ruins_background.png-89a1766f58f84ce4d3f460e4a5e0530d.ctex"]
 
 [params]
 

@@ -3,6 +3,14 @@
 [ext_resource type="Script" uid="uid://b8hb21risihan" path="res://scripts/ui/shop_screen.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="2"]
 [ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="3"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/hills_ruins_background.png" id="4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop_panel"]
+bg_color = Color(0.74902, 0.74902, 0.74902, 0.96)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="Shop" type="Control" unique_id=427197080]
 layout_mode = 3
@@ -13,14 +21,16 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="Background" type="ColorRect" parent="." unique_id=829052743]
+[node name="Background" type="TextureRect" parent="." unique_id=829052743]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.254902, 0.254902, 0.254902, 1)
+texture = ExtResource("4")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="Layout" type="MarginContainer" parent="." unique_id=2004919644]
 layout_mode = 1
@@ -134,18 +144,31 @@ custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 text = "MUSIC"
 
-[node name="Scroll" type="ScrollContainer" parent="Layout/VBox" unique_id=1499886116]
+[node name="OffersPanel" type="Panel" parent="Layout/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_shop_panel")
 
-[node name="Margin" type="MarginContainer" parent="Layout/VBox/Scroll" unique_id=1730580365]
+[node name="Scroll" type="ScrollContainer" parent="Layout/VBox/OffersPanel" unique_id=1499886116]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Layout/VBox/OffersPanel/Scroll" unique_id=1730580365]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="OffersList" type="VBoxContainer" parent="Layout/VBox/Scroll/Margin" unique_id=1442038118]
+[node name="OffersList" type="VBoxContainer" parent="Layout/VBox/OffersPanel/Scroll/Margin" unique_id=1442038118]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

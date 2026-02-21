@@ -1,10 +1,10 @@
 extends "res://scripts/ui/menu_transitions.gd"
 
 @onready var back_button: Button = $Layout/VBox/Header/BackButton
-@onready var music_slider: HSlider = $Layout/VBox/Content/MusicRow/MusicSlider
-@onready var sfx_slider: HSlider = $Layout/VBox/Content/SfxRow/SfxSlider
-@onready var music_value: Label = $Layout/VBox/Content/MusicRow/MusicValue
-@onready var sfx_value: Label = $Layout/VBox/Content/SfxRow/SfxValue
+@onready var music_slider: HSlider = $Layout/VBox/ContentPanel/Content/MusicRow/MusicSlider
+@onready var sfx_slider: HSlider = $Layout/VBox/ContentPanel/Content/SfxRow/SfxSlider
+@onready var music_value: Label = $Layout/VBox/ContentPanel/Content/MusicRow/MusicValue
+@onready var sfx_value: Label = $Layout/VBox/ContentPanel/Content/SfxRow/SfxValue
 
 func _ready() -> void:
 	super._ready()

@@ -1,11 +1,11 @@
 extends "res://scripts/ui/menu_transitions.gd"
 
-@onready var play_button: Button = $Layout/Panel/Margin/Buttons/PlayButton
-@onready var shop_button: Button = $Layout/Panel/Margin/Buttons/ShopButton
-@onready var character_button: Button = $Layout/Panel/Margin/Buttons/AmuletsButton
-@onready var how_to_play_button: Button = $Layout/Panel/Margin/Buttons/HowToPlayButton
-@onready var settings_button: Button = $Layout/Panel/Margin/Buttons/SettingsButton
-@onready var wipe_save_button: Button = $Layout/Panel/Margin/Buttons/WipeSaveButton
+@onready var play_button: Button = $Layout/Buttons/PlayButton
+@onready var shop_button: Button = $Layout/Buttons/ShopButton
+@onready var character_button: Button = $Layout/Buttons/AmuletsButton
+@onready var how_to_play_button: Button = $Layout/Buttons/HowToPlayButton
+@onready var settings_button: Button = $Layout/Buttons/SettingsButton
+@onready var wipe_save_button: Button = $Layout/Buttons/WipeSaveButton
 
 func _ready() -> void:
 	super._ready()

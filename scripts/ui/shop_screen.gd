@@ -10,7 +10,7 @@ const SHOP_ENTRY_SCENE := preload("res://scenes/ui/ShopEntry.tscn")
 @onready var amulets_tab: Button = $Layout/VBox/Tabs/AmuletsTab
 @onready var abilities_tab: Button = $Layout/VBox/Tabs/AbilitiesTab
 @onready var music_tab: Button = $Layout/VBox/Tabs/MusicTab
-@onready var offers_list: VBoxContainer = $Layout/VBox/Scroll/Margin/OffersList
+@onready var offers_list: VBoxContainer = $Layout/VBox/OffersPanel/Scroll/Margin/OffersList
 
 var _active_tab: String = "items"
 const TAB_OUTLINE_ITEMS := Color(0.796078, 0.682353, 0.145098, 1.0)
