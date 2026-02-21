@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://m5v7kkve38uv"]
 
 [ext_resource type="Script" uid="uid://3qwu4p7vblji" path="res://scripts/destroyable_platform.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://chcknj0nh57jb" path="res://assets/tiles/platform_palette_blue.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://c7jlpvggrsy0p" path="res://assets/tiles/stone.png" id="2_shpn7"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(224, 32)
@@ -13,7 +13,7 @@ script = ExtResource("1")
 modulate = Color(1, 0.019607844, 1, 1)
 texture_filter = 1
 texture_repeat = 2
-texture = ExtResource("2")
+texture = ExtResource("2_shpn7")
 region_enabled = true
 region_rect = Rect2(0, 0, 224, 32)
 

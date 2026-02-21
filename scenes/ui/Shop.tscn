@@ -37,22 +37,22 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 18.0
-offset_top = 12.0
-offset_right = -18.0
-offset_bottom = -12.0
+offset_left = 14.0
+offset_top = 10.0
+offset_right = -14.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBox" type="VBoxContainer" parent="Layout" unique_id=55924362]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="Header" type="HBoxContainer" parent="Layout/VBox" unique_id=901792274]
 layout_mode = 2
 
 [node name="BackButton" parent="Layout/VBox/Header" unique_id=2096413534 instance=ExtResource("2")]
-custom_minimum_size = Vector2(100, 36)
+custom_minimum_size = Vector2(88, 32)
 layout_mode = 2
 text = "BACK"
 
@@ -63,7 +63,7 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 32
 text = "SHOP"
 horizontal_alignment = 1
 
@@ -80,7 +80,7 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "Coins:"
 
 [node name="CoinsValue" type="Label" parent="Layout/VBox/Header/Currencies/Coins" unique_id=1130389229]
@@ -89,7 +89,7 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "0"
 
 [node name="Tokens" type="HBoxContainer" parent="Layout/VBox/Header/Currencies" unique_id=2111588388]
@@ -102,7 +102,7 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.74902, 0.184314, 0.686275, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "Tokens:"
 
 [node name="TokensValue" type="Label" parent="Layout/VBox/Header/Currencies/Tokens" unique_id=919864811]
@@ -111,36 +111,36 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.74902, 0.184314, 0.686275, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "0"
 
 [node name="Tabs" type="HBoxContainer" parent="Layout/VBox" unique_id=950124729]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 alignment = 1
 
 [node name="ItemsTab" parent="Layout/VBox/Tabs" unique_id=1579371752 instance=ExtResource("2")]
-custom_minimum_size = Vector2(130, 36)
+custom_minimum_size = Vector2(114, 32)
 layout_mode = 2
 text = "ITEMS"
 
 [node name="WeaponsTab" parent="Layout/VBox/Tabs" unique_id=449071570 instance=ExtResource("2")]
-custom_minimum_size = Vector2(130, 36)
+custom_minimum_size = Vector2(114, 32)
 layout_mode = 2
 text = "WEAPONS"
 
 [node name="AmuletsTab" parent="Layout/VBox/Tabs" unique_id=409917022 instance=ExtResource("2")]
-custom_minimum_size = Vector2(130, 36)
+custom_minimum_size = Vector2(114, 32)
 layout_mode = 2
 text = "AMULETS"
 
 [node name="AbilitiesTab" parent="Layout/VBox/Tabs" unique_id=110650026 instance=ExtResource("2")]
-custom_minimum_size = Vector2(130, 36)
+custom_minimum_size = Vector2(114, 32)
 layout_mode = 2
 text = "ABILITIES"
 
 [node name="MusicTab" parent="Layout/VBox/Tabs" unique_id=1319904463 instance=ExtResource("2")]
-custom_minimum_size = Vector2(130, 36)
+custom_minimum_size = Vector2(114, 32)
 layout_mode = 2
 text = "MUSIC"
 

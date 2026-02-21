@@ -1,0 +1,392 @@
+[gd_scene format=3 uid="uid://bnnqoid8673nh"]
+
+[ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/player/Player.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/enemies/Enemy.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/level_elements/platforms/Goal.tscn" id="3"]
+[ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="4"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/forest_ruins_background.png" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="8"]
+[ext_resource type="PackedScene" uid="uid://dnhg3sd3vvwvj" path="res://scenes/enemies/GreenEnemy.tscn" id="9"]
+[ext_resource type="PackedScene" uid="uid://m5v7kkve38uv" path="res://scenes/level_elements/platforms/DestroyablePlatform.tscn" id="destroyable_platform_scene"]
+[ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/level_elements/platforms/Ground.tscn" id="ground_scene"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/HazardSaw.tscn" id="hazard_saw_scene"]
+[ext_resource type="Script" uid="uid://ci2l63nm7wph7" path="res://scripts/level_camera_setup.gd" id="level_camera_setup_script"]
+[ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/level_elements/platforms/Platform.tscn" id="platform_scene"]
+[ext_resource type="PackedScene" path="res://scenes/level_elements/platforms/Wall.tscn" id="wall_scene"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/WallSlime.tscn" id="wall_slime_scene"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(3200, 30.00003)
+
+[node name="test_level_2" type="Node2D" unique_id=1198225251]
+script = ExtResource("level_camera_setup_script")
+
+[node name="Background" type="CanvasLayer" parent="." unique_id=1503960579]
+layer = -10
+
+[node name="Back" type="TextureRect" parent="Background" unique_id=1820796036]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("6")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="HUD" parent="." unique_id=86355027 instance=ExtResource("8")]
+
+[node name="World" type="Node2D" parent="." unique_id=1358519409]
+
+[node name="Player" parent="World" unique_id=693069414 instance=ExtResource("1")]
+position = Vector2(201.72534, 1065.11352)
+
+[node name="Platforms" type="Node2D" parent="World" unique_id=197979092]
+
+[node name="Ground" parent="World/Platforms" unique_id=1453284424 instance=ExtResource("ground_scene")]
+position = Vector2(0, 1536)
+length_tiles = 33
+visual_offset = Vector2(16, 16)
+collision_offset = Vector2(16, 16)
+
+[node name="PlatformA" parent="World/Platforms" unique_id=1990171567 instance=ExtResource("platform_scene")]
+position = Vector2(416, 1152)
+
+[node name="PlatformB" parent="World/Platforms" unique_id=11692420 instance=ExtResource("platform_scene")]
+position = Vector2(128, 960)
+length_tiles = 6
+
+[node name="PlatformC" parent="World/Platforms" unique_id=439982880 instance=ExtResource("platform_scene")]
+position = Vector2(-128, 768)
+length_tiles = 4
+
+[node name="PlatformD" parent="World/Platforms" unique_id=1262079969 instance=ExtResource("platform_scene")]
+position = Vector2(320, 576)
+length_tiles = 8
+
+[node name="PlatformE" parent="World/Platforms" unique_id=580559711 instance=ExtResource("platform_scene")]
+position = Vector2(-32, 448)
+length_tiles = 4
+
+[node name="DestroyablePlatformA" parent="World/Platforms" unique_id=173608242 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(-192, 320)
+
+[node name="DestroyablePlatformB" parent="World/Platforms" unique_id=1129467499 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(-192, 1216)
+
+[node name="PlatformF" parent="World/Platforms" unique_id=635516944 instance=ExtResource("platform_scene")]
+position = Vector2(224, 256)
+length_tiles = 5
+
+[node name="PlatformG" parent="World/Platforms" unique_id=243383558 instance=ExtResource("platform_scene")]
+position = Vector2(-128, 64)
+length_tiles = 4
+
+[node name="PlatformH" parent="World/Platforms" unique_id=1260171501 instance=ExtResource("platform_scene")]
+position = Vector2(64, -192)
+length_tiles = 8
+
+[node name="PlatformI" parent="World/Platforms" unique_id=1177325464 instance=ExtResource("platform_scene")]
+position = Vector2(-224, -256)
+length_tiles = 3
+
+[node name="PlatformJ" parent="World/Platforms" unique_id=1734530166 instance=ExtResource("platform_scene")]
+position = Vector2(320, -512)
+length_tiles = 6
+
+[node name="PlatformK" parent="World/Platforms" unique_id=123274068 instance=ExtResource("platform_scene")]
+position = Vector2(-32, -896)
+length_tiles = 4
+
+[node name="DestroyablePlatformC" parent="World/Platforms" unique_id=1153649272 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(-192, -1280)
+length_tiles = 4
+
+[node name="PlatformL" parent="World/Platforms" unique_id=698481026 instance=ExtResource("platform_scene")]
+position = Vector2(224, -1664)
+length_tiles = 5
+
+[node name="PlatformM" parent="World/Platforms" unique_id=1329339566 instance=ExtResource("platform_scene")]
+position = Vector2(-160, -2048)
+length_tiles = 4
+
+[node name="DestroyablePlatformD" parent="World/Platforms" unique_id=248788960 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(416, -2432)
+length_tiles = 6
+
+[node name="PlatformN" parent="World/Platforms" unique_id=569324829 instance=ExtResource("platform_scene")]
+position = Vector2(-224, -2816)
+length_tiles = 4
+
+[node name="DestroyablePlatformE" parent="World/Platforms" unique_id=1616698182 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(64, -3200)
+length_tiles = 5
+
+[node name="PlatformO" parent="World/Platforms" unique_id=1117589883 instance=ExtResource("platform_scene")]
+position = Vector2(-256, -3584)
+length_tiles = 4
+
+[node name="PlatformP" parent="World/Platforms" unique_id=1835859364 instance=ExtResource("platform_scene")]
+position = Vector2(256, -3968)
+length_tiles = 5
+
+[node name="DestroyablePlatformF" parent="World/Platforms" unique_id=604144997 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(-128, -4352)
+length_tiles = 4
+
+[node name="PlatformQ" parent="World/Platforms" unique_id=940980640 instance=ExtResource("platform_scene")]
+position = Vector2(320, -4736)
+length_tiles = 6
+
+[node name="DestroyablePlatformG" parent="World/Platforms" unique_id=1875018661 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(-32, -5120)
+length_tiles = 4
+
+[node name="PlatformR" parent="World/Platforms" unique_id=24682169 instance=ExtResource("platform_scene")]
+position = Vector2(-160, -5504)
+length_tiles = 4
+
+[node name="DestroyablePlatformH" parent="World/Platforms" unique_id=321012636 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(192, -5888)
+length_tiles = 5
+
+[node name="PlatformS" parent="World/Platforms" unique_id=1389734826 instance=ExtResource("platform_scene")]
+position = Vector2(-288, -6272)
+length_tiles = 4
+
+[node name="DestroyablePlatformI" parent="World/Platforms" unique_id=366364771 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(64, -6656)
+length_tiles = 5
+
+[node name="PlatformT" parent="World/Platforms" unique_id=2111407482 instance=ExtResource("platform_scene")]
+position = Vector2(-224, -7040)
+length_tiles = 4
+
+[node name="DestroyablePlatformJ" parent="World/Platforms" unique_id=1624706127 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(320, -7424)
+length_tiles = 6
+
+[node name="PlatformU" parent="World/Platforms" unique_id=1988659695 instance=ExtResource("platform_scene")]
+position = Vector2(-128, -7808)
+length_tiles = 4
+
+[node name="DestroyablePlatformK" parent="World/Platforms" unique_id=123607375 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(224, -8192)
+length_tiles = 5
+
+[node name="PlatformV" parent="World/Platforms" unique_id=1636962991 instance=ExtResource("platform_scene")]
+position = Vector2(-256, -8576)
+length_tiles = 4
+
+[node name="DestroyablePlatformL" parent="World/Platforms" unique_id=1165410817 instance=ExtResource("destroyable_platform_scene")]
+position = Vector2(64, -8960)
+length_tiles = 5
+
+[node name="PlatformW" parent="World/Platforms" unique_id=1809846606 instance=ExtResource("platform_scene")]
+position = Vector2(-192, -9344)
+length_tiles = 4
+
+[node name="CeilingPlatform" parent="World/Platforms" unique_id=1933199367 instance=ExtResource("platform_scene")]
+position = Vector2(0, -9920)
+length_tiles = 33
+
+[node name="Walls" type="Node2D" parent="World" unique_id=1218809112]
+
+[node name="LeftWall" parent="World/Walls" unique_id=789423377 instance=ExtResource("wall_scene")]
+position = Vector2(512, -4160)
+length_tiles = 360
+
+[node name="RightWall" parent="World/Walls" unique_id=1335665259 instance=ExtResource("wall_scene")]
+position = Vector2(-512, -4160)
+length_tiles = 360
+
+[node name="InnerWallA" parent="World/Walls" unique_id=437141480 instance=ExtResource("wall_scene")]
+position = Vector2(64, 576)
+length_tiles = 24
+collision_offset = Vector2(0, -2.6666565)
+
+[node name="InnerWallB" parent="World/Walls" unique_id=584122830 instance=ExtResource("wall_scene")]
+position = Vector2(-192, 256)
+length_tiles = 20
+collision_offset = Vector2(0, 0.33333588)
+
+[node name="InnerWallC" parent="World/Walls" unique_id=30100538 instance=ExtResource("wall_scene")]
+position = Vector2(96, -3200)
+length_tiles = 40
+
+[node name="InnerWallD" parent="World/Walls" unique_id=1816803324 instance=ExtResource("wall_scene")]
+position = Vector2(-224, -6400)
+length_tiles = 40
+
+[node name="Enemies" type="Node2D" parent="World" unique_id=1465750994]
+position = Vector2(0, -128)
+
+[node name="EnemyA" parent="World/Enemies" unique_id=826466757 instance=ExtResource("2")]
+position = Vector2(384, 960)
+
+[node name="EnemyB" parent="World/Enemies" unique_id=489875799 instance=ExtResource("2")]
+position = Vector2(128, 896)
+
+[node name="EnemyC" parent="World/Enemies" unique_id=1035981095 instance=ExtResource("2")]
+position = Vector2(-128, 768)
+
+[node name="EnemyD" parent="World/Enemies" unique_id=2093204920 instance=ExtResource("2")]
+position = Vector2(320, 576)
+
+[node name="EnemyE" parent="World/Enemies" unique_id=1035416980 instance=ExtResource("2")]
+position = Vector2(-32, 384)
+
+[node name="EnemyF" parent="World/Enemies" unique_id=145356115 instance=ExtResource("2")]
+position = Vector2(192, 192)
+
+[node name="EnemyG" parent="World/Enemies" unique_id=1950358418 instance=ExtResource("2")]
+position = Vector2(-128, 64)
+
+[node name="EnemyH" parent="World/Enemies" unique_id=1391844187 instance=ExtResource("2")]
+position = Vector2(64, -192)
+
+[node name="EnemyI" parent="World/Enemies" unique_id=663365207 instance=ExtResource("2")]
+position = Vector2(-224, -384)
+
+[node name="GreenEnemyA" parent="World/Enemies" unique_id=1713919263 instance=ExtResource("9")]
+position = Vector2(224, 512)
+
+[node name="GreenEnemyB" parent="World/Enemies" unique_id=2052163917 instance=ExtResource("9")]
+position = Vector2(-416, 1472)
+
+[node name="EnemyJ" parent="World/Enemies" unique_id=201743110 instance=ExtResource("2")]
+position = Vector2(320, -512)
+
+[node name="EnemyK" parent="World/Enemies" unique_id=267262016 instance=ExtResource("2")]
+position = Vector2(-32, -896)
+
+[node name="GreenEnemyC" parent="World/Enemies" unique_id=181347203 instance=ExtResource("9")]
+position = Vector2(-192, -1280)
+
+[node name="EnemyL" parent="World/Enemies" unique_id=651830715 instance=ExtResource("2")]
+position = Vector2(224, -1664)
+
+[node name="GreenEnemyD" parent="World/Enemies" unique_id=2035644653 instance=ExtResource("9")]
+position = Vector2(-160, -2048)
+
+[node name="EnemyM" parent="World/Enemies" unique_id=1485476803 instance=ExtResource("2")]
+position = Vector2(416, -2432)
+
+[node name="EnemyN" parent="World/Enemies" unique_id=244725937 instance=ExtResource("2")]
+position = Vector2(-224, -2816)
+
+[node name="GreenEnemyE" parent="World/Enemies" unique_id=1777990102 instance=ExtResource("9")]
+position = Vector2(64, -3200)
+
+[node name="EnemyO" parent="World/Enemies" unique_id=1471348371 instance=ExtResource("2")]
+position = Vector2(-256, -3584)
+
+[node name="GreenEnemyF" parent="World/Enemies" unique_id=1634257286 instance=ExtResource("9")]
+position = Vector2(256, -3968)
+
+[node name="EnemyP" parent="World/Enemies" unique_id=1586077979 instance=ExtResource("2")]
+position = Vector2(-128, -4352)
+
+[node name="GreenEnemyG" parent="World/Enemies" unique_id=47339539 instance=ExtResource("9")]
+position = Vector2(320, -4736)
+
+[node name="EnemyQ" parent="World/Enemies" unique_id=1739583922 instance=ExtResource("2")]
+position = Vector2(-32, -5120)
+
+[node name="GreenEnemyH" parent="World/Enemies" unique_id=984596690 instance=ExtResource("9")]
+position = Vector2(-192, -5504)
+
+[node name="EnemyR" parent="World/Enemies" unique_id=228496754 instance=ExtResource("2")]
+position = Vector2(192, -5888)
+
+[node name="GreenEnemyI" parent="World/Enemies" unique_id=1124074412 instance=ExtResource("9")]
+position = Vector2(-256, -6272)
+
+[node name="EnemyS" parent="World/Enemies" unique_id=882553359 instance=ExtResource("2")]
+position = Vector2(64, -6656)
+
+[node name="GreenEnemyJ" parent="World/Enemies" unique_id=1934450394 instance=ExtResource("9")]
+position = Vector2(-224, -7040)
+
+[node name="EnemyT" parent="World/Enemies" unique_id=608166624 instance=ExtResource("2")]
+position = Vector2(320, -7424)
+
+[node name="GreenEnemyK" parent="World/Enemies" unique_id=1846378391 instance=ExtResource("9")]
+position = Vector2(-128, -7808)
+
+[node name="EnemyU" parent="World/Enemies" unique_id=1044346182 instance=ExtResource("2")]
+position = Vector2(224, -8192)
+
+[node name="GreenEnemyL" parent="World/Enemies" unique_id=2138519565 instance=ExtResource("9")]
+position = Vector2(-256, -8576)
+
+[node name="EnemyV" parent="World/Enemies" unique_id=1919421574 instance=ExtResource("2")]
+position = Vector2(64, -8960)
+
+[node name="GreenEnemyM" parent="World/Enemies" unique_id=820040199 instance=ExtResource("9")]
+position = Vector2(-192, -9344)
+
+[node name="WallSlimeA" parent="World/Enemies" unique_id=1662658113 instance=ExtResource("wall_slime_scene")]
+position = Vector2(92, 704)
+
+[node name="WallSlimeB" parent="World/Enemies" unique_id=967226253 instance=ExtResource("wall_slime_scene")]
+position = Vector2(36.29251, 507.65534)
+wall_side = 0
+
+[node name="WallSlimeC" parent="World/Enemies" unique_id=1305267163 instance=ExtResource("wall_slime_scene")]
+position = Vector2(-164, 448)
+
+[node name="WallSlimeD" parent="World/Enemies" unique_id=422020951 instance=ExtResource("wall_slime_scene")]
+position = Vector2(-223.43948, 192.50241)
+wall_side = 0
+
+[node name="Hazards" type="Node2D" parent="World" unique_id=171441725]
+
+[node name="SawA" parent="World/Hazards" unique_id=1828693033 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(96, 1088)
+
+[node name="SawB" parent="World/Hazards" unique_id=2116314263 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(-64, 1216)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
+
+[node name="SawB2" parent="World/Hazards" unique_id=2010103474 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(-128, 1152)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
+
+[node name="SawB3" parent="World/Hazards" unique_id=1299344872 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(-256, 1152)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
+
+[node name="SawB4" parent="World/Hazards" unique_id=1215386600 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(-192, 1280)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
+
+[node name="SawC" parent="World/Hazards" unique_id=1197850242 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(256, 640)
+
+[node name="SawD" parent="World/Hazards" unique_id=1002933683 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(-320, 320)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformA")
+
+[node name="SawE" parent="World/Hazards" unique_id=1518020777 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(32, 128)
+
+[node name="SawE2" parent="World/Hazards" unique_id=1772519293 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(-224, 866.75732)
+auto_attach_to_nearest = false
+
+[node name="SawF" parent="World/Hazards" unique_id=583974554 instance=ExtResource("hazard_saw_scene")]
+position = Vector2(-320, 1216)
+attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
+
+[node name="Goal" parent="World" unique_id=159913275 instance=ExtResource("3")]
+position = Vector2(-320, -9792)
+scale = Vector2(4, 4)
+next_scene_path = "res://scenes/ui/LevelSelect.tscn"
+
+[node name="KillPlane" type="Area2D" parent="World" unique_id=1914274321]
+position = Vector2(0, 9216)
+script = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/KillPlane" unique_id=98737922]
+shape = SubResource("1")

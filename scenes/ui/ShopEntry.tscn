@@ -6,7 +6,7 @@
 
 [node name="ShopEntry" type="Panel" unique_id=1434293035]
 self_modulate = Color(0.247059, 0.247059, 0.247059, 1)
-custom_minimum_size = Vector2(0, 96)
+custom_minimum_size = Vector2(0, 84)
 size_flags_horizontal = 3
 script = ExtResource("1")
 
@@ -15,17 +15,17 @@ layout_mode = 0
 offset_right = 550.0
 offset_bottom = 112.0
 theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 8
+theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_bottom = 6
 
 [node name="Row" type="HBoxContainer" parent="Margin" unique_id=741696787]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="Icon" type="TextureRect" parent="Margin/Row" unique_id=1400285589]
-custom_minimum_size = Vector2(96, 96)
+custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 stretch_mode = 5
 
@@ -40,7 +40,7 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.796078, 0.682353, 0.145098, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 20
 text = "Title"
 
 [node name="Description" type="Label" parent="Margin/Row/Info" unique_id=995466120]
@@ -49,7 +49,7 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.254902, 0.254902, 0.254902, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 17
+theme_override_font_sizes/font_size = 15
 text = "Description"
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -65,7 +65,7 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.796078, 0.682353, 0.145098, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 17
 text = "40 Coins"
 
 [node name="State" type="Label" parent="Margin/Row/Info/MetaRow" unique_id=2117123448]
@@ -74,9 +74,9 @@ theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.254902, 0.254902, 0.254902, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 
 [node name="BuyButton" parent="Margin/Row" unique_id=628141359 instance=ExtResource("3")]
-custom_minimum_size = Vector2(130, 48)
+custom_minimum_size = Vector2(112, 40)
 layout_mode = 2
 text = "BUY"

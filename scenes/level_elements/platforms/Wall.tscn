@@ -1,23 +1,24 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://gni2n50y2lud"]
 
-[ext_resource type="Script" path="res://scripts/tiled_body.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/tiles/platform_palette_blue.png" id="2"]
+[ext_resource type="Script" uid="uid://dldckewkoe0oc" path="res://scripts/tiled_body.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://c7jlpvggrsy0p" path="res://assets/tiles/stone.png" id="2_rxxgy"]
 
-[sub_resource type="RectangleShape2D" id="1"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_18pvk"]
+resource_local_to_scene = true
 size = Vector2(32, 896)
 
-[node name="Wall" type="StaticBody2D"]
+[node name="Wall" type="StaticBody2D" unique_id=756775500]
 script = ExtResource("1")
 body_type = "wall"
 length_tiles = 28
 
-[node name="Visual" type="Sprite2D" parent="."]
+[node name="Visual" type="Sprite2D" parent="." unique_id=17073367]
 texture_filter = 1
 texture_repeat = 2
 rotation = 1.5708
-texture = ExtResource("2")
+texture = ExtResource("2_rxxgy")
 region_enabled = true
-region_rect = Rect2(0, 0, 896, 16)
+region_rect = Rect2(0, 0, 896, 32)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("1")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=227647907]
+shape = SubResource("RectangleShape2D_18pvk")

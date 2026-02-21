@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://banbnsurllhhs"]
 
 [ext_resource type="Script" uid="uid://dldckewkoe0oc" path="res://scripts/tiled_body.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://chcknj0nh57jb" path="res://assets/tiles/platform_palette_blue.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://c7jlpvggrsy0p" path="res://assets/tiles/stone.png" id="2_8sau4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lr1lr"]
 resource_local_to_scene = true
@@ -15,7 +15,7 @@ length_tiles = 69
 [node name="Visual" type="Sprite2D" parent="." unique_id=1164033700]
 texture_filter = 1
 texture_repeat = 2
-texture = ExtResource("2")
+texture = ExtResource("2_8sau4")
 region_enabled = true
 region_rect = Rect2(0, 0, 2208, 32)
 

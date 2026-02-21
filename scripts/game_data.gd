@@ -308,6 +308,18 @@ func is_level_completed(world: int, level: int) -> bool:
 	return completed_levels.has(level_key(world, level))
 
 func get_level_scene(world: int, level: int) -> String:
+	if world == 1:
+		match level:
+			1:
+				return "res://scenes/levels/test/test_level_1.tscn"
+			2:
+				return "res://scenes/levels/test/test_level_2.tscn"
+			3:
+				return "res://scenes/levels/test/test_level_3.tscn"
+			4:
+				return "res://scenes/levels/test/test_level_4.tscn"
+			5:
+				return "res://scenes/levels/test/test_level_5.tscn"
 	var cycle := [
 		"res://scenes/levels/world_1/Level_1_1.tscn",
 		"res://scenes/levels/test/MainLevel.tscn",
