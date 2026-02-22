@@ -24,6 +24,7 @@ const AMULET_ICON_MAP := {
 
 var _selected_amulet_id: String = ""
 var _manage_mode: bool = false
+var _equipped_only_mode: bool = false
 var _overlay_mode: bool = false
 var _opened_from_pause_menu: bool = false
 var _embedded_mode: bool = false
@@ -37,6 +38,11 @@ func set_embedded_mode(enabled: bool) -> void:
 	_embedded_mode = enabled
 	if is_inside_tree():
 		_apply_embedded_mode()
+
+func set_equipped_only_mode(enabled: bool) -> void:
+	_equipped_only_mode = enabled
+	if is_inside_tree():
+		_refresh()
 
 func set_compact_mode(_enabled: bool) -> void:
 	if is_inside_tree():
@@ -114,17 +120,22 @@ func _refresh() -> void:
 	slots_section.visible = _manage_mode
 	_clear_owned_list()
 	var owned: Array = gd.call("get_owned_amulets")
+	var equipped: Array = gd.call("get_equipped_amulets")
 	var catalog: Array = gd.call("get_amulet_catalog")
 	var selected_exists := false
 	for entry_variant in catalog:
 		var entry: Dictionary = entry_variant
 		var amulet_id := String(entry.get("id", ""))
-		if not owned.has(amulet_id):
+		var should_show: bool = owned.has(amulet_id)
+		if _equipped_only_mode:
+			should_show = equipped.has(amulet_id)
+		if not should_show:
 			continue
 		selected_exists = selected_exists or amulet_id == _selected_amulet_id
 		_add_owned_button(entry)
 	if not selected_exists:
-		_selected_amulet_id = String(owned[0]) if not owned.is_empty() else ""
+		var fallback_ids: Array = equipped if _equipped_only_mode else owned
+		_selected_amulet_id = String(fallback_ids[0]) if not fallback_ids.is_empty() else ""
 	_update_details(gd)
 	_update_slot_ui(gd)
 

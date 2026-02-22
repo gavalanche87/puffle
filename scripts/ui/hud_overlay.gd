@@ -17,7 +17,8 @@ func _ready() -> void:
 	if pause_button:
 		pause_button.pressed.connect(_on_pause_pressed)
 	if amulets_hud_button:
-		amulets_hud_button.pressed.connect(_on_amulets_hud_pressed)
+		amulets_hud_button.disabled = true
+		amulets_hud_button.mouse_default_cursor_shape = Control.CURSOR_ARROW
 	if complete_level_test_button:
 		complete_level_test_button.pressed.connect(_on_complete_level_test_pressed)
 	if pause_menu:
@@ -71,13 +72,13 @@ func _on_settings_requested() -> void:
 	_open_settings_overlay(true)
 
 func _on_amulets_requested() -> void:
-	_open_character_overlay(true)
+	_open_character_overlay("pause")
 
 func _on_main_menu_requested() -> void:
 	_change_scene_from_pause("res://scenes/ui/MainMenu.tscn")
 
 func _on_amulets_hud_pressed() -> void:
-	_open_character_overlay(false)
+	pass
 
 func _open_pause() -> void:
 	var audio_manager := get_node_or_null("/root/AudioManager")
@@ -108,12 +109,15 @@ func _change_scene_from_pause(path: String) -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file(path)
 
-func _open_character_overlay(from_pause_menu: bool) -> void:
+func _open_character_overlay(context: String) -> void:
 	if _character_overlay != null:
 		return
+	var from_pause_menu: bool = context == "pause"
+	var allow_manage: bool = context == "checkpoint"
+	var equipped_only_lists: bool = context == "pause"
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd and gd.has_method("set_amulet_screen_manage_mode"):
-		gd.call("set_amulet_screen_manage_mode", true)
+		gd.call("set_amulet_screen_manage_mode", allow_manage)
 	var packed: PackedScene = load("res://scenes/ui/CharacterOverlay.tscn") as PackedScene
 	if packed == null:
 		return
@@ -128,6 +132,8 @@ func _open_character_overlay(from_pause_menu: bool) -> void:
 	_character_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
 	if _character_overlay.has_method("set_overlay_mode"):
 		_character_overlay.call("set_overlay_mode", true, from_pause_menu)
+	if _character_overlay.has_method("set_overlay_context"):
+		_character_overlay.call("set_overlay_context", context, allow_manage, equipped_only_lists)
 	if _character_overlay.has_signal("overlay_closed"):
 		_character_overlay.connect("overlay_closed", _on_amulets_overlay_closed)
 	add_child(_character_overlay)
@@ -137,6 +143,9 @@ func _open_character_overlay(from_pause_menu: bool) -> void:
 	if audio_manager and audio_manager.has_method("pause_level_music"):
 		audio_manager.call("pause_level_music")
 	get_tree().paused = true
+
+func open_character_overlay_from_checkpoint() -> void:
+	_open_character_overlay("checkpoint")
 
 func _open_settings_overlay(from_pause_menu: bool) -> void:
 	if _settings_overlay != null:

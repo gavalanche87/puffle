@@ -17,6 +17,8 @@ const SCENE_WEAPONS_OVERLAY := preload("res://scenes/ui/WeaponsOverlay.tscn")
 var _overlay_mode: bool = false
 var _opened_from_pause_menu: bool = false
 var _manage_mode: bool = false
+var _equipped_only_lists: bool = false
+var _overlay_context: String = ""
 var _current_tab: String = "amulets"
 var _current_view: Control = null
 const TAB_OUTLINE_WEAPONS := Color(0.113725, 0.701961, 0.482353, 1.0) # #1db37b
@@ -26,14 +28,16 @@ const TAB_OUTLINE_ABILITIES := Color(0.980392, 0.513725, 0.203922, 1.0) # #fa833
 func set_overlay_mode(enabled: bool, from_pause_menu: bool) -> void:
 	_overlay_mode = enabled
 	_opened_from_pause_menu = from_pause_menu
-	if enabled:
-		_manage_mode = true
+
+func set_overlay_context(context: String, allow_manage: bool, equipped_only_lists: bool) -> void:
+	_overlay_context = context
+	_manage_mode = allow_manage
+	_equipped_only_lists = equipped_only_lists
 
 func _ready() -> void:
 	super._ready()
 	if _is_hud_overlay_context():
 		_overlay_mode = true
-		_manage_mode = true
 	var gd: Node = get_node_or_null("/root/GameData")
 	if (not _manage_mode) and gd and gd.has_method("get_amulet_screen_manage_mode"):
 		_manage_mode = bool(gd.call("get_amulet_screen_manage_mode"))
@@ -95,6 +99,8 @@ func _show_tab(tab_id: String) -> void:
 		_current_view.call("set_compact_mode", _overlay_mode or _is_hud_overlay_context())
 	if _current_view.has_method("set_manage_mode"):
 		_current_view.call("set_manage_mode", _manage_mode)
+	if _current_view.has_method("set_equipped_only_mode"):
+		_current_view.call("set_equipped_only_mode", _equipped_only_lists)
 	_current_view.anchor_left = 0.0
 	_current_view.anchor_top = 0.0
 	_current_view.anchor_right = 1.0

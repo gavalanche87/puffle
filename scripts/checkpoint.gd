@@ -39,7 +39,10 @@ func _process(_delta: float) -> void:
 	if _is_popup_open():
 		return
 	if Input.is_action_just_pressed("interact"):
-		_open_activation_popup()
+		if is_active_checkpoint:
+			_open_checkpoint_menu_popup()
+		else:
+			_open_activation_popup()
 
 func _on_body_entered(body: Node) -> void:
 	if body == null or not body.is_in_group("player"):
@@ -55,8 +58,6 @@ func _on_body_exited(body: Node) -> void:
 		_set_prompt_visible(false)
 
 func _open_activation_popup() -> void:
-	if is_active_checkpoint:
-		return
 	var popup_node: Control = _ensure_popup()
 	if popup_node == null:
 		return
@@ -66,6 +67,16 @@ func _open_activation_popup() -> void:
 		can_afford = bool(game_data.call("can_afford", "coins", activation_cost_coins))
 	if popup_node.has_method("setup_for_cost"):
 		popup_node.call("setup_for_cost", activation_cost_coins, can_afford)
+	if popup_node.has_method("open_popup"):
+		popup_node.call_deferred("open_popup")
+	_set_prompt_visible(false)
+
+func _open_checkpoint_menu_popup() -> void:
+	var popup_node: Control = _ensure_popup()
+	if popup_node == null:
+		return
+	if popup_node.has_method("setup_for_menu"):
+		popup_node.call("setup_for_menu")
 	if popup_node.has_method("open_popup"):
 		popup_node.call_deferred("open_popup")
 	_set_prompt_visible(false)
@@ -103,6 +114,8 @@ func _ensure_popup() -> Control:
 		popup.connect("activate_requested", Callable(self, "_on_popup_activate_requested"))
 	if popup.has_signal("cancelled") and not popup.is_connected("cancelled", Callable(self, "_on_popup_cancelled")):
 		popup.connect("cancelled", Callable(self, "_on_popup_cancelled"))
+	if popup.has_signal("loadout_requested") and not popup.is_connected("loadout_requested", Callable(self, "_on_popup_loadout_requested")):
+		popup.connect("loadout_requested", Callable(self, "_on_popup_loadout_requested"))
 	if popup.has_signal("closed") and not popup.is_connected("closed", Callable(self, "_on_popup_closed")):
 		popup.connect("closed", Callable(self, "_on_popup_closed"))
 	return popup
@@ -122,6 +135,13 @@ func _on_popup_activate_requested() -> void:
 
 func _on_popup_cancelled() -> void:
 	_set_prompt_visible(player_in_range != null and is_instance_valid(player_in_range))
+
+func _on_popup_loadout_requested() -> void:
+	if popup and popup.has_method("close_popup"):
+		popup.call("close_popup")
+	var hud := _find_hud_overlay()
+	if hud and hud.has_method("open_character_overlay_from_checkpoint"):
+		hud.call_deferred("open_character_overlay_from_checkpoint")
 
 func _on_popup_closed() -> void:
 	_set_prompt_visible(player_in_range != null and is_instance_valid(player_in_range))
@@ -170,7 +190,7 @@ func _update_visuals() -> void:
 		_start_glow_pulse()
 	else:
 		_stop_glow_pulse()
-	_set_prompt_visible(player_in_range != null and is_instance_valid(player_in_range) and not is_active_checkpoint and not _is_popup_open())
+	_set_prompt_visible(player_in_range != null and is_instance_valid(player_in_range) and not _is_popup_open())
 
 func _start_glow_pulse() -> void:
 	if glow_top == null:
@@ -227,3 +247,11 @@ func _play_checkpoint_activate_sfx() -> void:
 	var sfx := player_node.get_node_or_null("SfxItemLand") as AudioStreamPlayer
 	if sfx and sfx.stream:
 		sfx.play()
+
+func _find_hud_overlay() -> Node:
+	var current_scene := get_tree().current_scene
+	if current_scene:
+		var hud_node := current_scene.get_node_or_null("HUD")
+		if hud_node:
+			return hud_node
+	return get_tree().get_first_node_in_group("hud")

@@ -24,6 +24,7 @@ const WEAPON_ICON_MAP := {
 
 var _selected_weapon_id: String = ""
 var _manage_mode: bool = false
+var _equipped_only_mode: bool = false
 var _embedded_mode: bool = false
 
 func set_manage_mode(enabled: bool) -> void:
@@ -35,6 +36,11 @@ func set_embedded_mode(enabled: bool) -> void:
 	_embedded_mode = enabled
 	if is_inside_tree():
 		_apply_embedded_mode()
+
+func set_equipped_only_mode(enabled: bool) -> void:
+	_equipped_only_mode = enabled
+	if is_inside_tree():
+		_refresh()
 
 func set_compact_mode(_enabled: bool) -> void:
 	if is_inside_tree():
@@ -95,17 +101,24 @@ func _refresh() -> void:
 	slots_section.visible = _manage_mode
 	_clear_owned_list()
 	var owned: Array = gd.call("get_owned_weapons")
+	var equipped_id: String = String(gd.call("get_equipped_weapon"))
 	var catalog: Array = gd.call("get_weapon_catalog")
 	var selected_exists := false
 	for entry_variant in catalog:
 		var entry: Dictionary = entry_variant
 		var weapon_id := String(entry.get("id", ""))
-		if not owned.has(weapon_id):
+		var should_show: bool = owned.has(weapon_id)
+		if _equipped_only_mode:
+			should_show = (weapon_id == equipped_id and weapon_id != "")
+		if not should_show:
 			continue
 		selected_exists = selected_exists or weapon_id == _selected_weapon_id
 		_add_owned_button(entry)
 	if not selected_exists:
-		_selected_weapon_id = String(owned[0]) if not owned.is_empty() else ""
+		if _equipped_only_mode:
+			_selected_weapon_id = equipped_id
+		else:
+			_selected_weapon_id = String(owned[0]) if not owned.is_empty() else ""
 	_update_details(gd)
 	_update_slot_ui(gd)
 
