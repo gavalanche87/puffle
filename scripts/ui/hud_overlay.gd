@@ -1,4 +1,5 @@
 extends CanvasLayer
+const PLAYER_SCRIPT := preload("res://scripts/player.gd")
 
 @onready var pause_button: Button = $PauseButton
 @onready var complete_level_test_button: Button = $CompleteLevelTestButton
@@ -7,6 +8,8 @@ extends CanvasLayer
 
 var _character_overlay: Control = null
 var _character_overlay_from_pause: bool = false
+var _settings_overlay: Control = null
+var _settings_overlay_from_pause: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -33,6 +36,13 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
+		if _settings_overlay:
+			var from_pause: bool = _settings_overlay_from_pause
+			_close_settings_overlay(false)
+			if from_pause and not _is_pause_open():
+				_open_pause()
+			get_viewport().set_input_as_handled()
+			return
 		if _character_overlay:
 			_close_character_overlay(not _character_overlay_from_pause)
 			if _character_overlay_from_pause and not _is_pause_open():
@@ -58,7 +68,7 @@ func _on_resume_requested() -> void:
 	_close_pause()
 
 func _on_settings_requested() -> void:
-	_change_scene_from_pause("res://scenes/ui/Settings.tscn")
+	_open_settings_overlay(true)
 
 func _on_amulets_requested() -> void:
 	_open_character_overlay(true)
@@ -89,6 +99,12 @@ func _is_pause_open() -> bool:
 
 func _change_scene_from_pause(path: String) -> void:
 	_close_character_overlay(false)
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data and game_data.has_method("is_level_flow_active") and game_data.has_method("exit_level_flow"):
+		if bool(game_data.call("is_level_flow_active")):
+			game_data.call("exit_level_flow")
+	if PLAYER_SCRIPT:
+		PLAYER_SCRIPT.clear_checkpoint_runtime_state()
 	get_tree().paused = false
 	get_tree().change_scene_to_file(path)
 
@@ -122,6 +138,47 @@ func _open_character_overlay(from_pause_menu: bool) -> void:
 		audio_manager.call("pause_level_music")
 	get_tree().paused = true
 
+func _open_settings_overlay(from_pause_menu: bool) -> void:
+	if _settings_overlay != null:
+		return
+	var packed: PackedScene = load("res://scenes/ui/Settings.tscn") as PackedScene
+	if packed == null:
+		return
+	var instance: Node = packed.instantiate()
+	var screen: Control = instance as Control
+	if screen == null:
+		if instance:
+			instance.queue_free()
+		return
+	_settings_overlay = screen
+	_settings_overlay_from_pause = from_pause_menu
+	_settings_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
+	if _settings_overlay.has_method("set_overlay_mode"):
+		_settings_overlay.call("set_overlay_mode", true, from_pause_menu)
+	if _settings_overlay.has_signal("overlay_closed"):
+		_settings_overlay.connect("overlay_closed", _on_settings_overlay_closed)
+	add_child(_settings_overlay)
+	if from_pause_menu and _is_pause_open():
+		if pause_menu and pause_menu.has_method("close_popup"):
+			pause_menu.call("close_popup")
+	get_tree().paused = true
+
+func _on_settings_overlay_closed(from_pause_menu: bool) -> void:
+	_close_settings_overlay(not from_pause_menu)
+	if from_pause_menu and not _is_pause_open():
+		_open_pause()
+
+func _close_settings_overlay(resume_game: bool) -> void:
+	if _settings_overlay:
+		_settings_overlay.queue_free()
+		_settings_overlay = null
+	if resume_game:
+		get_tree().paused = false
+		var audio_manager := get_node_or_null("/root/AudioManager")
+		if audio_manager and audio_manager.has_method("resume_level_music"):
+			audio_manager.call("resume_level_music")
+	_settings_overlay_from_pause = false
+
 func _on_amulets_overlay_closed(from_pause_menu: bool) -> void:
 	_close_character_overlay(not from_pause_menu)
 	_refresh_player_amulet_state()
@@ -132,6 +189,9 @@ func _close_character_overlay(resume_game: bool) -> void:
 	if _character_overlay:
 		_character_overlay.queue_free()
 		_character_overlay = null
+	if _settings_overlay:
+		_settings_overlay.queue_free()
+		_settings_overlay = null
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd and gd.has_method("set_amulet_screen_manage_mode"):
 		gd.call("set_amulet_screen_manage_mode", false)
@@ -154,6 +214,8 @@ func _simulate_level_complete() -> void:
 	var game_data: Node = get_node_or_null("/root/GameData")
 	if game_data and game_data.has_method("complete_current_level"):
 		game_data.call("complete_current_level")
+	if PLAYER_SCRIPT:
+		PLAYER_SCRIPT.clear_checkpoint_runtime_state()
 	if game_data and game_data.has_method("is_level_flow_active") and game_data.call("is_level_flow_active"):
 		game_data.call("exit_level_flow")
 		get_tree().change_scene_to_file("res://scenes/ui/LevelSelect.tscn")

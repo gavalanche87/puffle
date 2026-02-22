@@ -1,10 +1,19 @@
 extends "res://scripts/ui/menu_transitions.gd"
 
+signal overlay_closed(from_pause_menu: bool)
+
 @onready var back_button: Button = $Layout/VBox/Header/BackButton
 @onready var music_slider: HSlider = $Layout/VBox/ContentPanel/Content/MusicRow/MusicSlider
 @onready var sfx_slider: HSlider = $Layout/VBox/ContentPanel/Content/SfxRow/SfxSlider
 @onready var music_value: Label = $Layout/VBox/ContentPanel/Content/MusicRow/MusicValue
 @onready var sfx_value: Label = $Layout/VBox/ContentPanel/Content/SfxRow/SfxValue
+
+var _overlay_mode: bool = false
+var _opened_from_pause_menu: bool = false
+
+func set_overlay_mode(enabled: bool, from_pause_menu: bool = false) -> void:
+	_overlay_mode = enabled
+	_opened_from_pause_menu = from_pause_menu
 
 func _ready() -> void:
 	super._ready()
@@ -22,6 +31,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_go_back()
 
 func _go_back() -> void:
+	if _overlay_mode:
+		emit_signal("overlay_closed", _opened_from_pause_menu)
+		return
 	go_to_scene("res://scenes/ui/MainMenu.tscn")
 
 func _on_music_changed(value: float) -> void:

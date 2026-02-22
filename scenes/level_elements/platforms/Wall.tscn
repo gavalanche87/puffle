@@ -11,14 +11,18 @@ size = Vector2(32, 896)
 script = ExtResource("1")
 body_type = "wall"
 length_tiles = 28
+visual_offset = Vector2(16, 0)
+collision_offset = Vector2(16, 0)
 
 [node name="Visual" type="Sprite2D" parent="." unique_id=17073367]
 texture_filter = 1
 texture_repeat = 2
+position = Vector2(16, 0)
 rotation = 1.5708
 texture = ExtResource("2_rxxgy")
 region_enabled = true
 region_rect = Rect2(0, 0, 896, 32)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=227647907]
+position = Vector2(16, 0)
 shape = SubResource("RectangleShape2D_18pvk")

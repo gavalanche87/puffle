@@ -21,6 +21,7 @@ const ABILITY_HEADBUTT := "headbutt"
 const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 const WEAPON_HEAD_SPIKE := "head_spike"
 const MUSIC_TRACK_LEVEL_1 := "level_music_1"
+const PLAYER_SCRIPT := preload("res://scripts/player.gd")
 
 var coins: int = 0
 var tokens: int = 3
@@ -344,6 +345,8 @@ func exit_level_flow() -> void:
 	level_flow_active = false
 	current_world = 0
 	current_level = 0
+	if PLAYER_SCRIPT:
+		PLAYER_SCRIPT.clear_checkpoint_runtime_state()
 
 func complete_current_level() -> void:
 	if current_world <= 0 or current_level <= 0:

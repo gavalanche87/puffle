@@ -1,17 +1,19 @@
 [gd_scene format=3 uid="uid://b7ira8hhennd3"]
 
 [ext_resource type="Script" uid="uid://yfay2d8t3adt" path="res://scripts/goal.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dseyka8bb486m" path="res://assets/items/bullet1.png" id="2_sos67"]
+[ext_resource type="Texture2D" uid="uid://ckfrt2e6mlmq4" path="res://assets/level_elements/level_end_portal.png" id="2_vyvws"]
 
 [sub_resource type="RectangleShape2D" id="1"]
-size = Vector2(24, 32)
+size = Vector2(16, 16)
 
 [node name="Goal" type="Area2D" unique_id=611772022]
 script = ExtResource("1")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=130894383]
+z_index = -30
 position = Vector2(16, 16)
-texture = ExtResource("2_sos67")
+scale = Vector2(2, 2)
+texture = ExtResource("2_vyvws")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1047593668]
 position = Vector2(16, 16)

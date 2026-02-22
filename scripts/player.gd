@@ -48,11 +48,13 @@ const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 @export var flip_energy_reward: int = 5
 @export var flip_reward_pickup_count_per_spin: int = 1
 @export var flips_per_energy_reward: int = 5
-@export var double_jump_energy_cost: int = 15
-@export var wall_jump_energy_cost: int = 5
+@export var double_jump_energy_cost: int = 6
+@export var wall_jump_energy_cost: int = 6
+@export var energy_regen_per_second: float = 1.0
 @export var death_anim_time: float = 0.4
 @export var death_fade_time: float = 0.22
 @export var xp_growth_multiplier: float = 1.25
+@export var respawn_coin_cost: int = 2
 
 var mode: PlayerMode = PlayerMode.SMALL
 var damage_multiplier: float = 1.0
@@ -77,6 +79,7 @@ var damage_multiplier: float = 1.0
 @export var run_sfx_volume_db_big: float = -8.0
 var current_health: int = max_health
 var current_energy: int = max_energy
+var energy_regen_accumulator: float = 0.0
 var damage_cooldown_timer: float = 0.0
 @export var grounded_grace: float = 0.08
 var grounded_timer: float = 0.0
@@ -110,6 +113,10 @@ var headbutt_hit_targets: Dictionary = {}
 static var pending_coin_restore: bool = false
 static var stored_coin_balance: int = 0
 static var pending_fade_in: bool = false
+static var checkpoint_scene_path: String = ""
+static var checkpoint_key: String = ""
+static var checkpoint_spawn_position: Vector2 = Vector2.ZERO
+static var pending_respawn_coin_cost_notice: int = 0
 
 
 var health_bar_bg: Control
@@ -143,6 +150,7 @@ var consumable_buttons_bound: bool = false
 @onready var energy_item_scene: PackedScene = preload("res://scenes/items/EnergyItem.tscn")
 @onready var hud_font: Font = preload("res://assets/fonts/gemunu-libre-v8-latin-700.ttf")
 @onready var amulet_icon_leap_of_faith: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
+@onready var spawn_portal_texture: Texture2D = preload("res://assets/player/player_spawn_portal.png")
 @onready var hurtbox: Area2D = $Hurtbox
 @onready var body_collision: CollisionShape2D = $CollisionShape2D
 @onready var sfx_jump: AudioStreamPlayer = $SfxJump
@@ -155,7 +163,7 @@ var consumable_buttons_bound: bool = false
 @onready var sfx_land: AudioStreamPlayer = $SfxLand
 @onready var sfx_wall_slide: AudioStreamPlayer = $SfxWallSlide
 @onready var sfx_run: AudioStreamPlayer = $SfxRun
-@onready var sfx_headbutt: AudioStreamPlayer = $SfxHeadbutt
+@onready var sfx_headbutt: AudioStreamPlayer = get_node_or_null("SfxHeadbutt") as AudioStreamPlayer
 @onready var camera: Camera2D = $Camera2D
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var head_attachment: Node2D = $AnimatedSprite2D/Head_Attachment
@@ -194,6 +202,9 @@ func _ready() -> void:
 	if game_data and game_data.has_signal("inventory_changed"):
 		if not game_data.inventory_changed.is_connected(_refresh_consumable_ui):
 			game_data.inventory_changed.connect(_refresh_consumable_ui)
+	if game_data and game_data.has_signal("currencies_changed"):
+		if not game_data.currencies_changed.is_connected(_on_currencies_changed):
+			game_data.currencies_changed.connect(_on_currencies_changed)
 	if game_data and game_data.has_signal("amulets_changed"):
 		if not game_data.amulets_changed.is_connected(_refresh_amulet_state):
 			game_data.amulets_changed.connect(_refresh_amulet_state)
@@ -211,6 +222,8 @@ func _ready() -> void:
 	_update_coins_ui()
 	_refresh_consumable_ui()
 	spawn_position = global_position
+	_apply_checkpoint_spawn_if_available()
+	_show_pending_respawn_coin_notice()
 	_ensure_unique_collision_shapes()
 	mode = PlayerMode.SMALL
 	if sprite:
@@ -250,7 +263,7 @@ func _ready() -> void:
 	if sfx_switch:
 		sfx_switch.volume_db = size_shift_sfx_gain_db
 	_refresh_amulet_state()
-	_play_spawn_pop_tween()
+	call_deferred("_play_spawn_sequence")
 	if pending_fade_in:
 		pending_fade_in = false
 		call_deferred("_fade_in_from_black")
@@ -295,6 +308,7 @@ func _physics_process(delta: float) -> void:
 		run_sfx_timer -= delta
 	if knockback_velocity != 0.0:
 		knockback_velocity = move_toward(knockback_velocity, 0.0, knockback_decay * delta)
+	_process_energy_regen(delta)
 
 	var input_dir := 0.0
 	if input_lock_timer <= 0.0:
@@ -504,6 +518,41 @@ func _play_spawn_pop_tween() -> void:
 	tween.tween_property(sprite, "scale", base_scale * 1.15, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.chain().tween_property(sprite, "scale", base_scale, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
+func _play_spawn_sequence() -> void:
+	if sprite:
+		sprite.modulate.a = 0.0
+	await _play_spawn_portal_effect(global_position)
+	_play_spawn_pop_tween()
+
+func _play_spawn_portal_effect(world_pos: Vector2) -> void:
+	if spawn_portal_texture == null:
+		return
+	var root := get_tree().current_scene
+	if root == null:
+		return
+	var portal := Sprite2D.new()
+	portal.texture = spawn_portal_texture
+	portal.global_position = world_pos + Vector2(0.0, 6.0)
+	portal.z_index = -40
+	portal.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	portal.scale = Vector2(0.5, 0.5)
+	root.add_child(portal)
+	_play_sfx(sfx_switch)
+	if sprite:
+		sprite.modulate.a = 0.0
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(portal, "scale", Vector2(4.0, 4.0), 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(portal, "rotation", TAU, 0.5).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
+	await tween.finished
+	if sprite:
+		sprite.modulate.a = 1.0
+	var fade := create_tween().set_parallel(true)
+	fade.tween_property(portal, "scale", Vector2(0.5, 0.5), 0.42).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	fade.tween_property(portal, "rotation", portal.rotation + TAU, 0.42).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
+	await fade.finished
+	if is_instance_valid(portal):
+		portal.queue_free()
+
 func respawn_from_kill_plane(damage_amount: int = 30) -> void:
 	if is_dying or is_killplane_respawning:
 		return
@@ -521,6 +570,9 @@ func respawn_from_kill_plane(damage_amount: int = 30) -> void:
 	grounded_timer = 0.0
 	air_time = 0.0
 	_reset_sprite_rotation()
+	if sprite:
+		sprite.modulate.a = 0.0
+	await _play_spawn_portal_effect(global_position)
 	_play_spawn_pop_tween()
 	if fade_rect:
 		var fade_in := create_tween()
@@ -530,6 +582,7 @@ func respawn_from_kill_plane(damage_amount: int = 30) -> void:
 		if fade_layer:
 			fade_layer.queue_free()
 	damage_cooldown_timer = 0.0
+	_charge_respawn_cost_and_notify(global_position)
 	take_damage(float(damage_amount))
 	is_killplane_respawning = false
 
@@ -553,6 +606,7 @@ func _ensure_toggle_action() -> void:
 	_ensure_action_has_key("consumable_next", KEY_E)
 	_ensure_action_has_key("consumable_use", KEY_W)
 	_ensure_action_has_key("headbutt", KEY_C)
+	_ensure_action_has_key("interact", KEY_G)
 
 func _ensure_action_has_key(action_name: String, keycode: Key) -> void:
 	if not InputMap.has_action(action_name):
@@ -677,6 +731,25 @@ func _update_energy_ui() -> void:
 	else:
 		print("Energy: %d/%d" % [current_energy, max_energy])
 
+func _process_energy_regen(delta: float) -> void:
+	if delta <= 0.0:
+		return
+	if current_energy >= max_energy:
+		energy_regen_accumulator = 0.0
+		return
+	var regen_rate := _current_energy_regen_rate()
+	if regen_rate <= 0.0:
+		return
+	energy_regen_accumulator += regen_rate * delta
+	var regen_amount: int = int(floor(energy_regen_accumulator))
+	if regen_amount <= 0:
+		return
+	energy_regen_accumulator -= float(regen_amount)
+	var prev_energy := current_energy
+	current_energy = min(max_energy, current_energy + regen_amount)
+	if current_energy != prev_energy:
+		_update_energy_ui()
+
 func _add_coins(amount: int, play_sound: bool = true) -> void:
 	if amount <= 0:
 		return
@@ -724,6 +797,46 @@ func _spawn_floating_text_with_item(
 		fx.call("setup_with_item_scene", text, color, item_scene, spawn_pos, icon_scale, hide_backings)
 	else:
 		fx.call("setup", text, color, null, spawn_pos)
+
+func _show_pending_respawn_coin_notice() -> void:
+	if pending_respawn_coin_cost_notice <= 0:
+		return
+	var charged: int = pending_respawn_coin_cost_notice
+	pending_respawn_coin_cost_notice = 0
+	_spawn_respawn_cost_text(charged)
+
+func _spawn_respawn_cost_text(charged_amount: int) -> void:
+	if charged_amount <= 0:
+		return
+	_spawn_floating_text_with_item(
+		"- %d Coins" % charged_amount,
+		Color(0.98039216, 0.972549, 0.6745098, 1.0),
+		coin_item_scene,
+		global_position + Vector2(0.0, -12.0),
+		Color(0.79607844, 0.68235296, 0.14509805, 1.0),
+		8,
+		1.0,
+		true
+	)
+
+func _charge_respawn_cost_and_notify(world_pos: Vector2 = Vector2.INF) -> int:
+	if respawn_coin_cost <= 0:
+		return 0
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null or not game_data.has_method("get_balance") or not game_data.has_method("add_currency"):
+		return 0
+	var balance: int = int(game_data.call("get_balance", "coins"))
+	var charged: int = mini(balance, respawn_coin_cost)
+	if charged <= 0:
+		return 0
+	game_data.call("add_currency", "coins", -charged)
+	_pull_coins_from_game_data()
+	_update_coins_ui()
+	if world_pos == Vector2.INF:
+		pending_respawn_coin_cost_notice = charged
+	else:
+		_spawn_respawn_cost_text(charged)
+	return charged
 
 func _spawn_screen_text(text: String, color: Color, screen_offset: Vector2, relative_to_player: bool = false, outline_color: Color = Color(0, 0, 0, 0), outline_size: int = 0) -> void:
 	if not floating_text_scene:
@@ -1134,6 +1247,10 @@ func _pull_coins_from_game_data() -> void:
 	if game_data.has_method("get_balance"):
 		coins = int(game_data.call("get_balance", "coins"))
 
+func _on_currencies_changed() -> void:
+	_pull_coins_from_game_data()
+	_update_coins_ui()
+
 func _pull_xp_from_game_data() -> void:
 	var game_data: Node = get_node_or_null("/root/GameData")
 	if game_data == null:
@@ -1160,6 +1277,36 @@ func _sync_xp_to_game_data() -> void:
 		return
 	if game_data.has_method("set_xp_state"):
 		game_data.call("set_xp_state", xp_level, xp_current, xp_to_next_level)
+
+func _apply_checkpoint_spawn_if_available() -> void:
+	var current_scene: Node = get_tree().current_scene
+	if current_scene == null:
+		return
+	var scene_path := String(current_scene.scene_file_path)
+	if scene_path == "":
+		return
+	if checkpoint_scene_path != scene_path:
+		return
+	spawn_position = checkpoint_spawn_position
+	global_position = checkpoint_spawn_position
+
+func set_active_checkpoint_respawn(world_position: Vector2, key: String) -> void:
+	spawn_position = world_position
+	var current_scene: Node = get_tree().current_scene
+	if current_scene:
+		checkpoint_scene_path = String(current_scene.scene_file_path)
+	checkpoint_key = key
+	checkpoint_spawn_position = world_position
+
+static func get_active_checkpoint_key_for_scene(scene_path: String) -> String:
+	if checkpoint_scene_path != scene_path:
+		return ""
+	return checkpoint_key
+
+static func clear_checkpoint_runtime_state() -> void:
+	checkpoint_scene_path = ""
+	checkpoint_key = ""
+	checkpoint_spawn_position = Vector2.ZERO
 
 func _set_frames(frames: SpriteFrames) -> void:
 	if not sprite or not frames:
@@ -1458,7 +1605,16 @@ func _wall_jump() -> bool:
 	return true
 
 func _current_wall_jump_energy_cost() -> int:
-	return maxi(1, int(floor(float(wall_jump_energy_cost) * 0.5)))
+	return maxi(1, wall_jump_energy_cost)
+
+func _current_energy_regen_rate() -> float:
+	return maxf(0.0, energy_regen_per_second * _energy_regen_multiplier_from_amulets())
+
+func _energy_regen_multiplier_from_amulets() -> float:
+	var mult := 1.0
+	# Hook for future amulets that improve stamina/energy regeneration.
+	# Keep additive/multiplicative logic centralized here.
+	return mult
 
 func _try_start_headbutt() -> void:
 	if is_dying or is_headbutting:
@@ -1485,6 +1641,10 @@ func _try_start_headbutt() -> void:
 		sfx_headbutt.stop()
 		sfx_headbutt.play()
 	if sprite:
+		# Big-mode mid-air can leave flip_v=true, which inverts the headbutt visual.
+		# Clear vertical flip so headbutt orientation matches small-mode behavior.
+		sprite.flip_v = false
+		_update_head_attachment_transform()
 		sprite.rotation = _current_headbutt_rotation()
 
 func _end_headbutt() -> void:
@@ -1562,6 +1722,7 @@ func _start_death_sequence() -> void:
 		var fade_tween := create_tween()
 		fade_tween.tween_property(fade_rect, "color:a", 1.0, death_fade_time).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
 		await fade_tween.finished
+	_charge_respawn_cost_and_notify(Vector2.INF)
 	stored_coin_balance = coins
 	pending_coin_restore = true
 	pending_fade_in = true

@@ -7,13 +7,14 @@
 [ext_resource type="Texture2D" uid="uid://c7tffwc222mk2" path="res://assets/backgrounds/background_1.png" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="8"]
 [ext_resource type="PackedScene" uid="uid://dnhg3sd3vvwvj" path="res://scenes/enemies/GreenEnemy.tscn" id="9"]
+[ext_resource type="PackedScene" uid="uid://civo2w33n3ek3" path="res://scenes/level_elements/Checkpoint.tscn" id="checkpoint_scene"]
 [ext_resource type="PackedScene" uid="uid://m5v7kkve38uv" path="res://scenes/level_elements/platforms/DestroyablePlatform.tscn" id="destroyable_platform_scene"]
 [ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/level_elements/platforms/Ground.tscn" id="ground_scene"]
 [ext_resource type="PackedScene" path="res://scenes/hazards/HazardSaw.tscn" id="hazard_saw_scene"]
 [ext_resource type="Script" uid="uid://ci2l63nm7wph7" path="res://scripts/level_camera_setup.gd" id="level_camera_setup_script"]
 [ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/level_elements/platforms/Platform.tscn" id="platform_scene"]
-[ext_resource type="PackedScene" path="res://scenes/level_elements/platforms/Wall.tscn" id="wall_scene"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/WallSlime.tscn" id="wall_slime_scene"]
+[ext_resource type="PackedScene" uid="uid://gni2n50y2lud" path="res://scenes/level_elements/platforms/Wall.tscn" id="wall_scene"]
+[ext_resource type="PackedScene" uid="uid://kxgu7g0bhh5l" path="res://scenes/enemies/WallSlime.tscn" id="wall_slime_scene"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(3200, 30.00003)
@@ -39,25 +40,23 @@ stretch_mode = 6
 [node name="World" type="Node2D" parent="." unique_id=1358519409]
 
 [node name="Player" parent="World" unique_id=693069414 instance=ExtResource("1")]
-position = Vector2(-201.72534, 532.55676)
+position = Vector2(-224, 672)
 
 [node name="Platforms" type="Node2D" parent="World" unique_id=197979092]
 
 [node name="Ground" parent="World/Platforms" unique_id=1453284424 instance=ExtResource("ground_scene")]
-position = Vector2(0, 768)
+position = Vector2(0, 800)
 length_tiles = 33
-visual_offset = Vector2(16, 16)
-collision_offset = Vector2(16, 16)
 
 [node name="PlatformA" parent="World/Platforms" unique_id=1990171567 instance=ExtResource("platform_scene")]
 position = Vector2(-416, 576)
 
 [node name="PlatformB" parent="World/Platforms" unique_id=11692420 instance=ExtResource("platform_scene")]
-position = Vector2(-128, 480)
+position = Vector2(-176, 480)
 length_tiles = 6
 
 [node name="PlatformC" parent="World/Platforms" unique_id=439982880 instance=ExtResource("platform_scene")]
-position = Vector2(128, 384)
+position = Vector2(64, 384)
 length_tiles = 4
 
 [node name="PlatformD" parent="World/Platforms" unique_id=1262079969 instance=ExtResource("platform_scene")]
@@ -65,14 +64,14 @@ position = Vector2(-320, 288)
 length_tiles = 8
 
 [node name="PlatformE" parent="World/Platforms" unique_id=580559711 instance=ExtResource("platform_scene")]
-position = Vector2(32, 224)
+position = Vector2(16, 224)
 length_tiles = 4
 
 [node name="DestroyablePlatformA" parent="World/Platforms" unique_id=173608242 instance=ExtResource("destroyable_platform_scene")]
-position = Vector2(192, 160)
+position = Vector2(208, 160)
 
 [node name="DestroyablePlatformB" parent="World/Platforms" unique_id=1129467499 instance=ExtResource("destroyable_platform_scene")]
-position = Vector2(192, 608)
+position = Vector2(208, 608)
 
 [node name="PlatformF" parent="World/Platforms" unique_id=635516944 instance=ExtResource("platform_scene")]
 position = Vector2(-224, 128)
@@ -83,7 +82,7 @@ position = Vector2(128, 32)
 length_tiles = 4
 
 [node name="PlatformH" parent="World/Platforms" unique_id=1260171501 instance=ExtResource("platform_scene")]
-position = Vector2(-64, -96)
+position = Vector2(-80, -96)
 length_tiles = 8
 
 [node name="PlatformI" parent="World/Platforms" unique_id=1177325464 instance=ExtResource("platform_scene")]
@@ -91,7 +90,7 @@ position = Vector2(224, -128)
 length_tiles = 3
 
 [node name="PlatformJ" parent="World/Platforms" unique_id=1734530166 instance=ExtResource("platform_scene")]
-position = Vector2(-320, -256)
+position = Vector2(-336, -256)
 length_tiles = 6
 
 [node name="PlatformK" parent="World/Platforms" unique_id=123274068 instance=ExtResource("platform_scene")]
@@ -119,7 +118,7 @@ position = Vector2(224, -1408)
 length_tiles = 4
 
 [node name="DestroyablePlatformE" parent="World/Platforms" unique_id=1616698182 instance=ExtResource("destroyable_platform_scene")]
-position = Vector2(-64, -1600)
+position = Vector2(-48, -1600)
 length_tiles = 5
 
 [node name="PlatformO" parent="World/Platforms" unique_id=1117589883 instance=ExtResource("platform_scene")]
@@ -159,8 +158,8 @@ position = Vector2(-64, -3328)
 length_tiles = 5
 
 [node name="PlatformT" parent="World/Platforms" unique_id=2111407482 instance=ExtResource("platform_scene")]
-position = Vector2(224, -3520)
-length_tiles = 4
+position = Vector2(208, -3520)
+length_tiles = 10
 
 [node name="DestroyablePlatformJ" parent="World/Platforms" unique_id=1624706127 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(-320, -3712)
@@ -187,13 +186,13 @@ position = Vector2(192, -4672)
 length_tiles = 4
 
 [node name="CeilingPlatform" parent="World/Platforms" unique_id=1933199367 instance=ExtResource("platform_scene")]
-position = Vector2(0, -4960)
+position = Vector2(-32, -4960)
 length_tiles = 33
 
 [node name="Walls" type="Node2D" parent="World" unique_id=1218809112]
 
 [node name="LeftWall" parent="World/Walls" unique_id=789423377 instance=ExtResource("wall_scene")]
-position = Vector2(-512, -2080)
+position = Vector2(-544, -2048)
 length_tiles = 180
 
 [node name="RightWall" parent="World/Walls" unique_id=1335665259 instance=ExtResource("wall_scene")]
@@ -203,12 +202,10 @@ length_tiles = 180
 [node name="InnerWallA" parent="World/Walls" unique_id=437141480 instance=ExtResource("wall_scene")]
 position = Vector2(-64, 288)
 length_tiles = 24
-collision_offset = Vector2(0, -2.6666565)
 
 [node name="InnerWallB" parent="World/Walls" unique_id=584122830 instance=ExtResource("wall_scene")]
 position = Vector2(192, 128)
 length_tiles = 20
-collision_offset = Vector2(0, 0.33333588)
 
 [node name="InnerWallC" parent="World/Walls" unique_id=30100538 instance=ExtResource("wall_scene")]
 position = Vector2(-96, -1600)
@@ -252,7 +249,7 @@ position = Vector2(224, -192)
 position = Vector2(-224, 256)
 
 [node name="GreenEnemyB" parent="World/Enemies" unique_id=2052163917 instance=ExtResource("9")]
-position = Vector2(416, 736)
+position = Vector2(271.92557, 760.475)
 
 [node name="EnemyJ" parent="World/Enemies" unique_id=201743110 instance=ExtResource("2")]
 position = Vector2(-320, -256)
@@ -300,13 +297,13 @@ position = Vector2(192, -2752)
 position = Vector2(-192, -2944)
 
 [node name="GreenEnemyI" parent="World/Enemies" unique_id=1124074412 instance=ExtResource("9")]
-position = Vector2(256, -3136)
+position = Vector2(304, -3520)
 
 [node name="EnemyS" parent="World/Enemies" unique_id=882553359 instance=ExtResource("2")]
 position = Vector2(-64, -3328)
 
 [node name="GreenEnemyJ" parent="World/Enemies" unique_id=1934450394 instance=ExtResource("9")]
-position = Vector2(224, -3520)
+position = Vector2(160, -3520)
 
 [node name="EnemyT" parent="World/Enemies" unique_id=608166624 instance=ExtResource("2")]
 position = Vector2(-320, -3712)
@@ -327,62 +324,71 @@ position = Vector2(-64, -4480)
 position = Vector2(192, -4672)
 
 [node name="WallSlimeA" parent="World/Enemies" unique_id=1662658113 instance=ExtResource("wall_slime_scene")]
-position = Vector2(-92, 352)
+position = Vector2(-80, 352)
 
 [node name="WallSlimeB" parent="World/Enemies" unique_id=967226253 instance=ExtResource("wall_slime_scene")]
-position = Vector2(-36.29251, 253.82767)
+position = Vector2(-16, 208)
 wall_side = 1
 
 [node name="WallSlimeC" parent="World/Enemies" unique_id=1305267163 instance=ExtResource("wall_slime_scene")]
-position = Vector2(164, 224)
+position = Vector2(176, 176)
 
 [node name="WallSlimeD" parent="World/Enemies" unique_id=422020951 instance=ExtResource("wall_slime_scene")]
-position = Vector2(223.43948, 96.251205)
+position = Vector2(240, 96)
 wall_side = 1
 
 [node name="Hazards" type="Node2D" parent="World" unique_id=171441725]
 
 [node name="SawA" parent="World/Hazards" unique_id=1828693033 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(-96, 544)
+position = Vector2(-80, 592)
 
 [node name="SawB" parent="World/Hazards" unique_id=2116314263 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(64, 608)
+position = Vector2(80, 608)
 attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
 
 [node name="SawB2" parent="World/Hazards" unique_id=2010103474 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(128, 576)
+position = Vector2(144, 576)
 attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
 
 [node name="SawB3" parent="World/Hazards" unique_id=1299344872 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(256, 576)
+position = Vector2(272, 576)
 attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
 
 [node name="SawB4" parent="World/Hazards" unique_id=1215386600 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(192, 640)
+position = Vector2(208, 640)
 attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
 
 [node name="SawC" parent="World/Hazards" unique_id=1197850242 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(-256, 320)
+position = Vector2(-256, 336)
 
 [node name="SawD" parent="World/Hazards" unique_id=1002933683 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(320, 160)
+position = Vector2(336, 160)
 attached_node_path = NodePath("../../Platforms/DestroyablePlatformA")
 
 [node name="SawE" parent="World/Hazards" unique_id=1518020777 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(-32, 64)
+position = Vector2(-16, 64)
 
 [node name="SawE2" parent="World/Hazards" unique_id=1772519293 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(224, 433.37866)
+position = Vector2(240, 432)
 auto_attach_to_nearest = false
 
 [node name="SawF" parent="World/Hazards" unique_id=583974554 instance=ExtResource("hazard_saw_scene")]
-position = Vector2(320, 608)
+position = Vector2(336, 608)
 attached_node_path = NodePath("../../Platforms/DestroyablePlatformB")
 
 [node name="Goal" parent="World" unique_id=159913275 instance=ExtResource("3")]
-position = Vector2(320, -4896)
+position = Vector2(352, -4896)
 scale = Vector2(4, 4)
 next_scene_path = "res://scenes/levels/test/MainLevel.tscn"
+
+[node name="CheckpointA" parent="World" unique_id=1882780726 instance=ExtResource("checkpoint_scene")]
+position = Vector2(432, 768.00006)
+
+[node name="CheckpointC" parent="World" unique_id=850589579 instance=ExtResource("checkpoint_scene")]
+position = Vector2(-144.00002, -128.00002)
+
+[node name="CheckpointB" parent="World" unique_id=1160331853 instance=ExtResource("checkpoint_scene")]
+position = Vector2(336.00003, -3168)
 
 [node name="KillPlane" type="Area2D" parent="World" unique_id=1914274321]
 position = Vector2(0, 4608)

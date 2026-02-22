@@ -11,13 +11,17 @@ size = Vector2(2208, 32)
 script = ExtResource("1")
 body_type = "ground"
 length_tiles = 69
+visual_offset = Vector2(16, 16)
+collision_offset = Vector2(16, 16)
 
 [node name="Visual" type="Sprite2D" parent="." unique_id=1164033700]
 texture_filter = 1
 texture_repeat = 2
+position = Vector2(16, 16)
 texture = ExtResource("2_8sau4")
 region_enabled = true
 region_rect = Rect2(0, 0, 2208, 32)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=738769069]
+position = Vector2(16, 16)
 shape = SubResource("RectangleShape2D_lr1lr")

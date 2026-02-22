@@ -10,7 +10,11 @@ extends Node2D
 @onready var label: Label = $Label
 
 func setup(text: String, color: Color, icon_tex: Texture2D, start_pos: Vector2) -> void:
+	_ensure_nodes()
 	global_position = start_pos
+	if label == null:
+		queue_free()
+		return
 	label.text = text
 	label.modulate = color
 	if override_font:
@@ -18,6 +22,15 @@ func setup(text: String, color: Color, icon_tex: Texture2D, start_pos: Vector2) 
 	if outline_size > 0:
 		label.add_theme_color_override("font_outline_color", outline_color)
 		label.add_theme_constant_override("outline_size", outline_size)
+	if icon == null:
+		scale = Vector2(0.85, 0.85)
+		var t_no_icon := create_tween()
+		t_no_icon.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t_no_icon.tween_property(self, "scale", Vector2.ONE, 0.14)
+		t_no_icon.parallel().tween_property(self, "position", position + Vector2(0.0, -float_distance), duration)
+		t_no_icon.parallel().tween_property(self, "modulate:a", 0.0, duration)
+		t_no_icon.finished.connect(queue_free)
+		return
 	if icon_tex:
 		icon.texture = icon_tex
 		icon.visible = true
@@ -40,6 +53,7 @@ func setup_with_item_scene(
 	hide_backings: bool = true
 ) -> void:
 	setup(text, color, null, start_pos)
+	_ensure_nodes()
 	if not item_scene:
 		return
 	var icon_node := item_scene.instantiate() as Node2D
@@ -53,3 +67,9 @@ func setup_with_item_scene(
 			var backing := icon_node.get_node_or_null(node_name) as CanvasItem
 			if backing:
 				backing.visible = false
+
+func _ensure_nodes() -> void:
+	if icon == null:
+		icon = get_node_or_null("Icon") as Sprite2D
+	if label == null:
+		label = get_node_or_null("Label") as Label

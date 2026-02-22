@@ -291,3 +291,7 @@ stream = ExtResource("26_wall_slide")
 [node name="SfxRun" type="AudioStreamPlayer" parent="." unique_id=126125274]
 stream = ExtResource("19")
 volume_db = -14.0
+
+[node name="SfxHeadbutt" type="AudioStreamPlayer" parent="." unique_id=1647123001]
+stream = ExtResource("19")
+volume_db = -4.0

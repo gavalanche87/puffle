@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cl6rjgribu4ku"
-path="res://.godot/imported/Cherries.png-aa1cc159689ad7f5cd3ac7eae9f3276d.ctex"
+uid="uid://4id73mf3wf1j"
+path="res://.godot/imported/checkpoint_off.png-57bba6af5a177633f3d2ded732ee00aa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/items/Cherries.png"
-dest_files=["res://.godot/imported/Cherries.png-aa1cc159689ad7f5cd3ac7eae9f3276d.ctex"]
+source_file="res://assets/level_elements/checkpoint_off.png"
+dest_files=["res://.godot/imported/checkpoint_off.png-57bba6af5a177633f3d2ded732ee00aa.ctex"]
 
 [params]
 
