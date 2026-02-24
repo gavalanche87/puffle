@@ -4,7 +4,6 @@
 [ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/enemies/Enemy.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/level_elements/platforms/Goal.tscn" id="3"]
 [ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="4"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/snowfield_background.png" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="8"]
 [ext_resource type="PackedScene" uid="uid://dnhg3sd3vvwvj" path="res://scenes/enemies/GreenEnemy.tscn" id="9"]
 [ext_resource type="PackedScene" uid="uid://m5v7kkve38uv" path="res://scenes/level_elements/platforms/DestroyablePlatform.tscn" id="destroyable_platform_scene"]
@@ -17,24 +16,15 @@
 
 [ext_resource type="PackedScene" path="res://scenes/level_elements/Checkpoint.tscn" id="checkpoint_scene"]
 
+[ext_resource type="PackedScene" path="res://scenes/level_elements/LevelParallaxBackground.tscn" id="parallax_bg_scene"]
+
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(3200, 30.00003)
 
 [node name="test_level_5" type="Node2D" unique_id=1198225251]
 script = ExtResource("level_camera_setup_script")
 
-[node name="Background" type="CanvasLayer" parent="." unique_id=1503960579]
-layer = -10
-
-[node name="Back" type="TextureRect" parent="Background" unique_id=1820796036]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("6")
-expand_mode = 1
-stretch_mode = 6
+[node name="Background" parent="." instance=ExtResource("parallax_bg_scene")]
 
 [node name="HUD" parent="." unique_id=86355027 instance=ExtResource("8")]
 

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b8hb21risihan" path="res://scripts/ui/shop_screen.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="2"]
 [ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="3"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/hills_ruins_background.png" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/ui/MenuBackground.tscn" id="4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop_panel"]
 bg_color = Color(0.74902, 0.74902, 0.74902, 0.96)
@@ -21,16 +21,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="Background" type="TextureRect" parent="." unique_id=829052743]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("4")
-expand_mode = 1
-stretch_mode = 6
+[node name="Background" parent="." instance=ExtResource("4")]
 
 [node name="Layout" type="MarginContainer" parent="." unique_id=2004919644]
 layout_mode = 1

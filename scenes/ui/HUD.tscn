@@ -8,12 +8,11 @@
 [ext_resource type="Script" uid="uid://c6o82o8u0lctj" path="res://scripts/ui/hud_overlay.gd" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseMenuPopup.tscn" id="8"]
-[ext_resource type="Texture2D" path="res://assets/ui/amulets/Leap_Of_Faith_Amulet.png" id="11"]
-[ext_resource type="Texture2D" path="res://assets/ui/amulets/Leap_Of_Faith_Amulet.png" id="12"]
-[ext_resource type="Texture2D" path="res://assets/ui/amulets/Leap_Of_Faith_Amulet.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://c4hi1jgpf5nu7" path="res://assets/ui/amulets/Leap_Of_Faith_Amulet.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://b21h2rtgws7wf" path="res://assets/ui/weapons/Head_Spike_Weapon.png" id="14"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0.7490196, 0.7490196, 0.7490196, 1)
+bg_color = Color(0.254902, 0.254902, 0.254902, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -25,7 +24,7 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="9"]
-bg_color = Color(0.7490196, 0.7490196, 0.7490196, 1)
+bg_color = Color(0.254902, 0.254902, 0.254902, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -37,7 +36,7 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="10"]
-bg_color = Color(0.7490196, 0.7490196, 0.7490196, 1)
+bg_color = Color(0.254902, 0.254902, 0.254902, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -49,7 +48,7 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="2"]
-bg_color = Color(0.254902, 0.737255, 0.737255, 1)
+bg_color = Color(0.254902, 0.254902, 0.254902, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
@@ -101,6 +100,7 @@ corner_radius_bottom_left = 4
 script = ExtResource("6")
 
 [node name="LeftPanel" type="Panel" parent="." unique_id=1801817848]
+visible = false
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 208.0
@@ -108,6 +108,7 @@ offset_bottom = 78.0
 theme_override_styles/panel = SubResource("1")
 
 [node name="RightPanel" type="Panel" parent="." unique_id=1552093256]
+visible = false
 offset_left = 436.0
 offset_top = 8.0
 offset_right = 632.0
@@ -115,28 +116,32 @@ offset_bottom = 80.0
 theme_override_styles/panel = SubResource("1")
 
 [node name="HealthItem" parent="." unique_id=610023548 instance=ExtResource("1")]
+visible = false
 position = Vector2(28, 28)
 
 [node name="EnergyItem" parent="." unique_id=925709517 instance=ExtResource("2")]
+visible = false
 position = Vector2(28, 57.09601)
 
 [node name="XpItem" parent="." unique_id=1154377571 instance=ExtResource("3")]
+visible = false
 position = Vector2(454, 28)
 
 [node name="CoinItem" parent="." unique_id=1861734594 instance=ExtResource("4")]
-position = Vector2(454, 58)
+position = Vector2(610.3433, 56.487)
 
 [node name="CoinCountLabel" type="Label" parent="." unique_id=17759874]
-offset_left = 480.3531
-offset_top = 42.93724
-offset_right = 580.3531
-offset_bottom = 69.93724
+offset_left = 489.67065
+offset_top = 43.461
+offset_right = 589.67065
+offset_bottom = 70.461
 theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("5")
 theme_override_font_sizes/font_size = 24
-text = "0"
+text = "10000"
+horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="CommentaryPanel" type="Panel" parent="." unique_id=1610744071]
@@ -169,12 +174,10 @@ vertical_alignment = 1
 
 [node name="PauseButton" parent="." unique_id=2109780733 instance=ExtResource("7")]
 custom_minimum_size = Vector2(0, 38)
-offset_left = 567.39734
-offset_top = 86.66528
-offset_right = 632.39734
-offset_bottom = 124.66528
-theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
-theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
+offset_left = 589.588
+offset_top = 77.58728
+offset_right = 624.588
+offset_bottom = 115.58728
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("10")
 theme_override_styles/pressed = SubResource("10")
@@ -184,13 +187,11 @@ text = "| |"
 
 [node name="CompleteLevelTestButton" parent="." unique_id=40223270 instance=ExtResource("7")]
 custom_minimum_size = Vector2(0, 32)
-offset_left = 443.0
-offset_top = 87.0
-offset_right = 561.0
-offset_bottom = 119.0
-theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
-theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
-theme_override_font_sizes/font_size = 16
+offset_left = 530.757
+offset_top = 81.25493
+offset_right = 580.757
+offset_bottom = 113.25493
+theme_override_font_sizes/font_size = 8
 theme_override_styles/normal = SubResource("10")
 theme_override_styles/pressed = SubResource("10")
 theme_override_styles/hover = SubResource("10")
@@ -202,43 +203,12 @@ text = "COMPLETE"
 [node name="ConsumablePanel" type="Panel" parent="." unique_id=1632010254]
 offset_left = 8.0
 offset_top = 315.0
-offset_right = 108.0
+offset_right = 58.0
 offset_bottom = 353.0
 theme_override_styles/panel = SubResource("1")
 
-[node name="ConsumableLeftButton" parent="ConsumablePanel" unique_id=1594554858 instance=ExtResource("7")]
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 0
-offset_left = 2.646
-offset_right = 27.646
-offset_bottom = 38.0
-theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
-theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
-theme_override_font_sizes/font_size = 35
-theme_override_styles/normal = SubResource("10")
-theme_override_styles/pressed = SubResource("10")
-theme_override_styles/hover = SubResource("10")
-theme_override_styles/disabled = SubResource("10")
-text = "<"
-
-[node name="ConsumableRightButton" parent="ConsumablePanel" unique_id=1592766338 instance=ExtResource("7")]
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 0
-offset_left = 73.323166
-offset_top = -0.26226807
-offset_right = 98.323166
-offset_bottom = 37.737732
-theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
-theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
-theme_override_font_sizes/font_size = 35
-theme_override_styles/normal = SubResource("10")
-theme_override_styles/pressed = SubResource("10")
-theme_override_styles/hover = SubResource("10")
-theme_override_styles/disabled = SubResource("10")
-text = ">"
-
 [node name="ConsumableHealthItem" parent="ConsumablePanel" unique_id=1275499505 instance=ExtResource("1")]
-position = Vector2(50, 20)
+position = Vector2(24.92266, 20)
 
 [node name="ConsumableEnergyItem" parent="ConsumablePanel" unique_id=1577687636 instance=ExtResource("2")]
 visible = false
@@ -246,10 +216,10 @@ position = Vector2(50, 20)
 
 [node name="ConsumableCountLabel" type="Label" parent="ConsumablePanel" unique_id=1966424498]
 layout_mode = 0
-offset_left = 39.688
-offset_top = 14.58905
-offset_right = 66.33969
-offset_bottom = 41.58905
+offset_left = 19.682484
+offset_top = 14.119446
+offset_right = 46.334175
+offset_bottom = 41.119446
 theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
 theme_override_constants/outline_size = 8
@@ -260,10 +230,10 @@ horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="EquippedAmuletsPanel" type="Panel" parent="." unique_id=2084601155]
-offset_left = 8.0
-offset_top = 84.27185
-offset_right = 152.0
-offset_bottom = 114.27185
+offset_left = 22.499317
+offset_top = 55.216156
+offset_right = 166.49931
+offset_bottom = 85.216156
 theme_override_styles/panel = SubResource("1")
 
 [node name="AmuletSlot1" type="TextureRect" parent="EquippedAmuletsPanel" unique_id=1786543211]
@@ -273,7 +243,7 @@ offset_top = 2.0
 offset_right = 72.0
 offset_bottom = 66.0
 scale = Vector2(0.4, 0.4)
-texture = ExtResource("11")
+texture = ExtResource("13")
 stretch_mode = 5
 
 [node name="AmuletSlot2" type="TextureRect" parent="EquippedAmuletsPanel" unique_id=1098765432]
@@ -283,7 +253,7 @@ offset_top = 2.0
 offset_right = 108.0
 offset_bottom = 66.0
 scale = Vector2(0.4, 0.4)
-texture = ExtResource("12")
+texture = ExtResource("13")
 stretch_mode = 5
 
 [node name="AmuletSlot3" type="TextureRect" parent="EquippedAmuletsPanel" unique_id=1098765433]
@@ -303,17 +273,42 @@ offset_bottom = 30.0
 focus_mode = 0
 flat = true
 
+[node name="WeaponSwitchPanel" type="Panel" parent="." unique_id=2084601156]
+offset_left = 590.0
+offset_top = 315.0
+offset_right = 632.0
+offset_bottom = 353.0
+theme_override_styles/panel = SubResource("1")
+
+[node name="WeaponIconBacking" type="ColorRect" parent="WeaponSwitchPanel" unique_id=2084601157]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 5.0
+offset_right = 35.0
+offset_bottom = 33.0
+color = Color(0.11372549, 0.7019608, 0.48235294, 1)
+
+[node name="WeaponIcon" type="TextureRect" parent="WeaponSwitchPanel" unique_id=2084601158]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 36.0
+offset_bottom = 34.0
+texture = ExtResource("14")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="HealthBarOutline" type="Panel" parent="." unique_id=1443374081]
-offset_left = 46.0
+offset_left = 18.056328
 offset_top = 20.5
-offset_right = 198.0
+offset_right = 170.05634
 offset_bottom = 34.5
 theme_override_styles/panel = SubResource("2")
 
 [node name="HealthBarBg" type="Panel" parent="." unique_id=302532238]
-offset_left = 48.0
+offset_left = 19.662758
 offset_top = 22.5
-offset_right = 196.0
+offset_right = 167.66275
 offset_bottom = 32.5
 theme_override_styles/panel = SubResource("3")
 
@@ -325,17 +320,17 @@ offset_bottom = 10.0
 theme_override_styles/panel = SubResource("4")
 
 [node name="EnergyBarOutline" type="Panel" parent="." unique_id=224594350]
-offset_left = 46.0
-offset_top = 49.59601
-offset_right = 198.0
-offset_bottom = 63.59601
+offset_left = 18.122341
+offset_top = 38.0
+offset_right = 170.12234
+offset_bottom = 52.0
 theme_override_styles/panel = SubResource("2")
 
 [node name="EnergyBarBg" type="Panel" parent="." unique_id=1627373366]
-offset_left = 48.0
-offset_top = 51.59601
-offset_right = 196.0
-offset_bottom = 61.59601
+offset_left = 20.05774
+offset_top = 40.0
+offset_right = 168.05774
+offset_bottom = 50.0
 theme_override_styles/panel = SubResource("5")
 
 [node name="EnergyBarFill" type="Panel" parent="EnergyBarBg" unique_id=834906253]

@@ -6,6 +6,7 @@ const ABILITY_DOUBLE_JUMP := "double_jump"
 const ABILITY_WALL_JUMP := "wall_jump"
 const ABILITY_HEADBUTT := "headbutt"
 const WEAPON_HEAD_SPIKE := "head_spike"
+const WEAPON_NONE := "none"
 const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 
 @export var small_speed: float = 320.0
@@ -133,16 +134,16 @@ var commentary_panel: Panel
 var commentary_label: Label
 var commentary_energy_item: Node2D
 var consumable_panel: Panel
-var consumable_left_button: Button
-var consumable_right_button: Button
 var consumable_health_item: Node2D
 var consumable_energy_item: Node2D
 var consumable_count_label: Label
+var weapon_switch_panel: Panel
+var weapon_switch_icon: TextureRect
 var equipped_amulet_slot_1: TextureRect
 var equipped_amulet_slot_2: TextureRect
 var equipped_amulet_slot_3: TextureRect
 var selected_consumable_key: String = "health"
-var consumable_buttons_bound: bool = false
+var selected_active_weapon_id: String = WEAPON_NONE
 @onready var floating_text_scene: PackedScene = preload("res://scenes/ui/FloatingText.tscn")
 @onready var item_pickup_scene: PackedScene = preload("res://scenes/items/ItemPickup.tscn")
 @onready var coin_item_scene: PackedScene = preload("res://scenes/items/CoinItem.tscn")
@@ -150,6 +151,7 @@ var consumable_buttons_bound: bool = false
 @onready var energy_item_scene: PackedScene = preload("res://scenes/items/EnergyItem.tscn")
 @onready var hud_font: Font = preload("res://assets/fonts/gemunu-libre-v8-latin-700.ttf")
 @onready var amulet_icon_leap_of_faith: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
+@onready var weapon_icon_head_spike: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Weapon.png")
 @onready var spawn_portal_texture: Texture2D = preload("res://assets/player/player_spawn_portal.png")
 @onready var hurtbox: Area2D = $Hurtbox
 @onready var body_collision: CollisionShape2D = $CollisionShape2D
@@ -250,7 +252,7 @@ func _ready() -> void:
 	if spike_hitbox_shape:
 		base_spike_hitbox_shape_position = spike_hitbox_shape.position
 	_apply_mode(mode, false)
-	var spike_allowed := _has_equipped_weapon(WEAPON_HEAD_SPIKE)
+	var spike_allowed := _has_active_weapon(WEAPON_HEAD_SPIKE)
 	_set_head_attachment_active(spike_allowed, false)
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	# Camera now uses Godot's built-in offset and position_smoothing
@@ -293,9 +295,11 @@ func _physics_process(delta: float) -> void:
 		_cycle_consumable(1)
 	if Input.is_action_just_pressed("consumable_use"):
 		_use_selected_consumable()
+	if Input.is_action_just_pressed("weapon_cycle"):
+		_cycle_active_weapon(1)
 	if Input.is_action_just_pressed("headbutt") and input_lock_timer <= 0.0:
 		_try_start_headbutt()
-	if not _has_equipped_weapon(WEAPON_HEAD_SPIKE) and head_attachment and head_attachment.visible:
+	if not _has_active_weapon(WEAPON_HEAD_SPIKE) and head_attachment and head_attachment.visible:
 		_set_head_attachment_active(false, false)
 
 	if input_lock_timer > 0.0:
@@ -587,7 +591,10 @@ func respawn_from_kill_plane(damage_amount: int = 30) -> void:
 	is_killplane_respawning = false
 
 func _current_speed() -> float:
-	return small_speed if mode == PlayerMode.SMALL else big_speed
+	var base_speed: float = small_speed if mode == PlayerMode.SMALL else big_speed
+	if selected_active_weapon_id == WEAPON_NONE:
+		return base_speed * 1.2
+	return base_speed
 
 func _current_gravity() -> float:
 	return small_gravity if mode == PlayerMode.SMALL else big_gravity
@@ -607,6 +614,7 @@ func _ensure_toggle_action() -> void:
 	_ensure_action_has_key("consumable_use", KEY_W)
 	_ensure_action_has_key("headbutt", KEY_C)
 	_ensure_action_has_key("interact", KEY_G)
+	_ensure_action_has_key("weapon_cycle", KEY_Y)
 
 func _ensure_action_has_key(action_name: String, keycode: Key) -> void:
 	if not InputMap.has_action(action_name):
@@ -1025,11 +1033,11 @@ func _cache_hud() -> void:
 	commentary_label = hud.get_node_or_null("CommentaryPanel/CommentaryLabel")
 	commentary_energy_item = hud.get_node_or_null("CommentaryPanel/CommentaryEnergyItem") as Node2D
 	consumable_panel = hud.get_node_or_null("ConsumablePanel")
-	consumable_left_button = hud.get_node_or_null("ConsumablePanel/ConsumableLeftButton")
-	consumable_right_button = hud.get_node_or_null("ConsumablePanel/ConsumableRightButton")
 	consumable_health_item = hud.get_node_or_null("ConsumablePanel/ConsumableHealthItem") as Node2D
 	consumable_energy_item = hud.get_node_or_null("ConsumablePanel/ConsumableEnergyItem") as Node2D
 	consumable_count_label = hud.get_node_or_null("ConsumablePanel/ConsumableCountLabel")
+	weapon_switch_panel = hud.get_node_or_null("WeaponSwitchPanel")
+	weapon_switch_icon = hud.get_node_or_null("WeaponSwitchPanel/WeaponIcon") as TextureRect
 	equipped_amulet_slot_1 = hud.get_node_or_null("EquippedAmuletsPanel/AmuletSlot1") as TextureRect
 	equipped_amulet_slot_2 = hud.get_node_or_null("EquippedAmuletsPanel/AmuletSlot2") as TextureRect
 	equipped_amulet_slot_3 = hud.get_node_or_null("EquippedAmuletsPanel/AmuletSlot3") as TextureRect
@@ -1040,6 +1048,7 @@ func _cache_hud() -> void:
 	var commentary_energy_backing := hud.get_node_or_null("CommentaryPanel/CommentaryEnergyItem/EnergyIconBacking") as CanvasItem
 	var consumable_health_backing := hud.get_node_or_null("ConsumablePanel/ConsumableHealthItem/HealthIconBacking") as CanvasItem
 	var consumable_energy_backing := hud.get_node_or_null("ConsumablePanel/ConsumableEnergyItem/EnergyIconBacking") as CanvasItem
+	var weapon_switch_backing := hud.get_node_or_null("WeaponSwitchPanel/WeaponIconBacking") as CanvasItem
 	if health_backing:
 		health_backing.visible = false
 	if energy_backing:
@@ -1054,7 +1063,8 @@ func _cache_hud() -> void:
 		consumable_health_backing.visible = false
 	if consumable_energy_backing:
 		consumable_energy_backing.visible = false
-	_bind_consumable_buttons()
+	if weapon_switch_backing:
+		weapon_switch_backing.visible = false
 	_refresh_consumable_ui()
 	if commentary_panel and not commentary_panel.visible:
 		commentary_panel.modulate.a = 0.0
@@ -1068,21 +1078,7 @@ func _cache_hud() -> void:
 		if node is CanvasItem:
 			_register_hud_base_modulate(node as CanvasItem)
 	_update_equipped_amulet_icons()
-
-func _bind_consumable_buttons() -> void:
-	if consumable_buttons_bound:
-		return
-	if consumable_left_button and not consumable_left_button.pressed.is_connected(_on_consumable_left_pressed):
-		consumable_left_button.pressed.connect(_on_consumable_left_pressed)
-	if consumable_right_button and not consumable_right_button.pressed.is_connected(_on_consumable_right_pressed):
-		consumable_right_button.pressed.connect(_on_consumable_right_pressed)
-	consumable_buttons_bound = true
-
-func _on_consumable_left_pressed() -> void:
-	_cycle_consumable(-1)
-
-func _on_consumable_right_pressed() -> void:
-	_cycle_consumable(1)
+	_refresh_weapon_switch_ui()
 
 func _cycle_consumable(direction: int) -> void:
 	var available := _get_available_consumables()
@@ -1126,10 +1122,73 @@ func _refresh_consumable_ui() -> void:
 		consumable_health_item.visible = selected_consumable_key == "health"
 	if consumable_energy_item:
 		consumable_energy_item.visible = selected_consumable_key == "energy"
-	if consumable_left_button:
-		consumable_left_button.visible = available.size() > 1
-	if consumable_right_button:
-		consumable_right_button.visible = available.size() > 1
+
+func _get_active_weapon_cycle_list() -> Array[String]:
+	var ids: Array[String] = [WEAPON_NONE]
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return ids
+	var max_slots: int = 1
+	if game_data.has_method("get_weapon_slots_unlocked"):
+		max_slots = maxi(1, int(game_data.call("get_weapon_slots_unlocked")))
+	var equipped_ids: Array[String] = []
+	if game_data.has_method("get_equipped_weapon"):
+		var equipped_id := String(game_data.call("get_equipped_weapon"))
+		if equipped_id != "":
+			equipped_ids.append(equipped_id)
+	var added: int = 0
+	for weapon_id_variant in equipped_ids:
+		var weapon_id := String(weapon_id_variant)
+		if weapon_id == "" or ids.has(weapon_id):
+			continue
+		ids.append(weapon_id)
+		added += 1
+		if added >= max_slots:
+			break
+	return ids
+
+func _validate_active_weapon_selection() -> void:
+	var active_list: Array[String] = _get_active_weapon_cycle_list()
+	if not active_list.has(selected_active_weapon_id):
+		selected_active_weapon_id = WEAPON_NONE
+
+func _cycle_active_weapon(direction: int) -> void:
+	var active_list: Array[String] = _get_active_weapon_cycle_list()
+	if active_list.is_empty():
+		selected_active_weapon_id = WEAPON_NONE
+		_refresh_weapon_switch_ui()
+		_refresh_amulet_state()
+		return
+	var current_index := active_list.find(selected_active_weapon_id)
+	if current_index == -1:
+		current_index = 0
+	var next_index := int(posmod(current_index + direction, active_list.size()))
+	var next_weapon_id := String(active_list[next_index])
+	if next_weapon_id == selected_active_weapon_id:
+		return
+	selected_active_weapon_id = next_weapon_id
+	_refresh_weapon_switch_ui()
+	_refresh_amulet_state()
+	_play_sfx(sfx_switch)
+
+func _refresh_weapon_switch_ui() -> void:
+	if weapon_switch_panel == null:
+		return
+	_validate_active_weapon_selection()
+	var is_none_selected: bool = selected_active_weapon_id == WEAPON_NONE
+	if weapon_switch_icon:
+		weapon_switch_icon.texture = _get_weapon_icon_texture(selected_active_weapon_id)
+		weapon_switch_icon.visible = (not is_none_selected) and weapon_switch_icon.texture != null
+	var weapon_switch_backing := weapon_switch_panel.get_node_or_null("WeaponIconBacking") as CanvasItem
+	if weapon_switch_backing:
+		weapon_switch_backing.visible = not is_none_selected
+
+func _get_weapon_icon_texture(weapon_id: String) -> Texture2D:
+	match weapon_id:
+		WEAPON_HEAD_SPIKE:
+			return weapon_icon_head_spike
+		_:
+			return null
 
 func _use_selected_consumable() -> void:
 	var game_data: Node = get_node_or_null("/root/GameData")
@@ -1475,6 +1534,9 @@ func _has_equipped_weapon(weapon_id: String) -> bool:
 		return bool(game_data.call("is_weapon_equipped", weapon_id))
 	return false
 
+func _has_active_weapon(weapon_id: String) -> bool:
+	return weapon_id != "" and selected_active_weapon_id == weapon_id and _has_equipped_weapon(weapon_id)
+
 func _can_double_jump() -> bool:
 	if _is_grounded():
 		return false
@@ -1489,7 +1551,8 @@ func _hazard_damage_multiplier_from_amulets() -> float:
 
 func _refresh_amulet_state() -> void:
 	var size_shift_owned := _has_ability(ABILITY_SIZE_SHIFT)
-	var head_spike_equipped := _has_equipped_weapon(WEAPON_HEAD_SPIKE)
+	_validate_active_weapon_selection()
+	var head_spike_equipped := _has_active_weapon(WEAPON_HEAD_SPIKE)
 	if not _has_ability(ABILITY_HEADBUTT) or not head_spike_equipped:
 		_end_headbutt()
 	if not size_shift_owned and mode == PlayerMode.BIG:
@@ -1502,6 +1565,7 @@ func _refresh_amulet_state() -> void:
 	_update_health_ui()
 	_set_head_attachment_active(head_spike_equipped, false)
 	_update_equipped_amulet_icons()
+	_refresh_weapon_switch_ui()
 
 func validate_ability_state_from_amulets() -> void:
 	_refresh_amulet_state()
@@ -1524,6 +1588,9 @@ func _update_equipped_amulet_icons() -> void:
 	equipped_amulet_slot_2.visible = id_2 != ""
 	equipped_amulet_slot_3.texture = _get_amulet_icon_texture(id_3)
 	equipped_amulet_slot_3.visible = id_3 != ""
+	var amulets_panel := equipped_amulet_slot_1.get_parent() as CanvasItem
+	if amulets_panel:
+		amulets_panel.visible = (id_1 != "" or id_2 != "" or id_3 != "")
 
 func _get_amulet_icon_texture(amulet_id: String) -> Texture2D:
 	match amulet_id:
@@ -1608,7 +1675,10 @@ func _current_wall_jump_energy_cost() -> int:
 	return maxi(1, wall_jump_energy_cost)
 
 func _current_energy_regen_rate() -> float:
-	return maxf(0.0, energy_regen_per_second * _energy_regen_multiplier_from_amulets())
+	var rate: float = energy_regen_per_second * _energy_regen_multiplier_from_amulets()
+	if selected_active_weapon_id == WEAPON_NONE:
+		rate *= 2.0
+	return maxf(0.0, rate)
 
 func _energy_regen_multiplier_from_amulets() -> float:
 	var mult := 1.0
@@ -1621,7 +1691,7 @@ func _try_start_headbutt() -> void:
 		return
 	if not _has_ability(ABILITY_HEADBUTT):
 		return
-	if not _has_equipped_weapon(WEAPON_HEAD_SPIKE):
+	if not _has_active_weapon(WEAPON_HEAD_SPIKE):
 		return
 	if current_energy < headbutt_energy_cost:
 		return

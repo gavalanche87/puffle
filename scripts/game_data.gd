@@ -36,6 +36,7 @@ var owned_weapons: Array[String] = []
 
 var equipped_amulets: Array[String] = []
 var amulet_slots_unlocked: int = 3
+var weapon_slots_unlocked: int = 1
 var equipped_weapon: String = ""
 var unlocked_music_tracks: Array[String] = [MUSIC_TRACK_LEVEL_1]
 
@@ -254,6 +255,7 @@ func wipe_save_data() -> void:
 	owned_weapons.clear()
 	equipped_amulets.clear()
 	amulet_slots_unlocked = 3
+	weapon_slots_unlocked = 1
 	equipped_weapon = ""
 	unlocked_music_tracks = [MUSIC_TRACK_LEVEL_1]
 	current_world = 0
@@ -323,7 +325,7 @@ func get_level_scene(world: int, level: int) -> String:
 				return "res://scenes/levels/test/test_level_5.tscn"
 	var cycle := [
 		"res://scenes/levels/world_1/Level_1_1.tscn",
-		"res://scenes/levels/test/MainLevel.tscn",
+		"res://scenes/levels/test/test_level_1.tscn",
 		"res://scenes/levels/test/VerticalTestScene.tscn"
 	]
 	var idx := ((world - 1) * LEVELS_PER_WORLD + (level - 1)) % cycle.size()
@@ -578,6 +580,9 @@ func get_owned_weapons() -> Array[String]:
 func get_equipped_weapon() -> String:
 	return equipped_weapon
 
+func get_weapon_slots_unlocked() -> int:
+	return maxi(1, weapon_slots_unlocked)
+
 func is_weapon_equipped(weapon_id: String) -> bool:
 	return equipped_weapon == weapon_id and weapon_id != ""
 
@@ -684,6 +689,7 @@ func _save_data() -> void:
 		"owned_weapons": owned_weapons,
 		"equipped_amulets": equipped_amulets,
 		"amulet_slots_unlocked": amulet_slots_unlocked,
+		"weapon_slots_unlocked": weapon_slots_unlocked,
 		"equipped_weapon": equipped_weapon,
 		"unlocked_music_tracks": unlocked_music_tracks,
 		"music_volume_linear": music_volume_linear,
@@ -779,6 +785,7 @@ func _load_data() -> void:
 			equipped_amulets.append(equipped_id)
 
 	amulet_slots_unlocked = max(3, int(data.get("amulet_slots_unlocked", amulet_slots_unlocked)))
+	weapon_slots_unlocked = maxi(1, int(data.get("weapon_slots_unlocked", weapon_slots_unlocked)))
 	while equipped_amulets.size() < amulet_slots_unlocked:
 		equipped_amulets.append("")
 	if equipped_amulets.size() > amulet_slots_unlocked:

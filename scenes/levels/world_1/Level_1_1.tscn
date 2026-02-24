@@ -4,7 +4,6 @@
 [ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/enemies/Enemy.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/level_elements/platforms/Goal.tscn" id="3"]
 [ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="4"]
-[ext_resource type="Texture2D" uid="uid://bxxd7qmpakhm6" path="res://assets/backgrounds/desert_ruins_background.png" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="6"]
 [ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/level_elements/platforms/Ground.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/hazards/HazardSaw.tscn" id="8"]
@@ -12,24 +11,15 @@
 [ext_resource type="PackedScene" path="res://scenes/level_elements/platforms/Wall.tscn" id="10"]
 [ext_resource type="Script" uid="uid://cfg62htb75fb8" path="res://scripts/level_1.gd" id="11"]
 
+[ext_resource type="PackedScene" path="res://scenes/level_elements/LevelParallaxBackground.tscn" id="parallax_bg_scene"]
+
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(8000, 200)
 
 [node name="Level_1" type="Node2D" unique_id=1498874025]
 script = ExtResource("11")
 
-[node name="Background" type="CanvasLayer" parent="." unique_id=1836297394]
-layer = -10
-
-[node name="Back" type="TextureRect" parent="Background" unique_id=1330332485]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("5")
-expand_mode = 1
-stretch_mode = 6
+[node name="Background" parent="." instance=ExtResource("parallax_bg_scene")]
 
 [node name="HUD" parent="." unique_id=337148851 instance=ExtResource("6")]
 
@@ -104,7 +94,7 @@ position = Vector2(1568, 384)
 [node name="Goal" parent="World" unique_id=1339931279 instance=ExtResource("3")]
 position = Vector2(3427.2178, -127.28735)
 scale = Vector2(4, 4)
-next_scene_path = "res://scenes/levels/test/MainLevel.tscn"
+next_scene_path = "res://scenes/ui/LevelSelect.tscn"
 
 [node name="KillPlane" type="Area2D" parent="World" unique_id=506157767]
 position = Vector2(1500, 1500)

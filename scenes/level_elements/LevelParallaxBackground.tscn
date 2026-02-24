@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://clc52l7b4jbx4"]
+
+[ext_resource type="Script" uid="uid://b2b1l7necdesr" path="res://scripts/level_parallax_background.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://c4dx6pyhpfevw" path="res://assets/backgrounds/blue_sky_bg.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://cktojqwjmrf56" path="res://assets/backgrounds/clouds_bg.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://drg6kuq2timod" path="res://assets/backgrounds/hills_bg.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://dmgbthyc6y2pu" path="res://assets/backgrounds/low_ground.png" id="5"]
+
+[node name="LevelParallaxBackground" type="CanvasLayer" unique_id=1191199150]
+layer = -10
+script = ExtResource("1")
+sky_vertical_speed = 0.05
+clouds_vertical_speed = 0.01
+hills_vertical_speed = 0.02
+ground_vertical_speed = 0.04
+
+[node name="SkyA" type="Sprite2D" parent="." unique_id=727771043]
+scale = Vector2(2, 2)
+texture = ExtResource("2")
+centered = false
+
+[node name="SkyB" type="Sprite2D" parent="." unique_id=1145047308]
+scale = Vector2(2, 2)
+texture = ExtResource("2")
+centered = false
+
+[node name="CloudsA" type="Sprite2D" parent="." unique_id=2108352753]
+scale = Vector2(2, 2)
+texture = ExtResource("3")
+centered = false
+
+[node name="CloudsB" type="Sprite2D" parent="." unique_id=1201414837]
+scale = Vector2(2, 2)
+texture = ExtResource("3")
+centered = false
+
+[node name="HillsA" type="Sprite2D" parent="." unique_id=897011659]
+scale = Vector2(2, 2)
+texture = ExtResource("4")
+centered = false
+
+[node name="HillsB" type="Sprite2D" parent="." unique_id=911281157]
+scale = Vector2(2, 2)
+texture = ExtResource("4")
+centered = false
+
+[node name="GroundA" type="Sprite2D" parent="." unique_id=238151674]
+scale = Vector2(2, 2)
+texture = ExtResource("5")
+centered = false
+
+[node name="GroundB" type="Sprite2D" parent="." unique_id=433215741]
+scale = Vector2(2, 2)
+texture = ExtResource("5")
+centered = false
