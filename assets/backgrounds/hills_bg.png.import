@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xbuj18q6xpl8"
-path="res://.godot/imported/mesa_background.png-898bb33da7b1326d9d5ea2fb605bff11.ctex"
+uid="uid://drg6kuq2timod"
+path="res://.godot/imported/hills_bg.png-73ccc4ba0b73a9e1fba8acceaec71cb0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/mesa_background.png"
-dest_files=["res://.godot/imported/mesa_background.png-898bb33da7b1326d9d5ea2fb605bff11.ctex"]
+source_file="res://assets/backgrounds/hills_bg.png"
+dest_files=["res://.godot/imported/hills_bg.png-73ccc4ba0b73a9e1fba8acceaec71cb0.ctex"]
 
 [params]
 

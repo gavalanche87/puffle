@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bxxd7qmpakhm6"
-path="res://.godot/imported/desert_ruins_background.png-161c8283088d969a72fec0e3d9374cce.ctex"
+uid="uid://cq2qubpivl23v"
+path="res://.godot/imported/Token.png-0e52a8fd0835aee0e9eecf96910054df.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/desert_ruins_background.png"
-dest_files=["res://.godot/imported/desert_ruins_background.png-161c8283088d969a72fec0e3d9374cce.ctex"]
+source_file="res://assets/items/Token.png"
+dest_files=["res://.godot/imported/Token.png-0e52a8fd0835aee0e9eecf96910054df.ctex"]
 
 [params]
 
