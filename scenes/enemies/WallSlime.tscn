@@ -32,14 +32,17 @@ size = Vector2(18, 18)
 
 [node name="WallSlime" type="Area2D" unique_id=268251483]
 script = ExtResource("1")
+wall_attach_offset = 15.0
 death_scene = ExtResource("2")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1487570531]
-scale = Vector2(1.4, 1.4)
+scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_wallslime")
 animation = &"breathing"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=842218712]
+position = Vector2(-0.9219284, 5.9413185)
+scale = Vector2(1.5, 1.14)
 shape = SubResource("RectangleShape2D_wallslime")
 
 [node name="EdgeCast" type="RayCast2D" parent="." unique_id=1942019489]
