@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://chcknj0nh57jb"
-path="res://.godot/imported/platform_palette_blue.png-a0ce17f20eead21b2ee33e74b00adddd.ctex"
+uid="uid://s25jsebpfor5"
+path="res://.godot/imported/vines_large_2.png-c1677908362f148a3c6af9b1c19b8d21.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tiles/platform_palette_blue.png"
-dest_files=["res://.godot/imported/platform_palette_blue.png-a0ce17f20eead21b2ee33e74b00adddd.ctex"]
+source_file="res://assets/level_elements/decals/vines_large_2.png"
+dest_files=["res://.godot/imported/vines_large_2.png-c1677908362f148a3c6af9b1c19b8d21.ctex"]
 
 [params]
 

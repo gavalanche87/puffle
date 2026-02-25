@@ -4,18 +4,24 @@
 [ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/enemies/Enemy.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/level_elements/platforms/Goal.tscn" id="3"]
 [ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://dvmjrq8ueuj5l" path="res://assets/level_elements/decals/grass_decal.png" id="6_f7khp"]
 [ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="8"]
+[ext_resource type="Texture2D" uid="uid://dmmjtcnyx4f4k" path="res://assets/level_elements/decals/vines_small_1.png" id="8_or7ij"]
 [ext_resource type="PackedScene" uid="uid://dnhg3sd3vvwvj" path="res://scenes/enemies/GreenEnemy.tscn" id="9"]
+[ext_resource type="Texture2D" uid="uid://vawdt7eag4ax" path="res://assets/level_elements/decals/vines_small_2.png" id="9_ffrux"]
+[ext_resource type="Texture2D" uid="uid://cy7xb63yp8bf6" path="res://assets/level_elements/decals/vines_small_3.png" id="10_fqb1d"]
+[ext_resource type="Texture2D" uid="uid://df87cxfaxw5xi" path="res://assets/level_elements/decals/vines_small_4.png" id="11_m3u7n"]
+[ext_resource type="Texture2D" uid="uid://gmmheoyb0psy" path="res://assets/level_elements/decals/vines_large_1.png" id="12_r2st1"]
+[ext_resource type="Texture2D" uid="uid://s25jsebpfor5" path="res://assets/level_elements/decals/vines_large_2.png" id="13_reuvo"]
 [ext_resource type="PackedScene" uid="uid://civo2w33n3ek3" path="res://scenes/level_elements/Checkpoint.tscn" id="checkpoint_scene"]
 [ext_resource type="PackedScene" uid="uid://m5v7kkve38uv" path="res://scenes/level_elements/platforms/DestroyablePlatform.tscn" id="destroyable_platform_scene"]
 [ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/level_elements/platforms/Ground.tscn" id="ground_scene"]
 [ext_resource type="PackedScene" path="res://scenes/hazards/HazardSaw.tscn" id="hazard_saw_scene"]
 [ext_resource type="Script" uid="uid://ci2l63nm7wph7" path="res://scripts/level_camera_setup.gd" id="level_camera_setup_script"]
+[ext_resource type="PackedScene" uid="uid://clc52l7b4jbx4" path="res://scenes/level_elements/LevelParallaxBackground.tscn" id="parallax_bg_scene"]
 [ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/level_elements/platforms/Platform.tscn" id="platform_scene"]
 [ext_resource type="PackedScene" uid="uid://gni2n50y2lud" path="res://scenes/level_elements/platforms/Wall.tscn" id="wall_scene"]
 [ext_resource type="PackedScene" uid="uid://kxgu7g0bhh5l" path="res://scenes/enemies/WallSlime.tscn" id="wall_slime_scene"]
-
-[ext_resource type="PackedScene" path="res://scenes/level_elements/LevelParallaxBackground.tscn" id="parallax_bg_scene"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(3200, 30.00003)
@@ -23,7 +29,7 @@ size = Vector2(3200, 30.00003)
 [node name="VerticalTestScene" type="Node2D" unique_id=1198225251]
 script = ExtResource("level_camera_setup_script")
 
-[node name="Background" parent="." instance=ExtResource("parallax_bg_scene")]
+[node name="Background" parent="." unique_id=582567782 instance=ExtResource("parallax_bg_scene")]
 
 [node name="HUD" parent="." unique_id=86355027 instance=ExtResource("8")]
 
@@ -38,24 +44,163 @@ position = Vector2(-224, 672)
 position = Vector2(0, 800)
 length_tiles = 33
 
+[node name="Grass" type="Sprite2D" parent="World/Platforms/Ground" unique_id=1957015052]
+show_behind_parent = true
+position = Vector2(-384, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/Ground" unique_id=837198458]
+show_behind_parent = true
+position = Vector2(-320, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass3" type="Sprite2D" parent="World/Platforms/Ground" unique_id=237354647]
+show_behind_parent = true
+position = Vector2(-432, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass4" type="Sprite2D" parent="World/Platforms/Ground" unique_id=231708561]
+show_behind_parent = true
+position = Vector2(112, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass5" type="Sprite2D" parent="World/Platforms/Ground" unique_id=1317055194]
+show_behind_parent = true
+position = Vector2(176, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass6" type="Sprite2D" parent="World/Platforms/Ground" unique_id=445633068]
+show_behind_parent = true
+position = Vector2(64, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass7" type="Sprite2D" parent="World/Platforms/Ground" unique_id=646102720]
+show_behind_parent = true
+position = Vector2(416, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass8" type="Sprite2D" parent="World/Platforms/Ground" unique_id=19118089]
+show_behind_parent = true
+position = Vector2(480, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="PlatformA" parent="World/Platforms" unique_id=1990171567 instance=ExtResource("platform_scene")]
 position = Vector2(-416, 576)
+
+[node name="Vines_Small_1" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=1877151451]
+position = Vector2(-48, 16)
+texture = ExtResource("8_or7ij")
+
+[node name="Vines_Small_2" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=171462942]
+position = Vector2(-80, 16)
+texture = ExtResource("9_ffrux")
+
+[node name="Vines_Small_3" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=1177102783]
+position = Vector2(-16, 16)
+texture = ExtResource("10_fqb1d")
+
+[node name="Vines_Small_4" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=501464591]
+position = Vector2(16, 16)
+texture = ExtResource("11_m3u7n")
+
+[node name="Vines_Large_1" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=798712764]
+position = Vector2(112, 32)
+texture = ExtResource("12_r2st1")
+
+[node name="Vines_Large_2" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=1339946513]
+position = Vector2(-80, 64)
+texture = ExtResource("13_reuvo")
+
+[node name="Vines_Small_4_2" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=734424774]
+position = Vector2(-48, 48)
+texture = ExtResource("11_m3u7n")
+
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=283775715]
+show_behind_parent = true
+position = Vector2(-64, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformA" unique_id=933973629]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="PlatformB" parent="World/Platforms" unique_id=11692420 instance=ExtResource("platform_scene")]
 position = Vector2(-176, 480)
 length_tiles = 6
 
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformB" unique_id=117400540]
+show_behind_parent = true
+position = Vector2(64, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass3" type="Sprite2D" parent="World/Platforms/PlatformB" unique_id=1226952918]
+show_behind_parent = true
+position = Vector2(-48, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="PlatformC" parent="World/Platforms" unique_id=439982880 instance=ExtResource("platform_scene")]
 position = Vector2(64, 384)
 length_tiles = 4
+
+[node name="Vines_Small_1" type="Sprite2D" parent="World/Platforms/PlatformC" unique_id=1005889508]
+position = Vector2(0, 16)
+texture = ExtResource("8_or7ij")
+
+[node name="Vines_Small_2" type="Sprite2D" parent="World/Platforms/PlatformC" unique_id=508122413]
+position = Vector2(-32, 16)
+texture = ExtResource("9_ffrux")
+
+[node name="Vines_Small_3" type="Sprite2D" parent="World/Platforms/PlatformC" unique_id=839983244]
+position = Vector2(32, 16)
+texture = ExtResource("10_fqb1d")
+
+[node name="Vines_Large_1" type="Sprite2D" parent="World/Platforms/PlatformC" unique_id=582794815]
+position = Vector2(64, 32)
+texture = ExtResource("12_r2st1")
+
+[node name="Vines_Large_2" type="Sprite2D" parent="World/Platforms/PlatformC" unique_id=1379710174]
+position = Vector2(-32, 64)
+texture = ExtResource("13_reuvo")
+
+[node name="Vines_Small_4_2" type="Sprite2D" parent="World/Platforms/PlatformC" unique_id=662859027]
+position = Vector2(0, 48)
+texture = ExtResource("11_m3u7n")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformC" unique_id=1993857901]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="PlatformD" parent="World/Platforms" unique_id=1262079969 instance=ExtResource("platform_scene")]
 position = Vector2(-320, 288)
 length_tiles = 8
 
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformD" unique_id=1083689618]
+show_behind_parent = true
+position = Vector2(112, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformD" unique_id=229591977]
+show_behind_parent = true
+position = Vector2(48, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass3" type="Sprite2D" parent="World/Platforms/PlatformD" unique_id=1005150336]
+show_behind_parent = true
+position = Vector2(-80, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="PlatformE" parent="World/Platforms" unique_id=580559711 instance=ExtResource("platform_scene")]
 position = Vector2(16, 224)
 length_tiles = 4
+
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformE" unique_id=1705801022]
+show_behind_parent = true
+position = Vector2(-48, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformE" unique_id=1830165597]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="DestroyablePlatformA" parent="World/Platforms" unique_id=173608242 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(208, 160)
@@ -67,25 +212,55 @@ position = Vector2(208, 608)
 position = Vector2(-224, 128)
 length_tiles = 5
 
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformF" unique_id=616212559]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
 [node name="PlatformG" parent="World/Platforms" unique_id=243383558 instance=ExtResource("platform_scene")]
 position = Vector2(128, 32)
 length_tiles = 4
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformG" unique_id=1587189280]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="PlatformH" parent="World/Platforms" unique_id=1260171501 instance=ExtResource("platform_scene")]
 position = Vector2(-80, -96)
 length_tiles = 8
 
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformH" unique_id=635139165]
+show_behind_parent = true
+position = Vector2(-64, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformH" unique_id=1427461150]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
 [node name="PlatformI" parent="World/Platforms" unique_id=1177325464 instance=ExtResource("platform_scene")]
 position = Vector2(224, -128)
 length_tiles = 3
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformI" unique_id=1163046623]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="PlatformJ" parent="World/Platforms" unique_id=1734530166 instance=ExtResource("platform_scene")]
 position = Vector2(-336, -256)
 length_tiles = 6
 
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformJ" unique_id=1261227088]
+show_behind_parent = true
+position = Vector2(64, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="PlatformK" parent="World/Platforms" unique_id=123274068 instance=ExtResource("platform_scene")]
 position = Vector2(32, -448)
 length_tiles = 4
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformK" unique_id=909624649]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="DestroyablePlatformC" parent="World/Platforms" unique_id=1153649272 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(192, -640)
@@ -95,9 +270,23 @@ length_tiles = 4
 position = Vector2(-224, -832)
 length_tiles = 5
 
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformL" unique_id=402957995]
+show_behind_parent = true
+position = Vector2(-32, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformL" unique_id=1900778028]
+show_behind_parent = true
+position = Vector2(64, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="PlatformM" parent="World/Platforms" unique_id=1329339566 instance=ExtResource("platform_scene")]
 position = Vector2(160, -1024)
 length_tiles = 4
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM" unique_id=534890363]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="DestroyablePlatformD" parent="World/Platforms" unique_id=248788960 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(-416, -1216)
@@ -107,6 +296,16 @@ length_tiles = 6
 position = Vector2(224, -1408)
 length_tiles = 4
 
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformN" unique_id=1496852815]
+show_behind_parent = true
+position = Vector2(48, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass3" type="Sprite2D" parent="World/Platforms/PlatformN" unique_id=1271166649]
+show_behind_parent = true
+position = Vector2(-16, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="DestroyablePlatformE" parent="World/Platforms" unique_id=1616698182 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(-48, -1600)
 length_tiles = 5
@@ -115,9 +314,23 @@ length_tiles = 5
 position = Vector2(256, -1792)
 length_tiles = 4
 
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformO" unique_id=1560215921]
+show_behind_parent = true
+position = Vector2(48, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformO" unique_id=868101208]
+show_behind_parent = true
+position = Vector2(-16, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="PlatformP" parent="World/Platforms" unique_id=1835859364 instance=ExtResource("platform_scene")]
 position = Vector2(-256, -1984)
 length_tiles = 5
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformP" unique_id=1714692291]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="DestroyablePlatformF" parent="World/Platforms" unique_id=604144997 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(128, -2176)
@@ -127,6 +340,21 @@ length_tiles = 4
 position = Vector2(-320, -2368)
 length_tiles = 6
 
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformQ" unique_id=1666890689]
+show_behind_parent = true
+position = Vector2(16, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformQ" unique_id=736143299]
+show_behind_parent = true
+position = Vector2(80, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass3" type="Sprite2D" parent="World/Platforms/PlatformQ" unique_id=1095543167]
+show_behind_parent = true
+position = Vector2(-48, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="DestroyablePlatformG" parent="World/Platforms" unique_id=1875018661 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(32, -2560)
 length_tiles = 4
@@ -134,6 +362,11 @@ length_tiles = 4
 [node name="PlatformR" parent="World/Platforms" unique_id=24682169 instance=ExtResource("platform_scene")]
 position = Vector2(160, -2752)
 length_tiles = 4
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformR" unique_id=843910811]
+show_behind_parent = true
+position = Vector2(0, -16)
+texture = ExtResource("6_f7khp")
 
 [node name="DestroyablePlatformH" parent="World/Platforms" unique_id=321012636 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(-192, -2944)
@@ -143,6 +376,10 @@ length_tiles = 5
 position = Vector2(288, -3136)
 length_tiles = 4
 
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformS" unique_id=516815564]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
 [node name="DestroyablePlatformI" parent="World/Platforms" unique_id=366364771 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(-64, -3328)
 length_tiles = 5
@@ -150,6 +387,20 @@ length_tiles = 5
 [node name="PlatformT" parent="World/Platforms" unique_id=2111407482 instance=ExtResource("platform_scene")]
 position = Vector2(208, -3520)
 length_tiles = 10
+
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformT" unique_id=1387922003]
+show_behind_parent = true
+position = Vector2(-64, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformT" unique_id=2056449825]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="Grass3" type="Sprite2D" parent="World/Platforms/PlatformT" unique_id=580474956]
+show_behind_parent = true
+position = Vector2(-112, 0)
+texture = ExtResource("6_f7khp")
 
 [node name="DestroyablePlatformJ" parent="World/Platforms" unique_id=1624706127 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(-320, -3712)
@@ -159,6 +410,16 @@ length_tiles = 6
 position = Vector2(128, -3904)
 length_tiles = 4
 
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformU" unique_id=1947604399]
+show_behind_parent = true
+position = Vector2(-16, -16)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformU" unique_id=1979761791]
+show_behind_parent = true
+position = Vector2(48, 0)
+texture = ExtResource("6_f7khp")
+
 [node name="DestroyablePlatformK" parent="World/Platforms" unique_id=123607375 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(-224, -4096)
 length_tiles = 5
@@ -167,6 +428,16 @@ length_tiles = 5
 position = Vector2(256, -4288)
 length_tiles = 4
 
+[node name="Grass" type="Sprite2D" parent="World/Platforms/PlatformV" unique_id=1245024006]
+show_behind_parent = true
+position = Vector2(-16, 0)
+texture = ExtResource("6_f7khp")
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformV" unique_id=1633732030]
+show_behind_parent = true
+position = Vector2(48, -16)
+texture = ExtResource("6_f7khp")
+
 [node name="DestroyablePlatformL" parent="World/Platforms" unique_id=1165410817 instance=ExtResource("destroyable_platform_scene")]
 position = Vector2(-64, -4480)
 length_tiles = 5
@@ -174,6 +445,10 @@ length_tiles = 5
 [node name="PlatformW" parent="World/Platforms" unique_id=1809846606 instance=ExtResource("platform_scene")]
 position = Vector2(192, -4672)
 length_tiles = 4
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformW" unique_id=1397853559]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
 
 [node name="CeilingPlatform" parent="World/Platforms" unique_id=1933199367 instance=ExtResource("platform_scene")]
 position = Vector2(-32, -4960)
