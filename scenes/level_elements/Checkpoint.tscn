@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://borbhw8rwkp5f" path="res://scripts/checkpoint.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://4id73mf3wf1j" path="res://assets/level_elements/checkpoint_off.png" id="2"]
-[ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="4"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="4"]
 
 [sub_resource type="CanvasItemMaterial" id="2"]
 blend_mode = 1

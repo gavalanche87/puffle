@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/popup_window.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="2"]
-[ext_resource type="FontFile" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="3"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="3"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
 bg_color = Color(0.254902, 0.254902, 0.254902, 0.96)

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/how_to_play.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="2"]
-[ext_resource type="FontFile" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="3"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/ui/MenuBackground.tscn" id="4"]
 
 [node name="HowToPlay" type="Control"]
@@ -79,6 +79,8 @@ autowrap_mode = 2
 theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.254902, 0.254902, 0.254902, 1)
 theme_override_constants/outline_size = 4
+theme_override_fonts/normal_font = ExtResource("3")
 theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/normal_font_size = 18
 theme_override_font_sizes/font_size = 18
 text = "Controls:\n- Move: Left / Right\n- Jump: Space\n- Toggle Mode: Z\n\nGoal:\n- Reach the Goal flag to finish each level.\n- Collect items from enemies:\n  * Heart: Health\n  * Energy: Energy\n  * XP Orb: XP\n  * Coin: Currency for Shop\n\nTips:\n- Complete flips to spawn bonus energy pickups.\n- Spend Coins and Tokens in the Shop for consumables and amulets."

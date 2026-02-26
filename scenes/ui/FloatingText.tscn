@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cdqq7145uumra"]
 
 [ext_resource type="Script" uid="uid://m0g4ioou2e6m" path="res://scripts/floating_text.gd" id="1"]
-[ext_resource type="FontFile" uid="uid://cc4s28tp5dj3i" path="res://assets/fonts/at01.ttf" id="2_fc4js"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="2_fc4js"]
 
 [node name="FloatingText" type="Node2D" unique_id=1808370664]
 script = ExtResource("1")

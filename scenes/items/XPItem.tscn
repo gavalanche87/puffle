@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://btah2q6fu5vgh"]
 
 [ext_resource type="Texture2D" uid="uid://dw6f7rechcxjv" path="res://assets/items/xp_orb.png" id="1_kx55h"]
-[ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="2_kx55h"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="2_kx55h"]
 
 [sub_resource type="Gradient" id="1"]
 offsets = PackedFloat32Array(0, 0.82, 1)

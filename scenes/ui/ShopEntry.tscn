@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ee7qafej3d33"]
 
 [ext_resource type="Script" uid="uid://gd8qkmnldwaa" path="res://scripts/ui/shop_entry.gd" id="1"]
-[ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="2"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="3"]
 
 [node name="ShopEntry" type="Panel" unique_id=1434293035]

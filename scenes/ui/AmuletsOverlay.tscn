@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://14t4td6es3cu" path="res://scripts/ui/amulets_screen.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="2"]
-[ext_resource type="FontFile" uid="uid://dwubil4canrne" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="3"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="3"]
 [ext_resource type="Texture2D" uid="uid://cctlmhkcwexnj" path="res://assets/ui/amulets/Amulet_Backing.png" id="4"]
 
 [node name="Amulets" type="Control" unique_id=2077697967]

@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/nav_button.gd" id="1"]
-[ext_resource type="FontFile" path="res://assets/fonts/gemunu-libre-v8-latin-700.ttf" id="2"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="2"]
 
 [node name="NavButton" type="Button"]
 custom_minimum_size = Vector2(220, 52)

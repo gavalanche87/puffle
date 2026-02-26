@@ -13,24 +13,28 @@ theme_override_constants/separation = 6
 
 [node name="ResumeButton" parent="Panel/Margin/VBox/Content/Buttons" instance=ExtResource("2")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 34)
+custom_minimum_size = Vector2(220, 34)
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "RESUME"
 
 [node name="SettingsButton" parent="Panel/Margin/VBox/Content/Buttons" instance=ExtResource("2")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 34)
+custom_minimum_size = Vector2(220, 34)
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "SETTINGS"
 
 [node name="AmuletsButton" parent="Panel/Margin/VBox/Content/Buttons" instance=ExtResource("2")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 34)
+custom_minimum_size = Vector2(220, 34)
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "CHARACTER"
 
 [node name="MainMenuButton" parent="Panel/Margin/VBox/Content/Buttons" instance=ExtResource("2")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 34)
+custom_minimum_size = Vector2(220, 34)
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "MAIN MENU"
