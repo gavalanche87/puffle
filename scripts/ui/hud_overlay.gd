@@ -220,6 +220,11 @@ func _refresh_player_amulet_state() -> void:
 			player.call("validate_ability_state_from_amulets")
 
 func _simulate_level_complete() -> void:
+	for node in get_tree().get_nodes_in_group("player"):
+		var player := node as Node
+		if player and player.has_method("on_level_goal_reached"):
+			player.call("on_level_goal_reached")
+			break
 	var game_data: Node = get_node_or_null("/root/GameData")
 	if game_data and game_data.has_method("complete_current_level"):
 		game_data.call("complete_current_level")

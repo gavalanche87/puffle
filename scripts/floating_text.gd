@@ -59,6 +59,8 @@ func setup_with_item_scene(
 	var icon_node := item_scene.instantiate() as Node2D
 	if not icon_node:
 		return
+	if icon_node.has_method("set_pickup_enabled"):
+		icon_node.call("set_pickup_enabled", false)
 	add_child(icon_node)
 	icon_node.position = icon.position
 	icon_node.scale *= icon_scale

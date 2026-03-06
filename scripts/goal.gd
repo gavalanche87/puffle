@@ -27,6 +27,8 @@ func _process(delta: float) -> void:
 func _on_body_entered(body: Node) -> void:
 	if not (body is CharacterBody2D):
 		return
+	if body.has_method("on_level_goal_reached"):
+		body.call("on_level_goal_reached")
 	var game_data := get_node_or_null("/root/GameData")
 	if game_data and game_data.has_method("complete_current_level"):
 		game_data.call("complete_current_level")

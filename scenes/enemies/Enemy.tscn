@@ -55,20 +55,19 @@ animations = [{
 size = Vector2(24, 21.98428)
 
 [node name="Enemy" type="Area2D" unique_id=923496733]
+scale = Vector2(1.5, 1.5)
 script = ExtResource("1")
 death_scene = ExtResource("3")
 xp_drop_value = 8
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=412141046]
-position = Vector2(16, 12)
-scale = Vector2(1.5, 1.5)
+position = Vector2(16, 16)
 sprite_frames = SubResource("12")
 animation = &"walk"
 frame_progress = 0.9680119
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=165281374]
-position = Vector2(16, 12.743477)
-scale = Vector2(1.5, 1.5)
+position = Vector2(16, 16)
 shape = SubResource("1")
 
 [node name="FloorCast" type="RayCast2D" parent="." unique_id=542463915]
@@ -78,4 +77,7 @@ position = Vector2(16, 16)
 position = Vector2(16.106209, 16)
 
 [node name="GroundCast" type="RayCast2D" parent="." unique_id=1298846010]
+position = Vector2(16, 16)
+
+[node name="HazardCast" type="RayCast2D" parent="." unique_id=500917331]
 position = Vector2(16, 16)

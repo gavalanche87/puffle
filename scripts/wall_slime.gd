@@ -89,7 +89,11 @@ func _on_area_entered(area: Area2D) -> void:
 	if area == null:
 		return
 	if area.is_in_group("hazards"):
-		take_damage(float(max_health))
+		# Fallback: if a hazard slips through ray checks, reverse instead of taking damage.
+		move_direction *= -1
+		reverse_cooldown = reverse_cooldown_time
+		global_position.y += speed * 0.08 * float(move_direction)
+		_update_casts()
 
 func die(kill_context: Dictionary = {}) -> void:
 	if not is_inside_tree():

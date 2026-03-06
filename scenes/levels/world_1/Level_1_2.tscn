@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://c3ncgsfotfrf7"]
+
+[ext_resource type="Script" uid="uid://cfg62htb75fb8" path="res://scripts/level_1.gd" id="1_otabl"]
+[ext_resource type="PackedScene" uid="uid://clc52l7b4jbx4" path="res://scenes/level_elements/LevelParallaxBackground.tscn" id="2_tvl3v"]
+[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="3_66801"]
+[ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/player/Player.tscn" id="4_d6ofu"]
+[ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/level_elements/platforms/Ground.tscn" id="5_xh3ao"]
+[ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/level_elements/platforms/Platform.tscn" id="6_7nidb"]
+[ext_resource type="PackedScene" uid="uid://gni2n50y2lud" path="res://scenes/level_elements/platforms/Wall.tscn" id="7_3u6ib"]
+[ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/enemies/Enemy.tscn" id="8_awysv"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/HazardSaw.tscn" id="9_wvc0g"]
+[ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/level_elements/platforms/Goal.tscn" id="10_1t867"]
+[ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="11_put7o"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(20000, 200)
+
+[node name="Level_1" type="Node2D" unique_id=1498874025]
+script = ExtResource("1_otabl")
+
+[node name="Background" parent="." unique_id=875531696 instance=ExtResource("2_tvl3v")]
+
+[node name="HUD" parent="." unique_id=337148851 instance=ExtResource("3_66801")]
+
+[node name="World" type="Node2D" parent="." unique_id=15817606]
+
+[node name="Player" parent="World" unique_id=913214436 instance=ExtResource("4_d6ofu")]
+position = Vector2(-7232, -368)
+
+[node name="Platforms" type="Node2D" parent="World" unique_id=360609642]
+position = Vector2(2100.2617, -385.89148)
+
+[node name="Ground" parent="World/Platforms" unique_id=2065003243 instance=ExtResource("5_xh3ao")]
+position = Vector2(-6692.2617, 785.8915)
+length_tiles = 200
+
+[node name="Platform1" parent="World/Platforms" unique_id=1704122404 instance=ExtResource("6_7nidb")]
+position = Vector2(4091.7383, 545.8915)
+length_tiles = 10
+
+[node name="Platform2" parent="World/Platforms" unique_id=1685315777 instance=ExtResource("6_7nidb")]
+position = Vector2(4843.7383, 385.89148)
+length_tiles = 10
+
+[node name="Ground2" parent="World/Platforms" unique_id=2068468700 instance=ExtResource("5_xh3ao")]
+position = Vector2(395.73828, 785.8915)
+length_tiles = 200
+
+[node name="Platform3" parent="World/Platforms" unique_id=1933199367 instance=ExtResource("6_7nidb")]
+position = Vector2(7019.7383, 129.89148)
+length_tiles = 100
+
+[node name="Walls" type="Node2D" parent="World" unique_id=976195661]
+position = Vector2(684.34174, 798.26355)
+
+[node name="LeftWall" parent="World/Walls" unique_id=2054015985 instance=ExtResource("7_3u6ib")]
+position = Vector2(-8460.342, -1998.2635)
+length_tiles = 100
+
+[node name="RightWall" parent="World/Walls" unique_id=1395029095 instance=ExtResource("7_3u6ib")]
+position = Vector2(10051.658, -2622.2637)
+length_tiles = 100
+
+[node name="Enemies" type="Node2D" parent="World" unique_id=1375909128]
+
+[node name="Enemy" parent="World/Enemies" unique_id=108086096 instance=ExtResource("8_awysv")]
+position = Vector2(4816, 336)
+
+[node name="Hazards" type="Node2D" parent="World" unique_id=377294241]
+position = Vector2(-6960, -16)
+
+[node name="SawGround" parent="World/Hazards" unique_id=174075143 instance=ExtResource("9_wvc0g")]
+position = Vector2(1376, 384)
+
+[node name="SawGround2" parent="World/Hazards" unique_id=1112322539 instance=ExtResource("9_wvc0g")]
+position = Vector2(1568, 384)
+
+[node name="SawGround3" parent="World/Hazards" unique_id=1041507713 instance=ExtResource("9_wvc0g")]
+position = Vector2(1744, 384)
+
+[node name="Goal" parent="World" unique_id=1339931279 instance=ExtResource("10_1t867")]
+position = Vector2(10496, -480)
+scale = Vector2(4, 4)
+next_scene_path = "res://scenes/ui/LevelSelect.tscn"
+
+[node name="KillPlane" type="Area2D" parent="World" unique_id=506157767]
+position = Vector2(1500, 1500)
+script = ExtResource("11_put7o")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/KillPlane" unique_id=2130299985]
+shape = SubResource("1")
+debug_color = Color(0.99210507, 0, 0.26287603, 0.41960785)

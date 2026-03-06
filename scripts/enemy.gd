@@ -6,6 +6,7 @@ extends Area2D
 @export var max_fall_speed: float = 900.0
 @export var floor_ray_length: float = 32.0
 @export var wall_ray_length: float = 12.0
+@export var hazard_lookahead: float = 18.0
 @export var knockback_decay: float = 900.0
 @export var knockback_duration: float = 0.18
 @export var max_health: int = 1
@@ -22,6 +23,7 @@ extends Area2D
 @onready var floor_cast: RayCast2D = $FloorCast
 @onready var wall_cast: RayCast2D = $WallCast
 @onready var ground_cast: RayCast2D = $GroundCast
+@onready var hazard_cast: RayCast2D = $HazardCast
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 var knockback_velocity: float = 0.0
@@ -33,6 +35,7 @@ func _ready() -> void:
 	add_to_group("enemies")
 	current_health = max(1, max_health)
 	area_entered.connect(_on_area_entered)
+	_configure_cast_collision_modes()
 	_configure_cast_exceptions()
 	_update_casts()
 	var sprite := $AnimatedSprite2D
@@ -50,12 +53,31 @@ func _configure_cast_exceptions() -> void:
 			wall_cast.add_exception(player_body)
 		if ground_cast:
 			ground_cast.add_exception(player_body)
+		if hazard_cast:
+			hazard_cast.add_exception(player_body)
+
+func _configure_cast_collision_modes() -> void:
+	if floor_cast:
+		floor_cast.collide_with_bodies = true
+		floor_cast.collide_with_areas = false
+	if wall_cast:
+		wall_cast.collide_with_bodies = true
+		wall_cast.collide_with_areas = false
+	if ground_cast:
+		ground_cast.collide_with_bodies = true
+		ground_cast.collide_with_areas = false
+	if hazard_cast:
+		hazard_cast.collide_with_bodies = false
+		hazard_cast.collide_with_areas = true
 
 func _on_area_entered(area: Area2D) -> void:
 	if area == null:
 		return
 	if area.is_in_group("hazards"):
-		take_damage(float(max_health))
+		# Fallback: if a hazard slips through, turn around instead of taking hazard damage.
+		direction *= -1
+		global_position.x += 4.0 * float(direction)
+		_update_casts()
 
 func _physics_process(delta: float) -> void:
 	if knockback_timer > 0.0:
@@ -75,7 +97,7 @@ func _physics_process(delta: float) -> void:
 		vertical_velocity = 0.0
 
 	# Patrol decisions should only run while grounded.
-	if vertical_velocity == 0.0 and (_is_at_edge() or _is_hitting_wall()):
+	if vertical_velocity == 0.0 and (_is_at_edge() or _is_hitting_wall() or _is_hazard_ahead()):
 		direction *= -1
 
 	_update_facing()
@@ -216,6 +238,20 @@ func _is_grounded() -> bool:
 	ground_cast.force_raycast_update()
 	return ground_cast.is_colliding()
 
+func _is_hazard_ahead() -> bool:
+	if hazard_cast == null:
+		return false
+	hazard_cast.force_raycast_update()
+	if not hazard_cast.is_colliding():
+		return false
+	var collider := hazard_cast.get_collider() as Node
+	if collider == null:
+		return false
+	if collider.is_in_group("hazards"):
+		return true
+	var parent := collider.get_parent()
+	return parent != null and parent.is_in_group("hazards")
+
 func _snap_to_ground() -> void:
 	if not ground_cast.is_colliding():
 		return
@@ -239,3 +275,5 @@ func _update_casts() -> void:
 	floor_cast.target_position = Vector2(direction * 12.0, floor_ray_length)
 	wall_cast.target_position = Vector2(direction * wall_ray_length, 0.0)
 	ground_cast.target_position = Vector2(0.0, floor_ray_length)
+	if hazard_cast:
+		hazard_cast.target_position = Vector2(direction * hazard_lookahead, 0.0)

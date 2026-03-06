@@ -54,6 +54,7 @@ var sfx_volume_linear: float = 0.8
 var xp_level: int = 1
 var xp_current: float = 0.0
 var xp_to_next_level: float = 100.0
+var level_best_times: Dictionary = {}
 
 const SHOP_ITEMS := [
 	{
@@ -264,6 +265,7 @@ func wipe_save_data() -> void:
 	xp_level = 1
 	xp_current = 0.0
 	xp_to_next_level = 100.0
+	level_best_times.clear()
 	amulet_screen_manage_mode = false
 	amulet_return_scene_path = ""
 	amulet_return_to_pause = false
@@ -314,15 +316,15 @@ func get_level_scene(world: int, level: int) -> String:
 	if world == 1:
 		match level:
 			1:
-				return "res://scenes/levels/test/test_level_1.tscn"
+				return "res://scenes/levels/world_1/Level_1_1.tscn"
 			2:
-				return "res://scenes/levels/test/test_level_2.tscn"
+				return "res://scenes/levels/world_1/Level_1_2.tscn"
 			3:
-				return "res://scenes/levels/test/test_level_3.tscn"
+				return "res://scenes/levels/world_1/Level_1_3.tscn"
 			4:
-				return "res://scenes/levels/test/test_level_4.tscn"
+				return "res://scenes/levels/world_1/Level_1_4.tscn"
 			5:
-				return "res://scenes/levels/test/test_level_5.tscn"
+				return "res://scenes/levels/world_1/Level_1_5.tscn"
 	var cycle := [
 		"res://scenes/levels/world_1/Level_1_1.tscn",
 		"res://scenes/levels/test/test_level_1.tscn",
@@ -478,6 +480,37 @@ func set_xp_state(level: int, current: float, to_next: float, save_now: bool = t
 	if save_now:
 		_save_data()
 	emit_signal("data_changed")
+
+func get_level_best_time(level_id: String) -> float:
+	if level_id == "":
+		return -1.0
+	if not level_best_times.has(level_id):
+		return -1.0
+	return float(level_best_times[level_id])
+
+func get_level_best_time_by_index(world: int, level: int) -> float:
+	if world < 1 or world > WORLD_COUNT:
+		return -1.0
+	if level < 1 or level > LEVELS_PER_WORLD:
+		return -1.0
+	var level_scene_path := get_level_scene(world, level)
+	if level_scene_path == "":
+		return -1.0
+	return get_level_best_time(level_scene_path)
+
+func submit_level_completion_time(level_id: String, elapsed_seconds: float, save_now: bool = true) -> bool:
+	if level_id == "":
+		return false
+	if elapsed_seconds <= 0.0:
+		return false
+	var current_best: float = get_level_best_time(level_id)
+	if current_best > 0.0 and elapsed_seconds >= current_best:
+		return false
+	level_best_times[level_id] = elapsed_seconds
+	if save_now:
+		_save_data()
+	emit_signal("data_changed")
+	return true
 
 func has_ability(ability_id: String) -> bool:
 	return owned_abilities.has(ability_id)
@@ -696,7 +729,8 @@ func _save_data() -> void:
 		"sfx_volume_linear": sfx_volume_linear,
 		"xp_level": xp_level,
 		"xp_current": xp_current,
-		"xp_to_next_level": xp_to_next_level
+		"xp_to_next_level": xp_to_next_level,
+		"level_best_times": level_best_times
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -811,6 +845,14 @@ func _load_data() -> void:
 	xp_level = max(1, int(data.get("xp_level", xp_level)))
 	xp_to_next_level = maxf(1.0, float(data.get("xp_to_next_level", xp_to_next_level)))
 	xp_current = clampf(float(data.get("xp_current", xp_current)), 0.0, xp_to_next_level)
+	level_best_times.clear()
+	var loaded_best_times: Dictionary = data.get("level_best_times", {})
+	for key_variant in loaded_best_times.keys():
+		var level_id: String = String(key_variant)
+		var best_time: float = float(loaded_best_times[key_variant])
+		if level_id == "" or best_time <= 0.0:
+			continue
+		level_best_times[level_id] = best_time
 
 func _ensure_audio_buses() -> void:
 	if AudioServer.get_bus_index("Music") == -1:

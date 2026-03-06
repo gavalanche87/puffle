@@ -35,9 +35,11 @@ const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 @export var headbutt_knockback_big: float = 360.0
 @export var headbutt_damage_small: int = 1
 @export var headbutt_damage_big_multiplier: float = 1.5
-@export var variable_jump_hold_time: float = 0.16
+@export var variable_jump_hold_time: float = 0.3
 @export var variable_jump_hold_gravity_scale: float = 0.45
 @export var variable_jump_release_velocity_scale: float = 0.45
+@export var high_jump_hold_threshold: float = 0.25
+@export var high_jump_energy_cost: int = 15
 @export var wall_snap_distance: float = 6.0
 @export var wall_snap_nudge: float = 1.5
 @export var ground_friction: float = 1400.0
@@ -56,6 +58,8 @@ const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 @export var death_fade_time: float = 0.22
 @export var xp_growth_multiplier: float = 1.25
 @export var respawn_coin_cost: int = 2
+@export var hit_stun_duration: float = 0.05
+@export_flags_2d_physics var invuln_disable_collision_mask_bits: int = (1 << 0) | (1 << 15)
 
 var mode: PlayerMode = PlayerMode.SMALL
 var damage_multiplier: float = 1.0
@@ -82,6 +86,9 @@ var current_health: int = max_health
 var current_energy: int = max_energy
 var energy_regen_accumulator: float = 0.0
 var damage_cooldown_timer: float = 0.0
+var hurtbox_base_collision_mask: int = 0
+var invuln_collision_filter_active: bool = false
+var hit_stun_active: bool = false
 @export var grounded_grace: float = 0.08
 var grounded_timer: float = 0.0
 @export var knockback_decay: float = 1200.0
@@ -107,6 +114,8 @@ var run_sfx_timer: float = 0.0
 var is_killplane_respawning: bool = false
 var extra_jumps_used: int = 0
 var jump_hold_timer: float = 0.0
+var jump_hold_elapsed: float = 0.0
+var high_jump_energy_charged: bool = false
 var is_headbutting: bool = false
 var headbutt_timer: float = 0.0
 var headbutt_dir: float = 1.0
@@ -133,6 +142,7 @@ var coin_count_label: Label
 var commentary_panel: Panel
 var commentary_label: Label
 var commentary_energy_item: Node2D
+var level_timer_label: Label
 var consumable_panel: Panel
 var consumable_health_item: Node2D
 var consumable_energy_item: Node2D
@@ -187,6 +197,8 @@ var commentary_tween: Tween
 var head_attachment_tween: Tween
 var hud_base_modulates: Dictionary = {}
 var base_max_health: int = 0
+var level_time_elapsed: float = 0.0
+var level_timer_running: bool = false
 
 func _ready() -> void:
 	_ensure_toggle_action()
@@ -222,6 +234,7 @@ func _ready() -> void:
 	_update_energy_ui()
 	_update_xp_ui()
 	_update_coins_ui()
+	_start_level_timer()
 	_refresh_consumable_ui()
 	spawn_position = global_position
 	_apply_checkpoint_spawn_if_available()
@@ -255,6 +268,7 @@ func _ready() -> void:
 	var spike_allowed := _has_active_weapon(WEAPON_HEAD_SPIKE)
 	_set_head_attachment_active(spike_allowed, false)
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
+	hurtbox_base_collision_mask = hurtbox.collision_mask
 	# Camera now uses Godot's built-in offset and position_smoothing
 	# No manual positioning needed
 	if sprite:
@@ -273,6 +287,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if is_dying:
 		return
+	_tick_level_timer(delta)
 	if not health_bar_bg or not health_bar_fill or not energy_bar_bg or not energy_bar_fill or not xp_bar_bg or not xp_bar_fill or not xp_level_label:
 		_cache_hud()
 	if Input.is_action_just_pressed("toggle_mode"):
@@ -306,6 +321,7 @@ func _physics_process(delta: float) -> void:
 		input_lock_timer -= delta
 	if damage_cooldown_timer > 0.0:
 		damage_cooldown_timer -= delta
+	_set_invulnerable_collision_filter(damage_cooldown_timer > 0.0)
 	if wall_slide_sfx_timer > 0.0:
 		wall_slide_sfx_timer -= delta
 	if run_sfx_timer > 0.0:
@@ -385,11 +401,15 @@ func _physics_process(delta: float) -> void:
 	if jump_released and velocity.y < 0.0:
 		velocity.y *= clampf(variable_jump_release_velocity_scale, 0.0, 1.0)
 		jump_hold_timer = 0.0
+		jump_hold_elapsed = 0.0
+		high_jump_energy_charged = false
 	elif jump_hold_timer > 0.0 and jump_held and velocity.y < 0.0:
 		var hold_scale := clampf(variable_jump_hold_gravity_scale, 0.0, 1.0)
 		var gravity_reduction := _current_gravity() * (1.0 - hold_scale) * delta
 		velocity.y -= gravity_reduction
 		jump_hold_timer = max(0.0, jump_hold_timer - delta)
+		jump_hold_elapsed += delta
+		_try_charge_high_jump_energy()
 
 	if should_spin and sprite and input_lock_timer <= 0.0:
 		var spin_dir := signf(velocity.x)
@@ -467,15 +487,18 @@ func _physics_process(delta: float) -> void:
 			
 	# Camera updates automatically via Godot's position_smoothing
 
-func take_damage(amount: float) -> float:
+func take_damage(amount: float, from_enemy_or_hazard: bool = false) -> float:
 	var final_amount := amount * damage_multiplier
 	if damage_cooldown_timer > 0.0:
 		return 0.0
 	damage_cooldown_timer = damage_cooldown
+	_set_invulnerable_collision_filter(true)
 	current_health = max(0, current_health - int(round(final_amount)))
 	input_lock_timer = damage_input_lock_duration
 	_update_health_ui()
 	_flash_left_panel(Color(1.0, 0.56, 0.78, 1.0))
+	if from_enemy_or_hazard:
+		_trigger_hit_stun()
 	if current_health <= 0 and not is_dying:
 		call_deferred("_start_death_sequence")
 	return final_amount
@@ -606,6 +629,21 @@ func _current_jump_velocity() -> float:
 
 func _begin_variable_jump() -> void:
 	jump_hold_timer = max(0.0, variable_jump_hold_time)
+	jump_hold_elapsed = 0.0
+	high_jump_energy_charged = false
+
+func _try_charge_high_jump_energy() -> void:
+	if high_jump_energy_charged:
+		return
+	if high_jump_energy_cost <= 0:
+		return
+	if jump_hold_elapsed < maxf(0.0, high_jump_hold_threshold):
+		return
+	if current_energy < high_jump_energy_cost:
+		return
+	current_energy = max(0, current_energy - high_jump_energy_cost)
+	_update_energy_ui()
+	high_jump_energy_charged = true
 
 func _ensure_toggle_action() -> void:
 	_ensure_action_has_key("toggle_mode", KEY_Z)
@@ -667,19 +705,23 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 		return
 
 	if area.is_in_group("hazards"):
+		if damage_cooldown_timer > 0.0:
+			return
 		var amount := hazard_contact_damage
 		if area.has_method("get_damage_amount"):
 			amount = int(area.call("get_damage_amount"))
 		_apply_knockback(area)
 		_play_sfx(sfx_hurt)
-		take_damage(amount * _hazard_damage_multiplier_from_amulets())
+		take_damage(amount * _hazard_damage_multiplier_from_amulets(), true)
 		return
 
 	if not area.is_in_group("enemies"):
 		return
+	if damage_cooldown_timer > 0.0:
+		return
 	_apply_knockback(area)
 	_play_sfx(sfx_hurt)
-	take_damage(enemy_contact_damage)
+	take_damage(enemy_contact_damage, true)
 
 func _on_spike_hitbox_area_entered(area: Area2D) -> void:
 	if area == null:
@@ -701,12 +743,14 @@ func _on_spike_hitbox_area_entered(area: Area2D) -> void:
 				"player_mode": ("small" if mode == PlayerMode.SMALL else "big")
 			}
 			enemy_node.call("take_damage", 1.0, kill_context)
+			_trigger_hit_stun()
 		elif enemy_node and enemy_node.has_method("die"):
 			var kill_context_legacy: Dictionary = {
 				"source": "head_spike",
 				"player_mode": ("small" if mode == PlayerMode.SMALL else "big")
 			}
 			enemy_node.call_deferred("die", kill_context_legacy)
+			_trigger_hit_stun()
 		velocity.y = stomp_bounce_velocity
 		_play_sfx(sfx_stomp)
 		return
@@ -1032,6 +1076,7 @@ func _cache_hud() -> void:
 	commentary_panel = hud.get_node_or_null("CommentaryPanel")
 	commentary_label = hud.get_node_or_null("CommentaryPanel/CommentaryLabel")
 	commentary_energy_item = hud.get_node_or_null("CommentaryPanel/CommentaryEnergyItem") as Node2D
+	level_timer_label = hud.get_node_or_null("LevelTimer")
 	consumable_panel = hud.get_node_or_null("ConsumablePanel")
 	consumable_health_item = hud.get_node_or_null("ConsumablePanel/ConsumableHealthItem") as Node2D
 	consumable_energy_item = hud.get_node_or_null("ConsumablePanel/ConsumableEnergyItem") as Node2D
@@ -1079,6 +1124,53 @@ func _cache_hud() -> void:
 			_register_hud_base_modulate(node as CanvasItem)
 	_update_equipped_amulet_icons()
 	_refresh_weapon_switch_ui()
+
+func _start_level_timer() -> void:
+	level_time_elapsed = 0.0
+	level_timer_running = true
+	_update_level_timer_ui()
+
+func _tick_level_timer(delta: float) -> void:
+	if not level_timer_running or delta <= 0.0:
+		return
+	level_time_elapsed += delta
+	_update_level_timer_ui()
+
+func on_level_goal_reached() -> void:
+	if not level_timer_running:
+		return
+	level_timer_running = false
+	_update_level_timer_ui()
+	_submit_level_completion_time()
+
+func _submit_level_completion_time() -> void:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null or not game_data.has_method("submit_level_completion_time"):
+		return
+	var level_id := _get_current_level_id()
+	if level_id == "":
+		return
+	game_data.call("submit_level_completion_time", level_id, level_time_elapsed)
+
+func _get_current_level_id() -> String:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return ""
+	return String(scene.scene_file_path)
+
+func _update_level_timer_ui() -> void:
+	if level_timer_label == null:
+		_cache_hud()
+	if level_timer_label == null:
+		return
+	level_timer_label.text = _format_level_time(level_time_elapsed)
+
+func _format_level_time(total_seconds: float) -> String:
+	var clamped := maxf(0.0, total_seconds)
+	var minutes: int = int(floor(clamped / 60.0))
+	var seconds: int = int(floor(fmod(clamped, 60.0)))
+	var centiseconds: int = int(floor(fmod(clamped, 1.0) * 100.0))
+	return "%02d:%02d.%02d" % [minutes, seconds, centiseconds]
 
 func _cycle_consumable(direction: int) -> void:
 	var available := _get_available_consumables()
@@ -1174,6 +1266,17 @@ func _cycle_active_weapon(direction: int) -> void:
 func _refresh_weapon_switch_ui() -> void:
 	if weapon_switch_panel == null:
 		return
+	var show_panel := _has_any_owned_weapons()
+	weapon_switch_panel.visible = show_panel
+	if not show_panel:
+		selected_active_weapon_id = WEAPON_NONE
+		if weapon_switch_icon:
+			weapon_switch_icon.texture = null
+			weapon_switch_icon.visible = false
+		var hidden_backing := weapon_switch_panel.get_node_or_null("WeaponIconBacking") as CanvasItem
+		if hidden_backing:
+			hidden_backing.visible = false
+		return
 	_validate_active_weapon_selection()
 	var is_none_selected: bool = selected_active_weapon_id == WEAPON_NONE
 	if weapon_switch_icon:
@@ -1182,6 +1285,17 @@ func _refresh_weapon_switch_ui() -> void:
 	var weapon_switch_backing := weapon_switch_panel.get_node_or_null("WeaponIconBacking") as CanvasItem
 	if weapon_switch_backing:
 		weapon_switch_backing.visible = not is_none_selected
+
+func _has_any_owned_weapons() -> bool:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return false
+	if game_data.has_method("get_owned_weapons"):
+		var owned: Array = game_data.call("get_owned_weapons")
+		return not owned.is_empty()
+	if game_data.has_method("has_weapon"):
+		return bool(game_data.call("has_weapon", WEAPON_HEAD_SPIKE))
+	return false
 
 func _get_weapon_icon_texture(weapon_id: String) -> Texture2D:
 	match weapon_id:
@@ -1755,6 +1869,7 @@ func _apply_headbutt_hit(area: Area2D) -> void:
 			"player_mode": ("small" if mode == PlayerMode.SMALL else "big"),
 			"damage": damage_value
 		})
+		_trigger_hit_stun()
 	elif enemy_node.has_method("die"):
 		var kill_context: Dictionary = {
 			"source": "headbutt",
@@ -1762,6 +1877,7 @@ func _apply_headbutt_hit(area: Area2D) -> void:
 			"damage": damage_value
 		}
 		enemy_node.call_deferred("die", kill_context)
+		_trigger_hit_stun()
 
 func _start_death_sequence() -> void:
 	if is_dying:
@@ -1771,6 +1887,7 @@ func _start_death_sequence() -> void:
 	velocity = Vector2.ZERO
 	knockback_velocity = 0.0
 	damage_cooldown_timer = 0.0
+	_set_invulnerable_collision_filter(false)
 	set_deferred("collision_layer", 0)
 	set_deferred("collision_mask", 0)
 	if body_collision:
@@ -1797,6 +1914,40 @@ func _start_death_sequence() -> void:
 	pending_coin_restore = true
 	pending_fade_in = true
 	get_tree().reload_current_scene()
+
+func _set_invulnerable_collision_filter(active: bool) -> void:
+	if hurtbox == null:
+		return
+	if hurtbox_base_collision_mask == 0:
+		hurtbox_base_collision_mask = hurtbox.collision_mask
+	if active:
+		if invuln_collision_filter_active:
+			return
+		hurtbox.collision_mask = hurtbox_base_collision_mask & ~invuln_disable_collision_mask_bits
+		invuln_collision_filter_active = true
+	else:
+		if not invuln_collision_filter_active:
+			return
+		hurtbox.collision_mask = hurtbox_base_collision_mask
+		invuln_collision_filter_active = false
+
+func _trigger_hit_stun() -> void:
+	if hit_stun_active:
+		return
+	var tree := get_tree()
+	if tree == null:
+		return
+	var duration := maxf(0.0, hit_stun_duration)
+	if duration <= 0.0:
+		return
+	hit_stun_active = true
+	var was_paused := tree.paused
+	if not was_paused:
+		tree.paused = true
+	await tree.create_timer(duration, true, false, true).timeout
+	if is_instance_valid(tree):
+		tree.paused = was_paused
+	hit_stun_active = false
 
 func _ensure_fade_overlay(initial_alpha: float) -> ColorRect:
 	var scene := get_tree().current_scene
