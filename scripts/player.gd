@@ -159,6 +159,7 @@ var selected_active_weapon_id: String = WEAPON_NONE
 @onready var coin_item_scene: PackedScene = preload("res://scenes/items/CoinItem.tscn")
 @onready var health_item_scene: PackedScene = preload("res://scenes/items/HealthItem.tscn")
 @onready var energy_item_scene: PackedScene = preload("res://scenes/items/EnergyItem.tscn")
+@onready var xp_levelup_popup_scene: PackedScene = preload("res://scenes/ui/XpLevelUpPopup.tscn")
 @onready var hud_font: Font = preload("res://assets/fonts/PixeligCursief.ttf")
 @onready var amulet_icon_leap_of_faith: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
 @onready var weapon_icon_head_spike: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Weapon.png")
@@ -199,6 +200,9 @@ var hud_base_modulates: Dictionary = {}
 var base_max_health: int = 0
 var level_time_elapsed: float = 0.0
 var level_timer_running: bool = false
+var xp_levelup_popup: Control
+var took_damage_this_level: bool = false
+var last_level_time_was_new_record: bool = false
 
 func _ready() -> void:
 	_ensure_toggle_action()
@@ -235,6 +239,7 @@ func _ready() -> void:
 	_update_xp_ui()
 	_update_coins_ui()
 	_start_level_timer()
+	took_damage_this_level = false
 	_refresh_consumable_ui()
 	spawn_position = global_position
 	_apply_checkpoint_spawn_if_available()
@@ -494,6 +499,7 @@ func take_damage(amount: float, from_enemy_or_hazard: bool = false) -> float:
 	damage_cooldown_timer = damage_cooldown
 	_set_invulnerable_collision_filter(true)
 	current_health = max(0, current_health - int(round(final_amount)))
+	took_damage_this_level = true
 	input_lock_timer = damage_input_lock_duration
 	_update_health_ui()
 	_flash_left_panel(Color(1.0, 0.56, 0.78, 1.0))
@@ -930,16 +936,19 @@ func add_xp(amount: int) -> void:
 	if amount <= 0:
 		return
 	xp_current += amount
-	var leveled_up := false
+	var levels_gained: int = 0
 	while xp_current >= xp_to_next_level:
 		xp_current -= xp_to_next_level
 		xp_level += 1
 		xp_to_next_level = ceil(xp_to_next_level * xp_growth_multiplier)
-		leveled_up = true
+		levels_gained += 1
 	_update_xp_ui()
 	_sync_xp_to_game_data()
-	if leveled_up:
-		_spawn_screen_text("LEVEL UP!", Color(1.0, 0.95, 0.35), Vector2(-52.0, -100.0), true, Color(0.35, 0.25, 0.0), 3)
+	if levels_gained > 0:
+		var game_data: Node = get_node_or_null("/root/GameData")
+		if game_data and game_data.has_method("add_currency"):
+			game_data.call("add_currency", "tokens", levels_gained)
+		_show_xp_levelup_popup(levels_gained)
 
 func on_item_picked(type: int, value: int) -> void:
 	match type:
@@ -1052,6 +1061,38 @@ func _show_commentary_message(text: String, show_energy_icon: bool) -> void:
 		commentary_panel.visible = false
 	)
 
+func _show_xp_levelup_popup(tokens_reward: int) -> void:
+	if xp_levelup_popup_scene == null:
+		return
+	if xp_levelup_popup and is_instance_valid(xp_levelup_popup):
+		if xp_levelup_popup.has_method("setup_reward"):
+			xp_levelup_popup.call("setup_reward", tokens_reward, xp_level)
+		if xp_levelup_popup.has_method("open_popup"):
+			xp_levelup_popup.call("open_popup")
+		return
+	var popup_parent: Node = get_tree().current_scene
+	if popup_parent == null:
+		return
+	var popup_node: Node = xp_levelup_popup_scene.instantiate()
+	var popup_control: Control = popup_node as Control
+	if popup_control == null:
+		if popup_node:
+			popup_node.queue_free()
+		return
+	xp_levelup_popup = popup_control
+	popup_parent.add_child(popup_control)
+	if xp_levelup_popup.has_method("setup_reward"):
+		xp_levelup_popup.call("setup_reward", tokens_reward, xp_level)
+	if xp_levelup_popup.has_signal("closed"):
+		xp_levelup_popup.connect("closed", _on_xp_levelup_popup_closed)
+	if xp_levelup_popup.has_method("open_popup"):
+		xp_levelup_popup.call("open_popup")
+
+func _on_xp_levelup_popup_closed() -> void:
+	if xp_levelup_popup and is_instance_valid(xp_levelup_popup):
+		xp_levelup_popup.queue_free()
+	xp_levelup_popup = null
+
 func on_xp_item_landed(value: int) -> void:
 	add_xp(value)
 	_play_sfx(sfx_item_land)
@@ -1128,6 +1169,7 @@ func _cache_hud() -> void:
 func _start_level_timer() -> void:
 	level_time_elapsed = 0.0
 	level_timer_running = true
+	last_level_time_was_new_record = false
 	_update_level_timer_ui()
 
 func _tick_level_timer(delta: float) -> void:
@@ -1143,6 +1185,15 @@ func on_level_goal_reached() -> void:
 	_update_level_timer_ui()
 	_submit_level_completion_time()
 
+func get_level_completion_time() -> float:
+	return level_time_elapsed
+
+func get_no_hit_bonus_earned() -> bool:
+	return not took_damage_this_level
+
+func get_last_level_time_was_new_record() -> bool:
+	return last_level_time_was_new_record
+
 func _submit_level_completion_time() -> void:
 	var game_data: Node = get_node_or_null("/root/GameData")
 	if game_data == null or not game_data.has_method("submit_level_completion_time"):
@@ -1150,7 +1201,7 @@ func _submit_level_completion_time() -> void:
 	var level_id := _get_current_level_id()
 	if level_id == "":
 		return
-	game_data.call("submit_level_completion_time", level_id, level_time_elapsed)
+	last_level_time_was_new_record = bool(game_data.call("submit_level_completion_time", level_id, level_time_elapsed))
 
 func _get_current_level_id() -> String:
 	var scene := get_tree().current_scene
@@ -1169,8 +1220,8 @@ func _format_level_time(total_seconds: float) -> String:
 	var clamped := maxf(0.0, total_seconds)
 	var minutes: int = int(floor(clamped / 60.0))
 	var seconds: int = int(floor(fmod(clamped, 60.0)))
-	var centiseconds: int = int(floor(fmod(clamped, 1.0) * 100.0))
-	return "%02d:%02d.%02d" % [minutes, seconds, centiseconds]
+	var centiseconds: int = int(floor(fmod(clamped, 1.0) * 10.0))
+	return "%02d:%02d.%01d" % [minutes, seconds, centiseconds]
 
 func _cycle_consumable(direction: int) -> void:
 	var available := _get_available_consumables()

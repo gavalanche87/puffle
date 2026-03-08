@@ -220,27 +220,30 @@ func _refresh_player_amulet_state() -> void:
 			player.call("validate_ability_state_from_amulets")
 
 func _simulate_level_complete() -> void:
+	var completion_time: float = 0.0
+	var no_hit_bonus: bool = false
+	var is_new_record: bool = false
 	for node in get_tree().get_nodes_in_group("player"):
 		var player := node as Node
 		if player and player.has_method("on_level_goal_reached"):
 			player.call("on_level_goal_reached")
+		if player and player.has_method("get_level_completion_time"):
+			completion_time = float(player.call("get_level_completion_time"))
+		if player and player.has_method("get_no_hit_bonus_earned"):
+			no_hit_bonus = bool(player.call("get_no_hit_bonus_earned"))
+		if player and player.has_method("get_last_level_time_was_new_record"):
+			is_new_record = bool(player.call("get_last_level_time_was_new_record"))
 			break
 	var game_data: Node = get_node_or_null("/root/GameData")
-	if game_data and game_data.has_method("complete_current_level"):
-		game_data.call("complete_current_level")
-	if PLAYER_SCRIPT:
-		PLAYER_SCRIPT.clear_checkpoint_runtime_state()
-	if game_data and game_data.has_method("is_level_flow_active") and game_data.call("is_level_flow_active"):
-		game_data.call("exit_level_flow")
-		get_tree().change_scene_to_file("res://scenes/ui/LevelSelect.tscn")
-		return
+	var next_scene_path := ""
 	var goal_node := _find_goal_node()
 	if goal_node:
-		var next_scene_path := String(goal_node.get("next_scene_path"))
-		if next_scene_path != "":
-			get_tree().change_scene_to_file(next_scene_path)
-			return
-	get_tree().change_scene_to_file("res://scenes/ui/LevelSelect.tscn")
+		next_scene_path = String(goal_node.get("next_scene_path"))
+	if game_data and game_data.has_method("register_level_complete_result"):
+		game_data.call("register_level_complete_result", completion_time, no_hit_bonus, next_scene_path, 20, is_new_record)
+	if PLAYER_SCRIPT:
+		PLAYER_SCRIPT.clear_checkpoint_runtime_state()
+	get_tree().change_scene_to_file("res://scenes/ui/LevelComplete.tscn")
 
 func _find_goal_node() -> Area2D:
 	var scene: Node = get_tree().current_scene

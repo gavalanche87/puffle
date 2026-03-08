@@ -1,0 +1,59 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/PopupWindow.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/xp_level_up_popup.gd" id="2"]
+[ext_resource type="FontFile" uid="uid://18u6y0h0gaqi" path="res://assets/fonts/PixeligCursief.ttf" id="3"]
+[ext_resource type="Texture2D" path="res://assets/items/Token.png" id="4"]
+[ext_resource type="AudioStream" uid="uid://bc5u5pd1akj01" path="res://assets/sound/pickup5.ogg" id="5"]
+
+[node name="XpLevelUpPopup" instance=ExtResource("1")]
+script = ExtResource("2")
+
+[node name="Message" type="Label" parent="Panel/Margin/VBox/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
+theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 24
+text = "LEVEL UP!"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RewardSpacer" type="Control" parent="Panel/Margin/VBox/Content"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+
+[node name="RewardRow" type="HBoxContainer" parent="Panel/Margin/VBox/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="RewardLabel" type="Label" parent="Panel/Margin/VBox/Content/RewardRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
+theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 22
+text = "Reward"
+
+[node name="TokenAmountLabel" type="Label" parent="Panel/Margin/VBox/Content/RewardRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
+theme_override_colors/font_outline_color = Color(0.79607844, 0.68235296, 0.14509805, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 24
+text = "x1"
+
+[node name="TokenIcon" type="TextureRect" parent="Panel/Margin/VBox/Content/RewardRow"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+texture = ExtResource("4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TokenSfx" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5")
+bus = &"SFX"

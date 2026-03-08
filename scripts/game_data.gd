@@ -10,6 +10,7 @@ signal weapons_changed
 
 const SAVE_PATH := "user://save_data.json"
 const LEVEL_SELECT_SCENE := "res://scenes/ui/LevelSelect.tscn"
+const LEVEL_COMPLETE_SCENE := "res://scenes/ui/LevelComplete.tscn"
 
 const WORLD_COUNT := 3
 const LEVELS_PER_WORLD := 10
@@ -55,6 +56,7 @@ var xp_level: int = 1
 var xp_current: float = 0.0
 var xp_to_next_level: float = 100.0
 var level_best_times: Dictionary = {}
+var pending_level_complete_summary: Dictionary = {}
 
 const SHOP_ITEMS := [
 	{
@@ -356,6 +358,69 @@ func complete_current_level() -> void:
 	if current_world <= 0 or current_level <= 0:
 		return
 	complete_level(current_world, current_level)
+
+func get_next_level_info(world: int, level: int) -> Dictionary:
+	if world < 1 or world > WORLD_COUNT:
+		return {"has_next": false, "world": 0, "level": 0, "scene_path": ""}
+	if level < 1 or level > LEVELS_PER_WORLD:
+		return {"has_next": false, "world": 0, "level": 0, "scene_path": ""}
+	var next_world: int = world
+	var next_level: int = level + 1
+	if next_level > LEVELS_PER_WORLD:
+		next_world += 1
+		next_level = 1
+	if next_world > WORLD_COUNT:
+		return {"has_next": false, "world": 0, "level": 0, "scene_path": ""}
+	return {
+		"has_next": true,
+		"world": next_world,
+		"level": next_level,
+		"scene_path": get_level_scene(next_world, next_level)
+	}
+
+func register_level_complete_result(level_time: float, no_hit: bool, next_scene_path: String = "", xp_reward: int = 20, was_new_record: bool = false) -> void:
+	var resolved_xp_reward: int = xp_reward
+	if current_world > 0 and current_level > 0:
+		resolved_xp_reward = _get_level_complete_xp_reward(current_world, current_level, xp_reward)
+	var summary: Dictionary = {
+		"level_time": maxf(0.0, level_time),
+		"no_hit": no_hit,
+		"new_record": was_new_record,
+		"xp_reward": maxi(0, resolved_xp_reward),
+		"level_flow_active": level_flow_active,
+		"current_world": current_world,
+		"current_level": current_level,
+		"next_scene_path": next_scene_path
+	}
+	if current_world > 0 and current_level > 0:
+		summary["level_scene_path"] = get_level_scene(current_world, current_level)
+		complete_current_level()
+		var next_info := get_next_level_info(current_world, current_level)
+		summary["has_next_level"] = bool(next_info.get("has_next", false))
+		summary["next_world"] = int(next_info.get("world", 0))
+		summary["next_level"] = int(next_info.get("level", 0))
+		summary["next_level_scene_path"] = String(next_info.get("scene_path", ""))
+	else:
+		summary["level_scene_path"] = ""
+		summary["has_next_level"] = false
+		summary["next_world"] = 0
+		summary["next_level"] = 0
+		summary["next_level_scene_path"] = ""
+	pending_level_complete_summary = summary
+
+func _get_level_complete_xp_reward(world: int, level: int, default_reward: int) -> int:
+	# Special tuning: make World 1 - Level 1 grant enough XP to trigger an early level-up.
+	if world == 1 and level == 1:
+		return 100
+	return default_reward
+
+func consume_pending_level_complete_summary() -> Dictionary:
+	var out: Dictionary = pending_level_complete_summary.duplicate(true)
+	pending_level_complete_summary.clear()
+	return out
+
+func has_pending_level_complete_summary() -> bool:
+	return not pending_level_complete_summary.is_empty()
 
 func complete_level(world: int, level: int) -> void:
 	var key := level_key(world, level)

@@ -1,92 +1,386 @@
 [gd_scene format=3 uid="uid://c3ncgsfotfrf7"]
 
-[ext_resource type="Script" uid="uid://cfg62htb75fb8" path="res://scripts/level_1.gd" id="1_otabl"]
-[ext_resource type="PackedScene" uid="uid://clc52l7b4jbx4" path="res://scenes/level_elements/LevelParallaxBackground.tscn" id="2_tvl3v"]
-[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="3_66801"]
-[ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/player/Player.tscn" id="4_d6ofu"]
-[ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/level_elements/platforms/Ground.tscn" id="5_xh3ao"]
-[ext_resource type="PackedScene" uid="uid://gt6stjks6uwx" path="res://scenes/level_elements/platforms/Platform.tscn" id="6_7nidb"]
-[ext_resource type="PackedScene" uid="uid://gni2n50y2lud" path="res://scenes/level_elements/platforms/Wall.tscn" id="7_3u6ib"]
-[ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/enemies/Enemy.tscn" id="8_awysv"]
-[ext_resource type="PackedScene" path="res://scenes/hazards/HazardSaw.tscn" id="9_wvc0g"]
-[ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/level_elements/platforms/Goal.tscn" id="10_1t867"]
-[ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="11_put7o"]
+[ext_resource type="PackedScene" uid="uid://bg882w6or57o" path="res://scenes/player/Player.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://bdlw4efq2llwq" path="res://scenes/enemies/Enemy.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://b7ira8hhennd3" path="res://scenes/level_elements/platforms/Goal.tscn" id="3"]
+[ext_resource type="Script" uid="uid://bfkjh2iannh2d" path="res://scripts/kill_plane.gd" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="6"]
+[ext_resource type="PackedScene" uid="uid://banbnsurllhhs" path="res://scenes/level_elements/platforms/Ground.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/HazardSaw.tscn" id="8"]
+[ext_resource type="PackedScene" uid="uid://gni2n50y2lud" path="res://scenes/level_elements/platforms/Wall.tscn" id="10"]
+[ext_resource type="Script" uid="uid://cfg62htb75fb8" path="res://scripts/level_1.gd" id="11"]
+[ext_resource type="PackedScene" uid="uid://civo2w33n3ek3" path="res://scenes/level_elements/Checkpoint.tscn" id="12_tvl3v"]
+[ext_resource type="PackedScene" path="res://scenes/items/CoinItem.tscn" id="12_ygb76"]
+[ext_resource type="PackedScene" uid="uid://clc52l7b4jbx4" path="res://scenes/level_elements/LevelParallaxBackground.tscn" id="parallax_bg_scene"]
 
 [sub_resource type="RectangleShape2D" id="1"]
-size = Vector2(20000, 200)
+size = Vector2(12000, 200)
 
 [node name="Level_1" type="Node2D" unique_id=1498874025]
-script = ExtResource("1_otabl")
+position = Vector2(2304, 0)
+script = ExtResource("11")
 
-[node name="Background" parent="." unique_id=875531696 instance=ExtResource("2_tvl3v")]
+[node name="Background" parent="." unique_id=875531696 instance=ExtResource("parallax_bg_scene")]
 
-[node name="HUD" parent="." unique_id=337148851 instance=ExtResource("3_66801")]
+[node name="HUD" parent="." unique_id=337148851 instance=ExtResource("6")]
 
 [node name="World" type="Node2D" parent="." unique_id=15817606]
 
-[node name="Player" parent="World" unique_id=913214436 instance=ExtResource("4_d6ofu")]
-position = Vector2(-7232, -368)
+[node name="Player" parent="World" unique_id=913214436 instance=ExtResource("1")]
+position = Vector2(-7536, 160)
 
 [node name="Platforms" type="Node2D" parent="World" unique_id=360609642]
 position = Vector2(2100.2617, -385.89148)
 
-[node name="Ground" parent="World/Platforms" unique_id=2065003243 instance=ExtResource("5_xh3ao")]
-position = Vector2(-6692.2617, 785.8915)
-length_tiles = 200
-
-[node name="Platform1" parent="World/Platforms" unique_id=1704122404 instance=ExtResource("6_7nidb")]
-position = Vector2(4091.7383, 545.8915)
-length_tiles = 10
-
-[node name="Platform2" parent="World/Platforms" unique_id=1685315777 instance=ExtResource("6_7nidb")]
-position = Vector2(4843.7383, 385.89148)
-length_tiles = 10
-
-[node name="Ground2" parent="World/Platforms" unique_id=2068468700 instance=ExtResource("5_xh3ao")]
-position = Vector2(395.73828, 785.8915)
-length_tiles = 200
-
-[node name="Platform3" parent="World/Platforms" unique_id=1933199367 instance=ExtResource("6_7nidb")]
-position = Vector2(7019.7383, 129.89148)
+[node name="Ground" parent="World/Platforms" unique_id=2065003243 instance=ExtResource("7")]
+position = Vector2(-8292.262, 785.8915)
 length_tiles = 100
+
+[node name="Ground2" parent="World/Platforms" unique_id=2068468700 instance=ExtResource("7")]
+position = Vector2(-4836.2617, 785.8915)
+length_tiles = 100
+
+[node name="Ground3" parent="World/Platforms" unique_id=413782465 instance=ExtResource("7")]
+position = Vector2(-820.2617, 785.8915)
+length_tiles = 25
+
+[node name="Platform" parent="World/Platforms" unique_id=481381579 instance=ExtResource("7")]
+position = Vector2(-8292.262, 337.89148)
+body_type = "platform"
+length_tiles = 100
+
+[node name="Platform2" parent="World/Platforms" unique_id=181453292 instance=ExtResource("7")]
+position = Vector2(-884.2617, 337.89148)
+body_type = "platform"
+length_tiles = 100
+
+[node name="Platform3" parent="World/Platforms" unique_id=1402106900 instance=ExtResource("7")]
+position = Vector2(-3492.2617, 337.89148)
+body_type = "platform"
+length_tiles = 50
+
+[node name="Platform4" parent="World/Platforms" unique_id=1957058862 instance=ExtResource("7")]
+position = Vector2(-4948.2617, 337.89148)
+body_type = "platform"
+length_tiles = 25
+
+[node name="Platform5" parent="World/Platforms" unique_id=1474090042 instance=ExtResource("7")]
+position = Vector2(-6004.2617, 337.89148)
+body_type = "platform"
+length_tiles = 25
+
+[node name="Platform6" parent="World/Platforms" unique_id=902591003 instance=ExtResource("7")]
+position = Vector2(-3012.2617, 673.8915)
+body_type = "platform"
+length_tiles = 7
+
+[node name="Platform7" parent="World/Platforms" unique_id=505005900 instance=ExtResource("7")]
+position = Vector2(-2772.2617, 673.8915)
+body_type = "platform"
+length_tiles = 5
+
+[node name="Platform8" parent="World/Platforms" unique_id=1477162061 instance=ExtResource("7")]
+position = Vector2(-2548.2617, 673.8915)
+body_type = "platform"
+length_tiles = 5
+
+[node name="Platform9" parent="World/Platforms" unique_id=38832358 instance=ExtResource("7")]
+position = Vector2(1115.7383, 449.89148)
+body_type = "platform"
+length_tiles = 5
+
+[node name="Platform10" parent="World/Platforms" unique_id=431375132 instance=ExtResource("7")]
+position = Vector2(859.7383, 561.8915)
+body_type = "platform"
+length_tiles = 5
+
+[node name="Platform11" parent="World/Platforms" unique_id=1735855374 instance=ExtResource("7")]
+position = Vector2(1115.7383, 673.8915)
+body_type = "platform"
+length_tiles = 5
+
+[node name="Platform12" parent="World/Platforms" unique_id=307225821 instance=ExtResource("7")]
+position = Vector2(875.7383, 385.89148)
+body_type = "platform"
+length_tiles = 3
+
+[node name="Ground4" parent="World/Platforms" unique_id=606326637 instance=ExtResource("7")]
+position = Vector2(-2132.2617, 785.8915)
+length_tiles = 15
+
+[node name="Ground5" parent="World/Platforms" unique_id=843594251 instance=ExtResource("7")]
+position = Vector2(-1556.2617, 785.8915)
+length_tiles = 15
+
+[node name="Ground6" parent="World/Platforms" unique_id=96525349 instance=ExtResource("7")]
+position = Vector2(-84.26172, 785.8915)
+length_tiles = 15
+
+[node name="Ground7" parent="World/Platforms" unique_id=1486567519 instance=ExtResource("7")]
+position = Vector2(603.7383, 785.8915)
+length_tiles = 20
 
 [node name="Walls" type="Node2D" parent="World" unique_id=976195661]
 position = Vector2(684.34174, 798.26355)
 
-[node name="LeftWall" parent="World/Walls" unique_id=2054015985 instance=ExtResource("7_3u6ib")]
+[node name="LeftWall" parent="World/Walls" unique_id=2054015985 instance=ExtResource("10")]
 position = Vector2(-8460.342, -1998.2635)
 length_tiles = 100
 
-[node name="RightWall" parent="World/Walls" unique_id=1395029095 instance=ExtResource("7_3u6ib")]
-position = Vector2(10051.658, -2622.2637)
+[node name="RightWall" parent="World/Walls" unique_id=1395029095 instance=ExtResource("10")]
+position = Vector2(2627.6582, -1966.2635)
 length_tiles = 100
 
 [node name="Enemies" type="Node2D" parent="World" unique_id=1375909128]
+position = Vector2(0, -48)
 
-[node name="Enemy" parent="World/Enemies" unique_id=108086096 instance=ExtResource("8_awysv")]
-position = Vector2(4816, 336)
+[node name="Enemy" parent="World/Enemies" unique_id=108086096 instance=ExtResource("2")]
+position = Vector2(-2048, 384)
+
+[node name="Enemy2" parent="World/Enemies" unique_id=923496733 instance=ExtResource("2")]
+position = Vector2(1264, 336)
+
+[node name="Enemy3" parent="World/Enemies" unique_id=1557110334 instance=ExtResource("2")]
+position = Vector2(1584, -80)
+
+[node name="Enemy4" parent="World/Enemies" unique_id=2020004943 instance=ExtResource("2")]
+position = Vector2(-1536, -112)
+
+[node name="Enemy5" parent="World/Enemies" unique_id=1089833764 instance=ExtResource("2")]
+position = Vector2(-2784, -96)
+
+[node name="Enemy6" parent="World/Enemies" unique_id=1803967677 instance=ExtResource("2")]
+position = Vector2(-3856, -96)
+scale = Vector2(2.25, 2.25)
+
+[node name="Enemy7" parent="World/Enemies" unique_id=1691326043 instance=ExtResource("2")]
+position = Vector2(-5664, -96)
+scale = Vector2(2.25, 2.25)
 
 [node name="Hazards" type="Node2D" parent="World" unique_id=377294241]
-position = Vector2(-6960, -16)
+position = Vector2(-4304, -816)
 
-[node name="SawGround" parent="World/Hazards" unique_id=174075143 instance=ExtResource("9_wvc0g")]
-position = Vector2(1376, 384)
+[node name="SawGround" parent="World/Hazards" unique_id=174075143 instance=ExtResource("8")]
+position = Vector2(-288, 1200)
 
-[node name="SawGround2" parent="World/Hazards" unique_id=1112322539 instance=ExtResource("9_wvc0g")]
-position = Vector2(1568, 384)
+[node name="SawGround2" parent="World/Hazards" unique_id=1112322539 instance=ExtResource("8")]
+position = Vector2(3168, 1200)
 
-[node name="SawGround3" parent="World/Hazards" unique_id=1041507713 instance=ExtResource("9_wvc0g")]
-position = Vector2(1744, 384)
+[node name="SawGround3" parent="World/Hazards" unique_id=1041507713 instance=ExtResource("8")]
+position = Vector2(1456, 1200)
 
-[node name="Goal" parent="World" unique_id=1339931279 instance=ExtResource("10_1t867")]
-position = Vector2(10496, -480)
-scale = Vector2(4, 4)
-next_scene_path = "res://scenes/ui/LevelSelect.tscn"
+[node name="SawGround4" parent="World/Hazards" unique_id=1185377633 instance=ExtResource("8")]
+position = Vector2(0, 1200)
+
+[node name="SawGround5" parent="World/Hazards" unique_id=616752117 instance=ExtResource("8")]
+position = Vector2(32, 752)
+
+[node name="SawGround6" parent="World/Hazards" unique_id=807292621 instance=ExtResource("8")]
+position = Vector2(-288, 752)
+
+[node name="SawGround7" parent="World/Hazards" unique_id=925167990 instance=ExtResource("8")]
+position = Vector2(800, 752)
+
+[node name="SawGround8" parent="World/Hazards" unique_id=265050814 instance=ExtResource("8")]
+position = Vector2(1088, 752)
+
+[node name="SawGround9" parent="World/Hazards" unique_id=1213495676 instance=ExtResource("8")]
+position = Vector2(1856, 752)
+
+[node name="SawGround10" parent="World/Hazards" unique_id=1577280966 instance=ExtResource("8")]
+position = Vector2(2144, 752)
+
+[node name="SawGround11" parent="World/Hazards" unique_id=698826654 instance=ExtResource("8")]
+position = Vector2(3712, 752)
+
+[node name="SawGround12" parent="World/Hazards" unique_id=1383650605 instance=ExtResource("8")]
+position = Vector2(3952, 752)
+
+[node name="SawGround13" parent="World/Hazards" unique_id=561666796 instance=ExtResource("8")]
+position = Vector2(3936, 1088)
+
+[node name="SawGround14" parent="World/Hazards" unique_id=174021784 instance=ExtResource("8")]
+position = Vector2(3312, 1088)
+
+[node name="SawGround15" parent="World/Hazards" unique_id=11668033 instance=ExtResource("8")]
+position = Vector2(3648, 1088)
+
+[node name="SawGround16" parent="World/Hazards" unique_id=387959634 instance=ExtResource("8")]
+position = Vector2(1552, 1200)
+
+[node name="SawGround17" parent="World/Hazards" unique_id=1217215305 instance=ExtResource("8")]
+position = Vector2(1648, 1200)
+
+[node name="SawGround18" parent="World/Hazards" unique_id=1678856886 instance=ExtResource("8")]
+position = Vector2(352, 1200)
+
+[node name="SawGround19" parent="World/Hazards" unique_id=390366499 instance=ExtResource("8")]
+position = Vector2(384, 1200)
+
+[node name="SawGround20" parent="World/Hazards" unique_id=910772903 instance=ExtResource("8")]
+position = Vector2(2784, 1200)
+
+[node name="SawGround21" parent="World/Hazards" unique_id=1755873936 instance=ExtResource("8")]
+position = Vector2(2816, 1200)
+
+[node name="SawGround22" parent="World/Hazards" unique_id=544462856 instance=ExtResource("8")]
+position = Vector2(-2176, 752)
+
+[node name="SawGround23" parent="World/Hazards" unique_id=1923512500 instance=ExtResource("8")]
+position = Vector2(-2208, 752)
+
+[node name="SawGround24" parent="World/Hazards" unique_id=1747798672 instance=ExtResource("8")]
+position = Vector2(-2272, 752)
+
+[node name="SawGround25" parent="World/Hazards" unique_id=729407426 instance=ExtResource("8")]
+position = Vector2(-2304, 752)
+
+[node name="SawGround26" parent="World/Hazards" unique_id=1486954436 instance=ExtResource("8")]
+position = Vector2(-2368, 752)
+
+[node name="SawGround27" parent="World/Hazards" unique_id=1898319194 instance=ExtResource("8")]
+position = Vector2(-2400, 752)
+
+[node name="SawGround28" parent="World/Hazards" unique_id=374677117 instance=ExtResource("8")]
+position = Vector2(-2464, 752)
+
+[node name="SawGround29" parent="World/Hazards" unique_id=797432111 instance=ExtResource("8")]
+position = Vector2(-2496, 752)
+
+[node name="SawGround30" parent="World/Hazards" unique_id=537116784 instance=ExtResource("8")]
+position = Vector2(-2560, 752)
+
+[node name="SawGround31" parent="World/Hazards" unique_id=1886421837 instance=ExtResource("8")]
+position = Vector2(-2592, 752)
 
 [node name="KillPlane" type="Area2D" parent="World" unique_id=506157767]
-position = Vector2(1500, 1500)
-script = ExtResource("11_put7o")
+position = Vector2(-2096, 880)
+script = ExtResource("4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/KillPlane" unique_id=2130299985]
 shape = SubResource("1")
 debug_color = Color(0.99210507, 0, 0.26287603, 0.41960785)
+
+[node name="Items" type="Node2D" parent="World" unique_id=1916509196]
+position = Vector2(0, -1936)
+
+[node name="CoinBundle" type="Node2D" parent="World/Items" unique_id=1165606039]
+position = Vector2(0, 2000)
+
+[node name="CoinItem" parent="World/Items/CoinBundle" unique_id=935503219 instance=ExtResource("12_ygb76")]
+position = Vector2(-6576, 304)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle" unique_id=300078811 instance=ExtResource("12_ygb76")]
+position = Vector2(-6528, 304)
+
+[node name="CoinItem3" parent="World/Items/CoinBundle" unique_id=1682883172 instance=ExtResource("12_ygb76")]
+position = Vector2(-6480, 304)
+
+[node name="CoinBundle2" type="Node2D" parent="World/Items" unique_id=475237024]
+position = Vector2(1072, 2000)
+
+[node name="CoinItem" parent="World/Items/CoinBundle2" unique_id=1208008716 instance=ExtResource("12_ygb76")]
+position = Vector2(-6576, 304)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle2" unique_id=678445941 instance=ExtResource("12_ygb76")]
+position = Vector2(-6528, 304)
+
+[node name="CoinItem3" parent="World/Items/CoinBundle2" unique_id=1844086587 instance=ExtResource("12_ygb76")]
+position = Vector2(-6480, 304)
+
+[node name="CoinBundle3" type="Node2D" parent="World/Items" unique_id=1831654491]
+position = Vector2(3776, 1872)
+
+[node name="CoinItem" parent="World/Items/CoinBundle3" unique_id=838754774 instance=ExtResource("12_ygb76")]
+position = Vector2(-6576, 304)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle3" unique_id=392818552 instance=ExtResource("12_ygb76")]
+position = Vector2(-6528, 304)
+
+[node name="CoinItem3" parent="World/Items/CoinBundle3" unique_id=764397689 instance=ExtResource("12_ygb76")]
+position = Vector2(-6480, 304)
+
+[node name="CoinBundle4" type="Node2D" parent="World/Items" unique_id=1651550772]
+position = Vector2(-656, 2096)
+
+[node name="CoinItem" parent="World/Items/CoinBundle4" unique_id=2078552567 instance=ExtResource("12_ygb76")]
+position = Vector2(-124, 0)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle4" unique_id=473924354 instance=ExtResource("12_ygb76")]
+
+[node name="CoinItem3" parent="World/Items/CoinBundle4" unique_id=1361484778 instance=ExtResource("12_ygb76")]
+position = Vector2(124, 0)
+
+[node name="CoinBundle5" type="Node2D" parent="World/Items" unique_id=914538537]
+position = Vector2(272, 2256)
+
+[node name="CoinItem" parent="World/Items/CoinBundle5" unique_id=718347518 instance=ExtResource("12_ygb76")]
+position = Vector2(-124, 0)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle5" unique_id=1011582968 instance=ExtResource("12_ygb76")]
+
+[node name="CoinItem3" parent="World/Items/CoinBundle5" unique_id=622770569 instance=ExtResource("12_ygb76")]
+position = Vector2(124, 0)
+
+[node name="CoinBundle6" type="Node2D" parent="World/Items" unique_id=196923058]
+position = Vector2(-480, 1808)
+
+[node name="CoinItem" parent="World/Items/CoinBundle6" unique_id=459906891 instance=ExtResource("12_ygb76")]
+position = Vector2(-124, 0)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle6" unique_id=1984820817 instance=ExtResource("12_ygb76")]
+
+[node name="CoinItem3" parent="World/Items/CoinBundle6" unique_id=590287395 instance=ExtResource("12_ygb76")]
+position = Vector2(124, 0)
+
+[node name="CoinBundle7" type="Node2D" parent="World/Items" unique_id=232685786]
+position = Vector2(-2320, 1808)
+
+[node name="CoinItem" parent="World/Items/CoinBundle7" unique_id=477919120 instance=ExtResource("12_ygb76")]
+position = Vector2(-124, 0)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle7" unique_id=679103972 instance=ExtResource("12_ygb76")]
+
+[node name="CoinItem3" parent="World/Items/CoinBundle7" unique_id=1516165022 instance=ExtResource("12_ygb76")]
+position = Vector2(124, 0)
+
+[node name="CoinBundle8" type="Node2D" parent="World/Items" unique_id=1772930891]
+position = Vector2(-3360, 1808)
+
+[node name="CoinItem" parent="World/Items/CoinBundle8" unique_id=942519265 instance=ExtResource("12_ygb76")]
+position = Vector2(-124, 0)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle8" unique_id=475312502 instance=ExtResource("12_ygb76")]
+
+[node name="CoinItem3" parent="World/Items/CoinBundle8" unique_id=262509326 instance=ExtResource("12_ygb76")]
+position = Vector2(124, 0)
+
+[node name="CoinBundle9" type="Node2D" parent="World/Items" unique_id=532038543]
+position = Vector2(-4448, 1808)
+
+[node name="CoinItem" parent="World/Items/CoinBundle9" unique_id=1175121645 instance=ExtResource("12_ygb76")]
+position = Vector2(-124, 0)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle9" unique_id=2109199892 instance=ExtResource("12_ygb76")]
+
+[node name="CoinItem3" parent="World/Items/CoinBundle9" unique_id=653241478 instance=ExtResource("12_ygb76")]
+position = Vector2(124, 0)
+
+[node name="CoinBundle10" type="Node2D" parent="World/Items" unique_id=1095873250]
+position = Vector2(2336, 2256)
+
+[node name="CoinItem" parent="World/Items/CoinBundle10" unique_id=255643260 instance=ExtResource("12_ygb76")]
+position = Vector2(-124, 0)
+
+[node name="CoinItem2" parent="World/Items/CoinBundle10" unique_id=1157464636 instance=ExtResource("12_ygb76")]
+
+[node name="CoinItem3" parent="World/Items/CoinBundle10" unique_id=1928009702 instance=ExtResource("12_ygb76")]
+position = Vector2(124, 0)
+
+[node name="Goal" parent="World" unique_id=611772022 instance=ExtResource("3")]
+position = Vector2(-7648, -240)
+scale = Vector2(4, 4)
+next_scene_path = "res://scenes/ui/LevelSelect.tscn"
+
+[node name="Checkpoint" parent="World" unique_id=663553948 instance=ExtResource("12_tvl3v")]
+position = Vector2(2463.9998, -80)

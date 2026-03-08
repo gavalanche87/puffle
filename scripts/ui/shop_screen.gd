@@ -41,9 +41,6 @@ func _ready() -> void:
 	)
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd:
-		if gd.has_method("add_currency"):
-			gd.call("add_currency", "coins", 100)
-			gd.call("add_currency", "tokens", 100)
 		if gd.has_signal("currencies_changed"):
 			gd.currencies_changed.connect(_refresh)
 		if gd.has_signal("inventory_changed"):
