@@ -54,9 +54,25 @@ func collect(player: Node2D) -> void:
 			return
 	collected = true
 	_disable_pickup()
-	if pickup_sfx and pickup_sfx.stream:
-		pickup_sfx.play()
+	_play_collision_pickup_sfx()
 	_fly_to_coin_hud(player)
+
+func _play_collision_pickup_sfx() -> void:
+	if pickup_sfx == null or pickup_sfx.stream == null:
+		return
+	var root := get_tree().current_scene
+	if root == null:
+		pickup_sfx.play()
+		return
+	var one_shot := AudioStreamPlayer2D.new()
+	one_shot.stream = pickup_sfx.stream
+	one_shot.bus = pickup_sfx.bus
+	one_shot.volume_db = pickup_sfx.volume_db
+	one_shot.pitch_scale = pickup_sfx.pitch_scale
+	one_shot.global_position = global_position
+	root.add_child(one_shot)
+	one_shot.finished.connect(one_shot.queue_free)
+	one_shot.play()
 
 func _fly_to_coin_hud(player: Node2D) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")

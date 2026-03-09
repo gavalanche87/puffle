@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-enum ItemType {HEALTH, ENERGY, COIN, XP}
+enum ItemType {HEALTH, ENERGY, COIN, XP, HALO}
 
 @export var type: ItemType = ItemType.COIN:
 	set(val):
@@ -35,6 +35,7 @@ const HEALTH_ITEM_SCENE: PackedScene = preload("res://scenes/items/HealthItem.ts
 const ENERGY_ITEM_SCENE: PackedScene = preload("res://scenes/items/EnergyItem.tscn")
 const XP_ITEM_SCENE: PackedScene = preload("res://scenes/items/XPItem.tscn")
 const COIN_ITEM_SCENE: PackedScene = preload("res://scenes/items/CoinItem.tscn")
+const HALO_ITEM_SCENE: PackedScene = preload("res://scenes/items/HaloItem.tscn")
 
 func _ready() -> void:
 	add_to_group("items")
@@ -102,6 +103,11 @@ func _setup_item() -> void:
 			backing_color = Color(0.7, 0.3, 1.0, 0.9)
 			glow_color = Color(0.85, 0.45, 1.0, 0.85)
 			particles.color = Color(0.75, 0.35, 1.0)
+		ItemType.HALO:
+			icon_visual = HALO_ITEM_SCENE.instantiate() as Node2D
+			backing_color = Color(0.37254903, 0.89411765, 0.89411765, 0.9)
+			glow_color = Color(0.37254903, 0.89411765, 0.89411765, 0.85)
+			particles.color = Color(0.37254903, 0.89411765, 0.89411765, 1.0)
 
 	if icon_visual:
 		icon_anchor.add_child(icon_visual)
@@ -254,6 +260,9 @@ func _apply_landing_reward(player: Node2D) -> void:
 	elif type == ItemType.COIN:
 		if player.has_method("on_coin_item_landed"):
 			player.call("on_coin_item_landed", value)
+	elif type == ItemType.HALO:
+		if player.has_method("on_halo_item_landed"):
+			player.call("on_halo_item_landed", value)
 
 func _play_pickup_burst() -> void:
 	if icon_visual:
@@ -278,7 +287,7 @@ func _clear_icon_visual() -> void:
 	item_backing = null
 
 func _find_item_backing(root: Node) -> CanvasItem:
-	for node_name in ["HealthIconBacking", "EnergyIconBacking", "XpIconBacking", "CoinIconBacking"]:
+	for node_name in ["HealthIconBacking", "EnergyIconBacking", "XpIconBacking", "CoinIconBacking", "HaloIconBacking"]:
 		var found := root.get_node_or_null(node_name) as CanvasItem
 		if found:
 			return found

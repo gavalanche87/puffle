@@ -26,6 +26,8 @@ const ICON_HEADBUTT: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Wea
 const ICON_HEAD_SPIKE: Texture2D = preload("res://assets/ui/weapons/Head_Spike_Weapon.png")
 const ICON_HEALTH_ITEM: Texture2D = preload("res://assets/items/heart_icon.png")
 const ICON_ENERGY_ITEM: Texture2D = preload("res://assets/items/energy_icon.png")
+const ICON_HALO_ITEM: Texture2D = preload("res://assets/items/halo_icon.png")
+const ICON_MUSIC_TRACK: Texture2D = preload("res://assets/ui/music_record.png")
 
 signal buy_requested(offer_id: String)
 
@@ -120,5 +122,9 @@ func _get_offer_icon(offer_kind_id: String) -> Texture2D:
 			return ICON_HEALTH_ITEM
 		"energy_pack":
 			return ICON_ENERGY_ITEM
+		"halo_pack":
+			return ICON_HALO_ITEM
 		_:
+			if offer_kind_id.begins_with("level_music_"):
+				return ICON_MUSIC_TRACK
 			return null

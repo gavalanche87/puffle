@@ -9,8 +9,10 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/NavButton.tscn" id="7"]
 [ext_resource type="Texture2D" uid="uid://brhwgafr2gvbr" path="res://assets/ui/Timer.png" id="7_p4k5r"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseMenuPopup.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/ui/XpLevelUpPopup.tscn" id="9"]
 [ext_resource type="Texture2D" uid="uid://c4hi1jgpf5nu7" path="res://assets/ui/amulets/Leap_Of_Faith_Amulet.png" id="13"]
 [ext_resource type="Texture2D" uid="uid://b21h2rtgws7wf" path="res://assets/ui/weapons/Head_Spike_Weapon.png" id="14"]
+[ext_resource type="PackedScene" path="res://scenes/items/HaloItem.tscn" id="15"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
 bg_color = Color(0.254902, 0.254902, 0.254902, 1)
@@ -179,10 +181,10 @@ scale = Vector2(0.8, 0.8)
 
 [node name="CommentaryLabel" type="Label" parent="CommentaryPanel" unique_id=214765294]
 layout_mode = 0
-offset_left = 25.51355
-offset_top = 3.502304
-offset_right = 173.51355
-offset_bottom = 30.502304
+offset_left = 10.0
+offset_top = 3.502
+offset_right = 156.0
+offset_bottom = 30.502
 theme_override_colors/font_color = Color(0.933333, 0.898039, 0.913725, 1)
 theme_override_colors/font_outline_color = Color(0.254902, 0.737255, 0.737255, 1)
 theme_override_constants/outline_size = 8
@@ -220,6 +222,8 @@ text = "COMPLETE"
 
 [node name="PauseMenuPopup" parent="." unique_id=1674893631 instance=ExtResource("8")]
 
+[node name="XpLevelUpPopup" parent="." instance=ExtResource("9")]
+
 [node name="ConsumablePanel" type="Panel" parent="." unique_id=1632010254]
 offset_left = 8.0
 offset_top = 315.0
@@ -232,7 +236,11 @@ position = Vector2(24.92266, 20)
 
 [node name="ConsumableEnergyItem" parent="ConsumablePanel" unique_id=1577687636 instance=ExtResource("2")]
 visible = false
-position = Vector2(50, 20)
+position = Vector2(24.92266, 20)
+
+[node name="ConsumableHaloItem" parent="ConsumablePanel" unique_id=1577687999 instance=ExtResource("15")]
+visible = false
+position = Vector2(24.9227, 20)
 
 [node name="ConsumableCountLabel" type="Label" parent="ConsumablePanel" unique_id=1966424498]
 layout_mode = 0

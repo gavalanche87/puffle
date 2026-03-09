@@ -25,6 +25,8 @@ func open_popup() -> void:
 	visible = true
 	if manage_pause_state:
 		get_tree().paused = true
+	if close_button:
+		close_button.grab_focus()
 	emit_signal("opened")
 
 func close_popup() -> void:

@@ -54,6 +54,8 @@ const AMULET_LEAP_OF_FAITH := "leap_of_faith"
 @export var double_jump_energy_cost: int = 6
 @export var wall_jump_energy_cost: int = 6
 @export var energy_regen_per_second: float = 1.0
+@export var halo_invincible_duration: float = 15.0
+@export var halo_follow_lerp_speed: float = 40.0
 @export var death_anim_time: float = 0.4
 @export var death_fade_time: float = 0.22
 @export var xp_growth_multiplier: float = 1.25
@@ -146,6 +148,7 @@ var level_timer_label: Label
 var consumable_panel: Panel
 var consumable_health_item: Node2D
 var consumable_energy_item: Node2D
+var consumable_halo_item: Node2D
 var consumable_count_label: Label
 var weapon_switch_panel: Panel
 var weapon_switch_icon: TextureRect
@@ -159,6 +162,8 @@ var selected_active_weapon_id: String = WEAPON_NONE
 @onready var coin_item_scene: PackedScene = preload("res://scenes/items/CoinItem.tscn")
 @onready var health_item_scene: PackedScene = preload("res://scenes/items/HealthItem.tscn")
 @onready var energy_item_scene: PackedScene = preload("res://scenes/items/EnergyItem.tscn")
+@onready var halo_icon_texture: Texture2D = preload("res://assets/items/halo_icon.png")
+@onready var enemy_death_scene: PackedScene = preload("res://scenes/enemies/EnemyDeath.tscn")
 @onready var xp_levelup_popup_scene: PackedScene = preload("res://scenes/ui/XpLevelUpPopup.tscn")
 @onready var hud_font: Font = preload("res://assets/fonts/PixeligCursief.ttf")
 @onready var amulet_icon_leap_of_faith: Texture2D = preload("res://assets/ui/amulets/Leap_Of_Faith_Amulet.png")
@@ -177,6 +182,7 @@ var selected_active_weapon_id: String = WEAPON_NONE
 @onready var sfx_wall_slide: AudioStreamPlayer = $SfxWallSlide
 @onready var sfx_run: AudioStreamPlayer = $SfxRun
 @onready var sfx_headbutt: AudioStreamPlayer = get_node_or_null("SfxHeadbutt") as AudioStreamPlayer
+@onready var sfx_halo_loop: AudioStreamPlayer = get_node_or_null("SfxHaloLoop") as AudioStreamPlayer
 @onready var camera: Camera2D = $Camera2D
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var head_attachment: Node2D = $AnimatedSprite2D/Head_Attachment
@@ -201,8 +207,12 @@ var base_max_health: int = 0
 var level_time_elapsed: float = 0.0
 var level_timer_running: bool = false
 var xp_levelup_popup: Control
+var xp_levelup_popup_runtime_instance: bool = false
 var took_damage_this_level: bool = false
 var last_level_time_was_new_record: bool = false
+var halo_invincible_timer: float = 0.0
+var halo_flash_timer: float = 0.0
+var halo_follow_sprite: Sprite2D
 
 func _ready() -> void:
 	_ensure_toggle_action()
@@ -283,7 +293,9 @@ func _ready() -> void:
 		camera.make_current()
 	if sfx_switch:
 		sfx_switch.volume_db = size_shift_sfx_gain_db
+	_prepare_halo_loop_player()
 	_refresh_amulet_state()
+	_ensure_halo_follow_sprite()
 	call_deferred("_play_spawn_sequence")
 	if pending_fade_in:
 		pending_fade_in = false
@@ -326,6 +338,12 @@ func _physics_process(delta: float) -> void:
 		input_lock_timer -= delta
 	if damage_cooldown_timer > 0.0:
 		damage_cooldown_timer -= delta
+	if halo_invincible_timer > 0.0:
+		halo_invincible_timer = maxf(0.0, halo_invincible_timer - delta)
+		halo_flash_timer += delta
+		if halo_invincible_timer <= 0.0:
+			_deactivate_halo_invincibility_visual()
+	_update_halo_follow_visual(delta)
 	_set_invulnerable_collision_filter(damage_cooldown_timer > 0.0)
 	if wall_slide_sfx_timer > 0.0:
 		wall_slide_sfx_timer -= delta
@@ -472,7 +490,13 @@ func _physics_process(delta: float) -> void:
 	_update_animation(wall_sliding)
 	
 	# Visual feedback for damage/invulnerability
-	if damage_cooldown_timer > 0.0:
+	if halo_invincible_timer > 0.0:
+		var flash_speed := 15.0
+		if int(halo_invincible_timer * flash_speed) % 2 == 0:
+			sprite.modulate = Color(4, 4, 4, 1)
+		else:
+			sprite.modulate = Color(1, 1, 1, 1)
+	elif damage_cooldown_timer > 0.0:
 		# Rapidly flicker between bright white and normal
 		var flash_speed := 15.0
 		if int(damage_cooldown_timer * flash_speed) % 2 == 0:
@@ -493,6 +517,8 @@ func _physics_process(delta: float) -> void:
 	# Camera updates automatically via Godot's position_smoothing
 
 func take_damage(amount: float, from_enemy_or_hazard: bool = false) -> float:
+	if halo_invincible_timer > 0.0 and from_enemy_or_hazard:
+		return 0.0
 	var final_amount := amount * damage_multiplier
 	if damage_cooldown_timer > 0.0:
 		return 0.0
@@ -649,6 +675,7 @@ func _try_charge_high_jump_energy() -> void:
 		return
 	current_energy = max(0, current_energy - high_jump_energy_cost)
 	_update_energy_ui()
+	_play_mode_switch_glow()
 	high_jump_energy_charged = true
 
 func _ensure_toggle_action() -> void:
@@ -711,6 +738,9 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 		return
 
 	if area.is_in_group("hazards"):
+		if halo_invincible_timer > 0.0:
+			_destroy_hazard_from_area(area)
+			return
 		if damage_cooldown_timer > 0.0:
 			return
 		var amount := hazard_contact_damage
@@ -722,6 +752,12 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 		return
 
 	if not area.is_in_group("enemies"):
+		return
+	if halo_invincible_timer > 0.0:
+		_destroy_enemy_from_area(area, {
+			"source": "halo_invincible",
+			"player_mode": ("small" if mode == PlayerMode.SMALL else "big")
+		})
 		return
 	if damage_cooldown_timer > 0.0:
 		return
@@ -958,6 +994,8 @@ func on_item_picked(type: int, value: int) -> void:
 			pass
 		2: # COIN
 			pass
+		4: # HALO
+			on_halo_item_landed(value)
 
 func on_energy_item_landed(value: int) -> void:
 	var gain := value if value > 1 else (value * 25)
@@ -972,6 +1010,12 @@ func on_coin_item_landed(value: int) -> void:
 	_add_coins(value, true)
 	_play_sfx(sfx_item_land)
 	_flash_right_panel(Color(0.98039216, 0.972549, 0.6745098, 1.0))
+
+func on_halo_item_landed(value: int) -> void:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data and game_data.has_method("add_consumable"):
+		game_data.call("add_consumable", "halo", maxi(1, value))
+	_play_sfx(sfx_item_land)
 
 func can_collect_item(type: int) -> bool:
 	match type:
@@ -1064,13 +1108,30 @@ func _show_commentary_message(text: String, show_energy_icon: bool) -> void:
 func _show_xp_levelup_popup(tokens_reward: int) -> void:
 	if xp_levelup_popup_scene == null:
 		return
+	var hud_layer: Node = null
+	if get_tree().current_scene:
+		hud_layer = get_tree().current_scene.get_node_or_null("HUD")
+	if hud_layer == null:
+		hud_layer = get_tree().get_first_node_in_group("hud")
+	if xp_levelup_popup == null or not is_instance_valid(xp_levelup_popup):
+		if hud_layer:
+			var existing_popup := hud_layer.get_node_or_null("XpLevelUpPopup") as Control
+			if existing_popup:
+				xp_levelup_popup = existing_popup
+				xp_levelup_popup_runtime_instance = false
 	if xp_levelup_popup and is_instance_valid(xp_levelup_popup):
 		if xp_levelup_popup.has_method("setup_reward"):
 			xp_levelup_popup.call("setup_reward", tokens_reward, xp_level)
+		if xp_levelup_popup.has_signal("closed"):
+			var on_closed := Callable(self, "_on_xp_levelup_popup_closed")
+			if not xp_levelup_popup.is_connected("closed", on_closed):
+				xp_levelup_popup.connect("closed", on_closed)
 		if xp_levelup_popup.has_method("open_popup"):
 			xp_levelup_popup.call("open_popup")
 		return
-	var popup_parent: Node = get_tree().current_scene
+	var popup_parent: Node = hud_layer
+	if popup_parent == null:
+		popup_parent = get_tree().current_scene
 	if popup_parent == null:
 		return
 	var popup_node: Node = xp_levelup_popup_scene.instantiate()
@@ -1080,18 +1141,22 @@ func _show_xp_levelup_popup(tokens_reward: int) -> void:
 			popup_node.queue_free()
 		return
 	xp_levelup_popup = popup_control
+	xp_levelup_popup_runtime_instance = true
 	popup_parent.add_child(popup_control)
 	if xp_levelup_popup.has_method("setup_reward"):
 		xp_levelup_popup.call("setup_reward", tokens_reward, xp_level)
 	if xp_levelup_popup.has_signal("closed"):
-		xp_levelup_popup.connect("closed", _on_xp_levelup_popup_closed)
+		var on_closed_runtime := Callable(self, "_on_xp_levelup_popup_closed")
+		if not xp_levelup_popup.is_connected("closed", on_closed_runtime):
+			xp_levelup_popup.connect("closed", on_closed_runtime)
 	if xp_levelup_popup.has_method("open_popup"):
 		xp_levelup_popup.call("open_popup")
 
 func _on_xp_levelup_popup_closed() -> void:
-	if xp_levelup_popup and is_instance_valid(xp_levelup_popup):
+	if xp_levelup_popup and is_instance_valid(xp_levelup_popup) and xp_levelup_popup_runtime_instance:
 		xp_levelup_popup.queue_free()
 	xp_levelup_popup = null
+	xp_levelup_popup_runtime_instance = false
 
 func on_xp_item_landed(value: int) -> void:
 	add_xp(value)
@@ -1121,6 +1186,7 @@ func _cache_hud() -> void:
 	consumable_panel = hud.get_node_or_null("ConsumablePanel")
 	consumable_health_item = hud.get_node_or_null("ConsumablePanel/ConsumableHealthItem") as Node2D
 	consumable_energy_item = hud.get_node_or_null("ConsumablePanel/ConsumableEnergyItem") as Node2D
+	consumable_halo_item = hud.get_node_or_null("ConsumablePanel/ConsumableHaloItem") as Node2D
 	consumable_count_label = hud.get_node_or_null("ConsumablePanel/ConsumableCountLabel")
 	weapon_switch_panel = hud.get_node_or_null("WeaponSwitchPanel")
 	weapon_switch_icon = hud.get_node_or_null("WeaponSwitchPanel/WeaponIcon") as TextureRect
@@ -1134,6 +1200,7 @@ func _cache_hud() -> void:
 	var commentary_energy_backing := hud.get_node_or_null("CommentaryPanel/CommentaryEnergyItem/EnergyIconBacking") as CanvasItem
 	var consumable_health_backing := hud.get_node_or_null("ConsumablePanel/ConsumableHealthItem/HealthIconBacking") as CanvasItem
 	var consumable_energy_backing := hud.get_node_or_null("ConsumablePanel/ConsumableEnergyItem/EnergyIconBacking") as CanvasItem
+	var consumable_halo_backing := hud.get_node_or_null("ConsumablePanel/ConsumableHaloItem/HaloIconBacking") as CanvasItem
 	var weapon_switch_backing := hud.get_node_or_null("WeaponSwitchPanel/WeaponIconBacking") as CanvasItem
 	if health_backing:
 		health_backing.visible = false
@@ -1149,6 +1216,8 @@ func _cache_hud() -> void:
 		consumable_health_backing.visible = false
 	if consumable_energy_backing:
 		consumable_energy_backing.visible = false
+	if consumable_halo_backing:
+		consumable_halo_backing.visible = false
 	if weapon_switch_backing:
 		weapon_switch_backing.visible = false
 	_refresh_consumable_ui()
@@ -1240,7 +1309,7 @@ func _get_available_consumables() -> Array[String]:
 	var game_data: Node = get_node_or_null("/root/GameData")
 	if game_data == null:
 		return available
-	for key in ["health", "energy"]:
+	for key in ["health", "energy", "halo"]:
 		var count: int = int(game_data.call("get_inventory_count", key))
 		if count > 0:
 			available.append(key)
@@ -1265,6 +1334,8 @@ func _refresh_consumable_ui() -> void:
 		consumable_health_item.visible = selected_consumable_key == "health"
 	if consumable_energy_item:
 		consumable_energy_item.visible = selected_consumable_key == "energy"
+	if consumable_halo_item:
+		consumable_halo_item.visible = selected_consumable_key == "halo"
 
 func _get_active_weapon_cycle_list() -> Array[String]:
 	var ids: Array[String] = [WEAPON_NONE]
@@ -1366,6 +1437,9 @@ func _use_selected_consumable() -> void:
 	elif key == "energy":
 		if current_energy >= max_energy:
 			return
+	elif key == "halo":
+		if halo_invincible_timer > 0.0:
+			return
 	else:
 		return
 	var consumed: bool = bool(game_data.call("consume_consumable", key, 1))
@@ -1376,12 +1450,154 @@ func _use_selected_consumable() -> void:
 		current_health = min(max_health, current_health + 25)
 		_update_health_ui()
 		_flash_left_panel(Color(0.11372549, 0.7019608, 0.48235294, 1.0))
-	else:
+	elif key == "energy":
 		current_energy = min(max_energy, current_energy + 25)
 		_update_energy_ui()
 		_flash_left_panel(Color(0.52, 0.86, 1.0, 1.0))
+	else:
+		_activate_halo_invincibility(halo_invincible_duration)
 	_play_sfx(sfx_item_land)
 	_refresh_consumable_ui()
+
+func _activate_halo_invincibility(duration: float) -> void:
+	var final_duration := maxf(0.1, duration)
+	halo_invincible_timer = maxf(halo_invincible_timer, final_duration)
+	halo_flash_timer = 0.0
+	damage_cooldown_timer = 0.0
+	_set_invulnerable_collision_filter(false)
+	_start_halo_loop_sfx()
+	_show_halo_invincibility_visual()
+
+func _ensure_halo_follow_sprite() -> void:
+	if halo_follow_sprite and is_instance_valid(halo_follow_sprite):
+		return
+	if halo_icon_texture == null:
+		return
+	var node := Sprite2D.new()
+	node.texture = halo_icon_texture
+	node.centered = true
+	node.visible = false
+	node.top_level = true
+	node.z_index = 120
+	node.modulate = Color(1.0, 1.0, 0.35, 0.95)
+	node.scale = Vector2(0.7, 0.7)
+	add_child(node)
+	halo_follow_sprite = node
+
+func _show_halo_invincibility_visual() -> void:
+	_ensure_halo_follow_sprite()
+	if halo_follow_sprite == null:
+		return
+	halo_follow_sprite.visible = true
+	halo_follow_sprite.global_position = _get_halo_follow_target_position()
+	halo_follow_sprite.scale = Vector2(0.7, 0.0)
+	var tween := create_tween()
+	tween.tween_property(halo_follow_sprite, "scale:y", 0.7, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+func _deactivate_halo_invincibility_visual() -> void:
+	if halo_follow_sprite == null or not is_instance_valid(halo_follow_sprite):
+		_stop_halo_loop_sfx()
+		return
+	_stop_halo_loop_sfx()
+	var tween := create_tween()
+	tween.tween_property(halo_follow_sprite, "scale:y", 0.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_callback(func() -> void:
+		if halo_follow_sprite and is_instance_valid(halo_follow_sprite):
+			halo_follow_sprite.visible = false
+			halo_follow_sprite.scale = Vector2(0.7, 0.7)
+	)
+
+func _get_halo_follow_target_position() -> Vector2:
+	var source := sprite.global_position if sprite else global_position
+	var y_offset := -20.0 if mode == PlayerMode.SMALL else -28.0
+	return source + Vector2(0.0, y_offset)
+
+func _update_halo_follow_visual(delta: float) -> void:
+	if halo_follow_sprite == null or not is_instance_valid(halo_follow_sprite):
+		return
+	if halo_invincible_timer <= 0.0:
+		return
+	if not halo_follow_sprite.visible:
+		halo_follow_sprite.visible = true
+	var target := _get_halo_follow_target_position()
+	var weight := clampf(delta * maxf(1.0, halo_follow_lerp_speed), 0.0, 1.0)
+	halo_follow_sprite.global_position = halo_follow_sprite.global_position.lerp(target, weight)
+
+func _spawn_enemy_death_fx_at(world_pos: Vector2) -> void:
+	if enemy_death_scene == null:
+		return
+	var root := get_tree().current_scene
+	if root == null:
+		return
+	var fx := enemy_death_scene.instantiate() as Node2D
+	if fx == null:
+		return
+	root.add_child(fx)
+	fx.global_position = world_pos
+
+func _destroy_enemy_from_area(area: Area2D, kill_context: Dictionary = {}) -> void:
+	if area == null:
+		return
+	var enemy_node: Node = area
+	if not enemy_node.has_method("die") and area.get_parent() and area.get_parent().has_method("die"):
+		enemy_node = area.get_parent()
+	if enemy_node == null:
+		return
+	var spawn_pos := area.global_position
+	if enemy_node is Node2D:
+		spawn_pos = (enemy_node as Node2D).global_position
+	_play_sfx(sfx_stomp)
+	if enemy_node.has_method("take_damage"):
+		enemy_node.call("take_damage", 999.0, kill_context)
+	elif enemy_node.has_method("die"):
+		enemy_node.call_deferred("die", kill_context)
+	else:
+		_spawn_enemy_death_fx_at(spawn_pos)
+		enemy_node.queue_free()
+
+func _destroy_hazard_from_area(area: Area2D) -> void:
+	if area == null:
+		return
+	var target: Node = area
+	if area.get_parent() is RigidBody2D:
+		target = area.get_parent()
+	var spawn_pos := area.global_position
+	if target is Node2D:
+		spawn_pos = (target as Node2D).global_position
+	_spawn_enemy_death_fx_at(spawn_pos)
+	_play_sfx(sfx_hurt)
+	target.queue_free()
+
+func _start_halo_loop_sfx() -> void:
+	if sfx_halo_loop == null or sfx_halo_loop.stream == null:
+		return
+	if not sfx_halo_loop.playing:
+		sfx_halo_loop.play()
+
+func _stop_halo_loop_sfx() -> void:
+	if sfx_halo_loop and sfx_halo_loop.playing:
+		sfx_halo_loop.stop()
+
+func _prepare_halo_loop_player() -> void:
+	if sfx_halo_loop == null:
+		return
+	sfx_halo_loop.volume_db = 3.0
+	if sfx_halo_loop.stream == null:
+		return
+	# Use a dedicated instance so loop settings do not affect other SFX players.
+	var local_stream: AudioStream = sfx_halo_loop.stream.duplicate(true)
+	sfx_halo_loop.stream = local_stream
+	var wav := local_stream as AudioStreamWAV
+	if wav:
+		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		return
+	var ogg := local_stream as AudioStreamOggVorbis
+	if ogg:
+		ogg.loop = true
+		return
+	var mp3 := local_stream as AudioStreamMP3
+	if mp3:
+		mp3.loop = true
 
 func _set_mode_scale(target_scale: Vector2, animate: bool) -> void:
 	if not sprite:
@@ -1934,6 +2150,7 @@ func _start_death_sequence() -> void:
 	if is_dying:
 		return
 	is_dying = true
+	_stop_halo_loop_sfx()
 	input_lock_timer = 999.0
 	velocity = Vector2.ZERO
 	knockback_velocity = 0.0
@@ -1999,6 +2216,12 @@ func _trigger_hit_stun() -> void:
 	if is_instance_valid(tree):
 		tree.paused = was_paused
 	hit_stun_active = false
+
+func _exit_tree() -> void:
+	_stop_halo_loop_sfx()
+	if halo_follow_sprite and is_instance_valid(halo_follow_sprite):
+		halo_follow_sprite.queue_free()
+	halo_follow_sprite = null
 
 func _ensure_fade_overlay(initial_alpha: float) -> ColorRect:
 	var scene := get_tree().current_scene

@@ -27,6 +27,7 @@ var _xp_to_next: float = 100.0
 var _xp_reward: int = 20
 var _xp_levelup_popup: Control
 var _is_new_record: bool = false
+var _has_rewards: bool = true
 
 func _ready() -> void:
 	super._ready()
@@ -48,6 +49,7 @@ func _load_summary() -> void:
 	var no_hit: bool = bool(_summary.get("no_hit", false))
 	_is_new_record = bool(_summary.get("new_record", false))
 	_xp_reward = maxi(0, int(_summary.get("xp_reward", 20)))
+	_has_rewards = bool(_summary.get("has_rewards", _xp_reward > 0))
 	if level_time_value:
 		level_time_value.text = _format_time(level_time)
 	if no_hit_value:
@@ -87,7 +89,8 @@ func _run_reveal_sequence() -> void:
 	if _is_new_record:
 		await _reveal_row(new_record_row)
 	await _reveal_row(no_hit_row)
-	await _reveal_row(rewards_row)
+	if _has_rewards:
+		await _reveal_row(rewards_row)
 	await _apply_xp_reward_animation()
 
 func _set_row_visible(row: Control, visible_state: bool) -> void:
@@ -111,7 +114,11 @@ func _reveal_row(row: Control) -> void:
 	await get_tree().create_timer(0.18).timeout
 
 func _apply_xp_reward_animation() -> void:
-	if _xp_reward <= 0:
+	if not _has_rewards or _xp_reward <= 0:
+		if rewards_row:
+			rewards_row.visible = false
+		if next_level_button:
+			next_level_button.disabled = false
 		return
 	if reward_xp_icon == null or xp_icon_target == null:
 		_apply_xp_reward_state()

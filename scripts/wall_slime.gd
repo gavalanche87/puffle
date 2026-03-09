@@ -17,7 +17,8 @@ extends Area2D
 @export_range(0, 100) var health_drop_rate: float = 30.0
 @export_range(0, 100) var energy_drop_rate: float = 30.0
 @export_range(0, 100) var coin_drop_rate: float = 30.0
-@export var xp_drop_value: int = 12
+@export_range(0, 100) var halo_drop_rate: float = 15.0
+@export var xp_drop_value: int = 100
 @export var item_scene: PackedScene = preload("res://scenes/items/ItemPickup.tscn")
 
 @onready var edge_cast: RayCast2D = $EdgeCast
@@ -205,6 +206,8 @@ func _build_drop_requests(kill_context: Dictionary = {}) -> Array[Dictionary]:
 		drops.append({"type": 1, "value": 1})
 	elif roll < (health_drop_rate + energy_drop_rate + coin_drop_rate):
 		drops.append({"type": 2, "value": 1})
+	elif roll < (health_drop_rate + energy_drop_rate + coin_drop_rate + halo_drop_rate):
+		drops.append({"type": 4, "value": 1})
 	if _is_small_head_spike_kill(kill_context):
 		drops.append({"type": 2, "value": 1})
 	return drops

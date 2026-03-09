@@ -25,11 +25,11 @@ const MUSIC_TRACK_LEVEL_1 := "level_music_1"
 const PLAYER_SCRIPT := preload("res://scripts/player.gd")
 
 var coins: int = 0
-var tokens: int = 3
+var tokens: int = 0
 var unlocked_worlds: int = 1
 var unlocked_levels: Dictionary = {1: 1, 2: 0, 3: 0}
 var completed_levels: Array[String] = []
-var consumable_inventory: Dictionary = {"health": 0, "energy": 0}
+var consumable_inventory: Dictionary = {"health": 0, "energy": 0, "halo": 0}
 
 var owned_abilities: Array[String] = []
 var owned_amulets: Array[String] = []
@@ -57,6 +57,10 @@ var xp_current: float = 0.0
 var xp_to_next_level: float = 100.0
 var level_best_times: Dictionary = {}
 var pending_level_complete_summary: Dictionary = {}
+var item_coin_costs: Dictionary = {
+	"health_pack": 10,
+	"energy_pack": 10
+}
 
 const SHOP_ITEMS := [
 	{
@@ -76,6 +80,15 @@ const SHOP_ITEMS := [
 		"currency": "coins",
 		"cost": 5,
 		"inventory_key": "energy"
+	},
+	{
+		"id": "halo_pack",
+		"kind": "item",
+		"title": "Halo",
+		"description": "Halo collectible item",
+		"currency": "coins",
+		"cost": 5,
+		"inventory_key": "halo"
 	}
 ]
 
@@ -86,7 +99,7 @@ const SHOP_ABILITIES := [
 		"title": "Size Shift",
 		"description": "Boon: Toggle Big/Small Mode",
 		"currency": "tokens",
-		"cost": 2
+		"cost": 3
 	},
 	{
 		"id": ABILITY_DOUBLE_JUMP,
@@ -94,15 +107,15 @@ const SHOP_ABILITIES := [
 		"title": "Double Jump",
 		"description": "Boon: Gain one extra jump in mid-air",
 		"currency": "tokens",
-		"cost": 3
+		"cost": 10
 	},
 	{
 		"id": ABILITY_WALL_JUMP,
 		"kind": "ability",
-		"title": "Wall Jump",
+		"title": "Wall Master",
 		"description": "Boon: Enables wall slide and wall jump",
 		"currency": "tokens",
-		"cost": 3
+		"cost": 5
 	},
 	{
 		"id": ABILITY_HEADBUTT,
@@ -132,7 +145,7 @@ const SHOP_WEAPONS := [
 		"title": "Head Spike",
 		"description": "Boon: Head-mounted spike attack",
 		"currency": "tokens",
-		"cost": 3
+		"cost": 1
 	}
 ]
 
@@ -201,19 +214,19 @@ const ABILITY_INFO := {
 		"title": "Size Shift",
 		"boon": "Toggle Big and Small form with Z",
 		"grievance": "None",
-		"shop_cost_tokens": 2
+		"shop_cost_tokens": 3
 	},
 	ABILITY_DOUBLE_JUMP: {
 		"title": "Double Jump",
 		"boon": "Gain one extra jump in mid-air",
 		"grievance": "None",
-		"shop_cost_tokens": 3
+		"shop_cost_tokens": 10
 	},
 	ABILITY_WALL_JUMP: {
-		"title": "Wall Jump",
+		"title": "Wall Master",
 		"boon": "Enables wall slide and wall jump",
 		"grievance": "None",
-		"shop_cost_tokens": 3
+		"shop_cost_tokens": 5
 	},
 	ABILITY_HEADBUTT: {
 		"title": "Headbutt",
@@ -228,7 +241,7 @@ const AMULET_INFO := {
 		"title": "Leap of Faith",
 		"boon": "Jump height increased x2",
 		"grievance": "Take 20% more damage from hazards",
-		"shop_cost_tokens": 3
+		"shop_cost_tokens": 1
 	}
 }
 
@@ -248,11 +261,11 @@ func _ready() -> void:
 
 func wipe_save_data() -> void:
 	coins = 0
-	tokens = 3
+	tokens = 0
 	unlocked_worlds = 1
 	unlocked_levels = {1: 1, 2: 0, 3: 0}
 	completed_levels.clear()
-	consumable_inventory = {"health": 0, "energy": 0}
+	consumable_inventory = {"health": 0, "energy": 0, "halo": 0}
 	owned_abilities.clear()
 	owned_amulets.clear()
 	owned_weapons.clear()
@@ -268,6 +281,10 @@ func wipe_save_data() -> void:
 	xp_current = 0.0
 	xp_to_next_level = 100.0
 	level_best_times.clear()
+	item_coin_costs = {
+		"health_pack": 10,
+		"energy_pack": 10
+	}
 	amulet_screen_manage_mode = false
 	amulet_return_scene_path = ""
 	amulet_return_to_pause = false
@@ -282,10 +299,23 @@ func wipe_save_data() -> void:
 	emit_signal("data_changed")
 
 func get_shop_items() -> Array:
-	return SHOP_ITEMS.duplicate(true)
+	var out: Array = SHOP_ITEMS.duplicate(true)
+	for i in range(out.size()):
+		var offer: Dictionary = out[i]
+		var offer_id := String(offer.get("id", ""))
+		if item_coin_costs.has(offer_id):
+			offer["cost"] = int(item_coin_costs.get(offer_id, offer.get("cost", 10)))
+		out[i] = offer
+	return out
 
 func get_shop_abilities() -> Array:
-	return SHOP_ABILITIES.duplicate(true)
+	var out: Array = []
+	for offer in SHOP_ABILITIES:
+		var offer_id := String(offer.get("id", ""))
+		if offer_id == ABILITY_HEADBUTT and not has_weapon(WEAPON_HEAD_SPIKE):
+			continue
+		out.append(offer)
+	return out
 
 func get_shop_amulets() -> Array:
 	return SHOP_AMULETS.duplicate(true)
@@ -380,13 +410,19 @@ func get_next_level_info(world: int, level: int) -> Dictionary:
 
 func register_level_complete_result(level_time: float, no_hit: bool, next_scene_path: String = "", xp_reward: int = 20, was_new_record: bool = false) -> void:
 	var resolved_xp_reward: int = xp_reward
+	var first_time_clear: bool = false
 	if current_world > 0 and current_level > 0:
+		first_time_clear = not is_level_completed(current_world, current_level)
 		resolved_xp_reward = _get_level_complete_xp_reward(current_world, current_level, xp_reward)
+		if not first_time_clear:
+			resolved_xp_reward = 0
 	var summary: Dictionary = {
 		"level_time": maxf(0.0, level_time),
 		"no_hit": no_hit,
 		"new_record": was_new_record,
 		"xp_reward": maxi(0, resolved_xp_reward),
+		"has_rewards": maxi(0, resolved_xp_reward) > 0,
+		"first_time_clear": first_time_clear,
 		"level_flow_active": level_flow_active,
 		"current_world": current_world,
 		"current_level": current_level,
@@ -480,10 +516,12 @@ func purchase_offer(offer_id: String) -> Dictionary:
 
 	var currency := String(offer.get("currency", "coins"))
 	var cost := int(offer.get("cost", 0))
+	var kind := String(offer.get("kind", ""))
+	if kind == "item" and item_coin_costs.has(offer_id):
+		cost = int(item_coin_costs.get(offer_id, cost))
 	if not can_afford(currency, cost):
 		return {"ok": false, "message": "Not enough %s" % currency}
 
-	var kind := String(offer.get("kind", ""))
 	var id := String(offer.get("id", ""))
 	if kind == "amulet":
 		if owned_amulets.has(id):
@@ -492,6 +530,8 @@ func purchase_offer(offer_id: String) -> Dictionary:
 	elif kind == "ability":
 		if owned_abilities.has(id):
 			return {"ok": false, "message": "Already owned"}
+		if id == ABILITY_HEADBUTT and not has_weapon(WEAPON_HEAD_SPIKE):
+			return {"ok": false, "message": "Requires Head Spike"}
 		owned_abilities.append(id)
 	elif kind == "weapon":
 		if owned_weapons.has(id):
@@ -505,6 +545,8 @@ func purchase_offer(offer_id: String) -> Dictionary:
 		var inv_key := String(offer.get("inventory_key", ""))
 		if inv_key != "":
 			consumable_inventory[inv_key] = int(consumable_inventory.get(inv_key, 0)) + 1
+		if item_coin_costs.has(id):
+			item_coin_costs[id] = int(item_coin_costs.get(id, 10)) + 10
 
 	add_currency(currency, -cost, false)
 	_save_data()
@@ -530,6 +572,14 @@ func consume_consumable(key: String, amount: int = 1) -> bool:
 	emit_signal("inventory_changed")
 	emit_signal("data_changed")
 	return true
+
+func add_consumable(key: String, amount: int = 1) -> void:
+	if key == "" or amount <= 0:
+		return
+	consumable_inventory[key] = int(consumable_inventory.get(key, 0)) + amount
+	_save_data()
+	emit_signal("inventory_changed")
+	emit_signal("data_changed")
 
 func get_xp_state() -> Dictionary:
 	return {
@@ -795,7 +845,8 @@ func _save_data() -> void:
 		"xp_level": xp_level,
 		"xp_current": xp_current,
 		"xp_to_next_level": xp_to_next_level,
-		"level_best_times": level_best_times
+		"level_best_times": level_best_times,
+		"item_coin_costs": item_coin_costs
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -832,6 +883,7 @@ func _load_data() -> void:
 	var loaded_inventory: Dictionary = data.get("consumable_inventory", {})
 	consumable_inventory["health"] = int(loaded_inventory.get("health", consumable_inventory.get("health", 0)))
 	consumable_inventory["energy"] = int(loaded_inventory.get("energy", consumable_inventory.get("energy", 0)))
+	consumable_inventory["halo"] = int(loaded_inventory.get("halo", consumable_inventory.get("halo", 0)))
 
 	owned_abilities.clear()
 	owned_amulets.clear()
@@ -910,6 +962,9 @@ func _load_data() -> void:
 	xp_level = max(1, int(data.get("xp_level", xp_level)))
 	xp_to_next_level = maxf(1.0, float(data.get("xp_to_next_level", xp_to_next_level)))
 	xp_current = clampf(float(data.get("xp_current", xp_current)), 0.0, xp_to_next_level)
+	var loaded_item_coin_costs: Dictionary = data.get("item_coin_costs", {})
+	item_coin_costs["health_pack"] = maxi(10, int(loaded_item_coin_costs.get("health_pack", 10)))
+	item_coin_costs["energy_pack"] = maxi(10, int(loaded_item_coin_costs.get("energy_pack", 10)))
 	level_best_times.clear()
 	var loaded_best_times: Dictionary = data.get("level_best_times", {})
 	for key_variant in loaded_best_times.keys():

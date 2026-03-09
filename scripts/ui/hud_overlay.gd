@@ -13,6 +13,7 @@ var _settings_overlay_from_pause: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("hud")
 	var gd: Node = get_node_or_null("/root/GameData")
 	if pause_button:
 		pause_button.pressed.connect(_on_pause_pressed)
