@@ -13,7 +13,7 @@ func _ready() -> void:
 func setup_reward(tokens_reward: int, new_level: int) -> void:
 	var safe_reward: int = maxi(1, tokens_reward)
 	if message_label:
-		message_label.text = "Level %d reached!" % new_level
+		message_label.text = "Level %d Reached!" % new_level
 	if token_amount_label:
 		token_amount_label.text = "x%d" % safe_reward
 

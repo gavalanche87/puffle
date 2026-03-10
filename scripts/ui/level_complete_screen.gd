@@ -3,6 +3,7 @@ extends "res://scripts/ui/menu_transitions.gd"
 const XP_GROWTH_MULTIPLIER: float = 1.25
 const XP_LEVELUP_POPUP_SCENE: PackedScene = preload("res://scenes/ui/XpLevelUpPopup.tscn")
 const NO_HIT_COIN_BONUS: int = 50
+const SEQUENCE_TIME_SCALE: float = 3.0
 
 @onready var level_time_row: Control = $Layout/VBox/Card/CardMargin/CardVBox/LevelTimeRow
 @onready var level_time_value: Label = $Layout/VBox/Card/CardMargin/CardVBox/LevelTimeRow/LevelTimeValue
@@ -108,10 +109,10 @@ func _reveal_row(row: Control) -> void:
 	row.modulate.a = 0.0
 	row.scale = Vector2(0.92, 0.92)
 	var t := create_tween().set_parallel(true)
-	t.tween_property(row, "modulate:a", 1.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	t.tween_property(row, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_property(row, "modulate:a", 1.0, 0.2 * SEQUENCE_TIME_SCALE).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(row, "scale", Vector2.ONE, 0.22 * SEQUENCE_TIME_SCALE).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	await t.finished
-	await get_tree().create_timer(0.18).timeout
+	await get_tree().create_timer(0.18 * SEQUENCE_TIME_SCALE).timeout
 
 func _apply_xp_reward_animation() -> void:
 	if not _has_rewards or _xp_reward <= 0:
@@ -132,38 +133,56 @@ func _apply_xp_reward_animation() -> void:
 	fly_icon.scale = reward_xp_icon.scale
 	add_child(fly_icon)
 	var t := create_tween().set_parallel(true)
-	t.tween_property(fly_icon, "global_position", xp_icon_target.global_position, 0.42).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	t.tween_property(fly_icon, "scale", reward_xp_icon.scale * 0.35, 0.42).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	t.tween_property(fly_icon, "modulate:a", 0.2, 0.42).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_property(fly_icon, "global_position", xp_icon_target.global_position, 0.42 * SEQUENCE_TIME_SCALE).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	t.tween_property(fly_icon, "scale", reward_xp_icon.scale * 0.35, 0.42 * SEQUENCE_TIME_SCALE).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_property(fly_icon, "modulate:a", 0.2, 0.42 * SEQUENCE_TIME_SCALE).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await t.finished
 	fly_icon.queue_free()
 	_apply_xp_reward_state()
 
 func _apply_xp_reward_state() -> void:
-	var xp_gain: float = float(_xp_reward)
-	_xp_current += xp_gain
+	var remaining_xp: float = float(_xp_reward)
 	var levels_gained: int = 0
-	while _xp_current >= _xp_to_next:
-		_xp_current -= _xp_to_next
-		_xp_level += 1
-		_xp_to_next = ceil(_xp_to_next * XP_GROWTH_MULTIPLIER)
-		levels_gained += 1
+	while remaining_xp > 0.0:
+		var needed_to_level: float = maxf(0.0, _xp_to_next - _xp_current)
+		if needed_to_level <= 0.0:
+			needed_to_level = _xp_to_next
+		if remaining_xp >= needed_to_level:
+			_xp_current = _xp_to_next
+			await _tween_xp_bar_to_ratio(1.0, 0.36 * SEQUENCE_TIME_SCALE)
+			remaining_xp -= needed_to_level
+			_xp_current = 0.0
+			_xp_level += 1
+			_xp_to_next = ceil(_xp_to_next * XP_GROWTH_MULTIPLIER)
+			levels_gained += 1
+			_update_xp_ui()
+			if xp_bar_fill:
+				xp_bar_fill.size.x = 0.0
+			await get_tree().create_timer(0.08 * SEQUENCE_TIME_SCALE).timeout
+		else:
+			_xp_current += remaining_xp
+			remaining_xp = 0.0
+			var partial_ratio: float = clampf(_xp_current / _xp_to_next, 0.0, 1.0)
+			await _tween_xp_bar_to_ratio(partial_ratio, 0.34 * SEQUENCE_TIME_SCALE)
+	_update_xp_ui()
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd and gd.has_method("set_xp_state"):
 		gd.call("set_xp_state", _xp_level, _xp_current, _xp_to_next)
 	if levels_gained > 0 and gd and gd.has_method("add_currency"):
 		gd.call("add_currency", "tokens", levels_gained)
-	var ratio: float = clampf(_xp_current / _xp_to_next, 0.0, 1.0)
-	if xp_bar_bg and xp_bar_fill:
-		var target_width: float = xp_bar_bg.size.x * ratio
-		var t := create_tween()
-		t.tween_property(xp_bar_fill, "size:x", target_width, 0.34).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		await t.finished
-	_update_xp_ui()
 	if levels_gained > 0:
 		await _show_xp_levelup_popup(levels_gained)
 	if next_level_button:
 		next_level_button.disabled = false
+
+func _tween_xp_bar_to_ratio(ratio: float, duration: float) -> void:
+	if xp_bar_bg == null or xp_bar_fill == null:
+		return
+	var clamped_ratio: float = clampf(ratio, 0.0, 1.0)
+	var target_width: float = xp_bar_bg.size.x * clamped_ratio
+	var t := create_tween()
+	t.tween_property(xp_bar_fill, "size:x", target_width, maxf(0.01, duration)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await t.finished
 
 func _on_next_level_pressed() -> void:
 	if next_level_button:

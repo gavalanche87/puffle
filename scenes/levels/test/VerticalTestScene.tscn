@@ -454,6 +454,93 @@ texture = ExtResource("6_f7khp")
 position = Vector2(-32, -4960)
 length_tiles = 33
 
+[node name="PlatformM2" parent="World/Platforms" unique_id=1420530138 instance=ExtResource("platform_scene")]
+position = Vector2(-176, -1088)
+length_tiles = 4
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM2" unique_id=1489177395]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM3" parent="World/Platforms" unique_id=1096120850 instance=ExtResource("platform_scene")]
+position = Vector2(-176, -1440)
+length_tiles = 4
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM3" unique_id=34958305]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM4" parent="World/Platforms" unique_id=118032625 instance=ExtResource("platform_scene")]
+position = Vector2(-416, -1728)
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM4" unique_id=2122091811]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM5" parent="World/Platforms" unique_id=68664603 instance=ExtResource("platform_scene")]
+position = Vector2(-32, -1312)
+length_tiles = 3
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM5" unique_id=1828665381]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM6" parent="World/Platforms" unique_id=1001206756 instance=ExtResource("platform_scene")]
+position = Vector2(464, -2016)
+length_tiles = 3
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM6" unique_id=269672993]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM7" parent="World/Platforms" unique_id=1993268754 instance=ExtResource("platform_scene")]
+position = Vector2(416, -2496)
+length_tiles = 5
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM7" unique_id=633888039]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM8" parent="World/Platforms" unique_id=1897152014 instance=ExtResource("platform_scene")]
+position = Vector2(448, -2736)
+length_tiles = 3
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM8" unique_id=734397717]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM9" parent="World/Platforms" unique_id=1434539988 instance=ExtResource("platform_scene")]
+position = Vector2(-400, -3152)
+length_tiles = 8
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM9" unique_id=53990762]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM10" parent="World/Platforms" unique_id=1958473493 instance=ExtResource("platform_scene")]
+position = Vector2(448, -3376)
+length_tiles = 3
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM10" unique_id=722961635]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM11" parent="World/Platforms" unique_id=1625515782 instance=ExtResource("platform_scene")]
+position = Vector2(448, -3792)
+length_tiles = 3
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM11" unique_id=1132711052]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
+[node name="PlatformM12" parent="World/Platforms" unique_id=1133529741 instance=ExtResource("platform_scene")]
+position = Vector2(480, -2944)
+length_tiles = 1
+
+[node name="Grass2" type="Sprite2D" parent="World/Platforms/PlatformM12" unique_id=1062764118]
+show_behind_parent = true
+texture = ExtResource("6_f7khp")
+
 [node name="Walls" type="Node2D" parent="World" unique_id=1218809112]
 
 [node name="LeftWall" parent="World/Walls" unique_id=789423377 instance=ExtResource("wall_scene")]
@@ -512,9 +599,11 @@ position = Vector2(224, -192)
 
 [node name="GreenEnemyA" parent="World/Enemies" unique_id=1713919263 instance=ExtResource("9")]
 position = Vector2(-224, 256)
+xp_drop_value = 16
 
 [node name="GreenEnemyB" parent="World/Enemies" unique_id=2052163917 instance=ExtResource("9")]
 position = Vector2(-399.99997, 544)
+xp_drop_value = 16
 
 [node name="EnemyJ" parent="World/Enemies" unique_id=201743110 instance=ExtResource("2")]
 position = Vector2(-320, -256)
@@ -524,12 +613,14 @@ position = Vector2(32, -448)
 
 [node name="GreenEnemyC" parent="World/Enemies" unique_id=181347203 instance=ExtResource("9")]
 position = Vector2(192, -640)
+xp_drop_value = 16
 
 [node name="EnemyL" parent="World/Enemies" unique_id=651830715 instance=ExtResource("2")]
 position = Vector2(-224, -832)
 
 [node name="GreenEnemyD" parent="World/Enemies" unique_id=2035644653 instance=ExtResource("9")]
 position = Vector2(160, -1024)
+xp_drop_value = 16
 
 [node name="EnemyM" parent="World/Enemies" unique_id=1485476803 instance=ExtResource("2")]
 position = Vector2(-416, -1216)
@@ -539,54 +630,63 @@ position = Vector2(224, -1408)
 
 [node name="GreenEnemyE" parent="World/Enemies" unique_id=1777990102 instance=ExtResource("9")]
 position = Vector2(-64, -1600)
+xp_drop_value = 16
 
 [node name="EnemyO" parent="World/Enemies" unique_id=1471348371 instance=ExtResource("2")]
 position = Vector2(256, -1792)
 
 [node name="GreenEnemyF" parent="World/Enemies" unique_id=1634257286 instance=ExtResource("9")]
 position = Vector2(-256, -1984)
+xp_drop_value = 16
 
 [node name="EnemyP" parent="World/Enemies" unique_id=1586077979 instance=ExtResource("2")]
 position = Vector2(128, -2176)
 
 [node name="GreenEnemyG" parent="World/Enemies" unique_id=47339539 instance=ExtResource("9")]
 position = Vector2(-320, -2368)
+xp_drop_value = 16
 
 [node name="EnemyQ" parent="World/Enemies" unique_id=1739583922 instance=ExtResource("2")]
 position = Vector2(32, -2560)
 
 [node name="GreenEnemyH" parent="World/Enemies" unique_id=984596690 instance=ExtResource("9")]
 position = Vector2(192, -2752)
+xp_drop_value = 16
 
 [node name="EnemyR" parent="World/Enemies" unique_id=228496754 instance=ExtResource("2")]
 position = Vector2(-192, -2944)
 
 [node name="GreenEnemyI" parent="World/Enemies" unique_id=1124074412 instance=ExtResource("9")]
 position = Vector2(304, -3520)
+xp_drop_value = 16
 
 [node name="EnemyS" parent="World/Enemies" unique_id=882553359 instance=ExtResource("2")]
 position = Vector2(-64, -3328)
 
 [node name="GreenEnemyJ" parent="World/Enemies" unique_id=1934450394 instance=ExtResource("9")]
 position = Vector2(160, -3520)
+xp_drop_value = 16
 
 [node name="EnemyT" parent="World/Enemies" unique_id=608166624 instance=ExtResource("2")]
 position = Vector2(-320, -3712)
 
 [node name="GreenEnemyK" parent="World/Enemies" unique_id=1846378391 instance=ExtResource("9")]
 position = Vector2(128, -3904)
+xp_drop_value = 16
 
 [node name="EnemyU" parent="World/Enemies" unique_id=1044346182 instance=ExtResource("2")]
 position = Vector2(-224, -4096)
 
 [node name="GreenEnemyL" parent="World/Enemies" unique_id=2138519565 instance=ExtResource("9")]
 position = Vector2(256, -4288)
+xp_drop_value = 16
 
 [node name="EnemyV" parent="World/Enemies" unique_id=1919421574 instance=ExtResource("2")]
 position = Vector2(-64, -4480)
 
 [node name="GreenEnemyM" parent="World/Enemies" unique_id=820040199 instance=ExtResource("9")]
 position = Vector2(192, -4672)
+xp_drop_value = 16
 
 [node name="WallSlimeA" parent="World/Enemies" unique_id=1662658113 instance=ExtResource("wall_slime_scene")]
 position = Vector2(-80, 352)

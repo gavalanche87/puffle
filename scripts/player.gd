@@ -203,6 +203,7 @@ var hud_flash_tween: Tween
 var commentary_tween: Tween
 var head_attachment_tween: Tween
 var hud_base_modulates: Dictionary = {}
+var pending_weapon_autoselect_from_loadout: bool = false
 var base_max_health: int = 0
 var level_time_elapsed: float = 0.0
 var level_timer_running: bool = false
@@ -240,8 +241,8 @@ func _ready() -> void:
 		if not game_data.abilities_changed.is_connected(_refresh_amulet_state):
 			game_data.abilities_changed.connect(_refresh_amulet_state)
 	if game_data and game_data.has_signal("weapons_changed"):
-		if not game_data.weapons_changed.is_connected(_refresh_amulet_state):
-			game_data.weapons_changed.connect(_refresh_amulet_state)
+		if not game_data.weapons_changed.is_connected(_on_weapons_changed):
+			game_data.weapons_changed.connect(_on_weapons_changed)
 	_pull_xp_from_game_data()
 	_cache_hud()
 	_update_health_ui()
@@ -685,7 +686,8 @@ func _ensure_toggle_action() -> void:
 	_ensure_action_has_key("consumable_use", KEY_W)
 	_ensure_action_has_key("headbutt", KEY_C)
 	_ensure_action_has_key("interact", KEY_G)
-	_ensure_action_has_key("weapon_cycle", KEY_Y)
+	_ensure_action_has_key("weapon_cycle", KEY_P)
+	_remove_action_key("weapon_cycle", KEY_Y)
 
 func _ensure_action_has_key(action_name: String, keycode: Key) -> void:
 	if not InputMap.has_action(action_name):
@@ -697,6 +699,14 @@ func _ensure_action_has_key(action_name: String, keycode: Key) -> void:
 	var new_event := InputEventKey.new()
 	new_event.keycode = keycode
 	InputMap.action_add_event(action_name, new_event)
+
+func _remove_action_key(action_name: String, keycode: Key) -> void:
+	if not InputMap.has_action(action_name):
+		return
+	for event_variant in InputMap.action_get_events(action_name):
+		var key_event := event_variant as InputEventKey
+		if key_event and key_event.keycode == keycode:
+			InputMap.action_erase_event(action_name, key_event)
 
 func _set_head_attachment_active(active: bool, animate: bool) -> void:
 	if not head_attachment:
@@ -1345,14 +1355,9 @@ func _get_active_weapon_cycle_list() -> Array[String]:
 	var max_slots: int = 1
 	if game_data.has_method("get_weapon_slots_unlocked"):
 		max_slots = maxi(1, int(game_data.call("get_weapon_slots_unlocked")))
-	var equipped_ids: Array[String] = []
-	if game_data.has_method("get_equipped_weapon"):
-		var equipped_id := String(game_data.call("get_equipped_weapon"))
-		if equipped_id != "":
-			equipped_ids.append(equipped_id)
+	var equipped_ids: Array[String] = _get_equipped_weapon_ids()
 	var added: int = 0
-	for weapon_id_variant in equipped_ids:
-		var weapon_id := String(weapon_id_variant)
+	for weapon_id in equipped_ids:
 		if weapon_id == "" or ids.has(weapon_id):
 			continue
 		ids.append(weapon_id)
@@ -1363,8 +1368,17 @@ func _get_active_weapon_cycle_list() -> Array[String]:
 
 func _validate_active_weapon_selection() -> void:
 	var active_list: Array[String] = _get_active_weapon_cycle_list()
+	var equipped_weapon_id := _get_equipped_weapon_id()
 	if not active_list.has(selected_active_weapon_id):
-		selected_active_weapon_id = WEAPON_NONE
+		selected_active_weapon_id = equipped_weapon_id if equipped_weapon_id != "" and active_list.has(equipped_weapon_id) else WEAPON_NONE
+
+func _get_equipped_weapon_id() -> String:
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return ""
+	if game_data.has_method("get_equipped_weapon"):
+		return String(game_data.call("get_equipped_weapon"))
+	return ""
 
 func _cycle_active_weapon(direction: int) -> void:
 	var active_list: Array[String] = _get_active_weapon_cycle_list()
@@ -1388,7 +1402,8 @@ func _cycle_active_weapon(direction: int) -> void:
 func _refresh_weapon_switch_ui() -> void:
 	if weapon_switch_panel == null:
 		return
-	var show_panel := _has_any_owned_weapons()
+	var active_list: Array[String] = _get_active_weapon_cycle_list()
+	var show_panel := active_list.size() > 1
 	weapon_switch_panel.visible = show_panel
 	if not show_panel:
 		selected_active_weapon_id = WEAPON_NONE
@@ -1418,6 +1433,24 @@ func _has_any_owned_weapons() -> bool:
 	if game_data.has_method("has_weapon"):
 		return bool(game_data.call("has_weapon", WEAPON_HEAD_SPIKE))
 	return false
+
+func _get_equipped_weapon_ids() -> Array[String]:
+	var ids: Array[String] = []
+	var game_data: Node = get_node_or_null("/root/GameData")
+	if game_data == null:
+		return ids
+	if game_data.has_method("get_equipped_weapons"):
+		var equipped_multi: Array = game_data.call("get_equipped_weapons")
+		for entry in equipped_multi:
+			var weapon_id := String(entry)
+			if weapon_id != "" and not ids.has(weapon_id):
+				ids.append(weapon_id)
+		return ids
+	if game_data.has_method("get_equipped_weapon"):
+		var equipped_id := String(game_data.call("get_equipped_weapon"))
+		if equipped_id != "":
+			ids.append(equipped_id)
+	return ids
 
 func _get_weapon_icon_texture(weapon_id: String) -> Texture2D:
 	match weapon_id:
@@ -1933,6 +1966,14 @@ func _hazard_damage_multiplier_from_amulets() -> float:
 func _refresh_amulet_state() -> void:
 	var size_shift_owned := _has_ability(ABILITY_SIZE_SHIFT)
 	_validate_active_weapon_selection()
+	if pending_weapon_autoselect_from_loadout:
+		var active_list := _get_active_weapon_cycle_list()
+		if selected_active_weapon_id == WEAPON_NONE and active_list.size() > 1:
+			for weapon_id in active_list:
+				if weapon_id != WEAPON_NONE:
+					selected_active_weapon_id = weapon_id
+					break
+		pending_weapon_autoselect_from_loadout = false
 	var head_spike_equipped := _has_active_weapon(WEAPON_HEAD_SPIKE)
 	if not _has_ability(ABILITY_HEADBUTT) or not head_spike_equipped:
 		_end_headbutt()
@@ -1949,6 +1990,10 @@ func _refresh_amulet_state() -> void:
 	_refresh_weapon_switch_ui()
 
 func validate_ability_state_from_amulets() -> void:
+	_refresh_amulet_state()
+
+func _on_weapons_changed() -> void:
+	pending_weapon_autoselect_from_loadout = true
 	_refresh_amulet_state()
 
 func _update_equipped_amulet_icons() -> void:
